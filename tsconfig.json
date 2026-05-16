@@ -19,6 +19,8 @@
       }
     ],
     "paths": {
+      "@prisma-generated-client": ["./src/app/generated/prisma/client"],
+      "@infra/*": ["./src/app/infra/*"],
       "@/*": ["./*"]
     }
   },
