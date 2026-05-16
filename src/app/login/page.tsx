@@ -12,7 +12,6 @@ export default function LoginPage() {
   const [pending, setPending] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    console.log("Submitting form...");
     event.preventDefault();
     setError(null);
     setPending(true);

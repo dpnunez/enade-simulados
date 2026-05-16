@@ -15,6 +15,33 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - Tailwind CSS 4 para estilos.
 - Prisma 7 como ORM principal.
 - PostgreSQL 17 em Docker Compose para ambiente local.
+- Better Auth para AuthN e AuthZ
+
+## Stack de testes
+
+- Vitest para testes unitários e de integração leves, com `jsdom` como ambiente padrão quando houver renderização de React.
+- `@testing-library/react` e `@testing-library/jest-dom` para validar comportamento de componentes e helpers com semântica de usuário.
+- Playwright para testes E2E no navegador real.
+- Banco de teste isolado via PostgreSQL no mesmo container do `docker-compose`, usando outro database e `.env.test`.
+- Seed determinístico como fonte oficial de usuários de teste, reaproveitando os usuários `admin@enade.local`, `student@enade.local` e `teacher@enade.local`.
+
+## Estrutura dos testes
+
+- Testes unitários e de integração próximos da lógica que estão cobrindo, ou em diretórios dedicados quando fizer mais sentido.
+- Testes E2E em `tests/e2e`.
+- Fixtures e dados compartilhados em `tests/e2e/fixtures`.
+- Helpers de fluxo E2E em `tests/e2e/helpers`.
+- Preparação do banco E2E em `scripts/e2e/prepare-test-db.ts`.
+- Configuração do Vitest em `vitest.config.ts`.
+- Configuração do Playwright em `playwright.config.ts`.
+
+## Política de cobertura
+
+- Sempre que uma funcionalidade principal for adicionada, avaliar a necessidade de testes de unidade e/ou integração para as regras puras, helpers e contratos críticos.
+- Sempre que a funcionalidade tiver impacto visível no navegador, avaliar a adição de pelo menos um teste E2E cobrindo o fluxo principal.
+- A decisão final entre unit/integration e E2E deve usar julgamento técnico da LLM, priorizando risco, criticidade do fluxo e custo de manutenção.
+- Fluxos de autenticação, autorização, navegação protegida, seed, banco e regras centrais devem receber cobertura por padrão.
+- Preferir testes determinísticos, com dados fixos e sem dependência do banco de desenvolvimento.
 
 ## Decisões de arquitetura e bibliotecas
 
