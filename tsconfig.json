@@ -22,7 +22,7 @@
       "@prisma-generated-client": ["./src/generated/prisma/client"],
       "@infra/*": ["./src/infra/*"],
       "@auth/*": ["./src/auth/*"],
-      "@/*": ["./*"]
+      "@/*": ["./src/*"]
     }
   },
   "include": [

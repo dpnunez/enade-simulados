@@ -12,7 +12,13 @@ test("bloqueia student na rota admin e redireciona para /app", async ({
 
   await expect(page).toHaveURL(/\/app$/);
   await expect(
-    page.getByRole("heading", { name: "Área privada" }),
+    page.getByRole("heading", {
+      name: "Qualquer usuário autenticado pode ver esta página.",
+    }),
   ).toBeVisible();
-  await expect(page.getByText("Role atual: STUDENT")).toBeVisible();
+  await expect(
+    page.getByText(
+      new RegExp(`Role atual:\\s*${TEST_USERS.student.role}`),
+    ).first(),
+  ).toBeVisible();
 });

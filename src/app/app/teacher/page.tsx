@@ -1,12 +1,29 @@
 import { requireRole } from "@auth/session";
+import { BookOpenText } from "lucide-react";
+
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function TeacherPage() {
   const session = await requireRole("TEACHER");
 
   return (
-    <main className="space-y-2">
-      <h1 className="text-2xl font-semibold">Área TEACHER</h1>
-      <p className="text-sm text-zinc-600">Role atual: {session.user.role}</p>
-    </main>
+    <Card>
+      <CardHeader>
+        <Badge variant="outline" className="w-fit gap-1.5">
+          <BookOpenText className="h-3.5 w-3.5" />
+          TEACHER
+        </Badge>
+        <CardTitle>Área TEACHER</CardTitle>
+        <CardDescription>
+          Espaço restrito aos usuários com role de docente.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <p className="text-sm text-muted-foreground">
+          Role atual: <span className="font-medium">{session.user.role}</span>
+        </p>
+      </CardContent>
+    </Card>
   );
 }

@@ -3,8 +3,15 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+import { ArrowRight, Mail, Lock } from "lucide-react";
 
 import { signIn } from "@auth/auth-client";
+import { Alert, AlertDescription, AlertIcon, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -35,45 +42,80 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-6 py-12">
-      <h1 className="text-2xl font-semibold">Entrar</h1>
-      <p className="mt-2 text-sm text-zinc-600">Use um dos usuários de seed.</p>
+    <main className="mx-auto flex w-full max-w-lg flex-1 items-center px-6 py-12">
+      <Card className="w-full">
+        <CardHeader className="space-y-3">
+          <CardTitle className="text-3xl">Entrar</CardTitle>
+          <CardDescription>
+            Use um dos usuários de seed para acessar a área privada.
+          </CardDescription>
+        </CardHeader>
 
-      <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-        <label className="block">
-          <span className="mb-1 block text-sm">Email</span>
-          <input
-            name="email"
-            type="email"
-            required
-            className="w-full rounded-md border border-zinc-300 px-3 py-2"
-          />
-        </label>
+        <CardContent className="space-y-6">
+          {error ? (
+            <Alert variant="destructive">
+              <AlertIcon />
+              <div>
+                <AlertTitle>Falha ao autenticar</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+              </div>
+            </Alert>
+          ) : null}
 
-        <label className="block">
-          <span className="mb-1 block text-sm">Senha</span>
-          <input
-            name="password"
-            type="password"
-            required
-            className="w-full rounded-md border border-zinc-300 px-3 py-2"
-          />
-        </label>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <div className="relative">
+                <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  autoComplete="email"
+                  placeholder="admin@enade.local"
+                  className="pl-9"
+                />
+              </div>
+            </div>
 
-        {error ? <p className="text-sm text-red-600">{error}</p> : null}
+            <div className="space-y-2">
+              <Label htmlFor="password">Senha</Label>
+              <div className="relative">
+                <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  autoComplete="current-password"
+                  placeholder="Sua senha"
+                  className="pl-9"
+                />
+              </div>
+            </div>
 
-        <button
-          type="submit"
-          disabled={pending}
-          className="w-full rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
-        >
-          {pending ? "Entrando..." : "Entrar"}
-        </button>
-      </form>
+            <Button type="submit" className="w-full" disabled={pending}>
+              {pending ? "Entrando..." : "Entrar"}
+              {!pending ? <ArrowRight className="h-4 w-4" /> : null}
+            </Button>
+          </form>
+        </CardContent>
 
-      <Link href="/" className="mt-6 text-sm text-zinc-700 underline">
-        Voltar para a home
-      </Link>
+        <Separator />
+
+        <CardFooter className="flex-col items-start gap-4 px-6 py-6">
+          <p className="text-sm text-muted-foreground">
+            Os usuários disponíveis no seed foram preparados para os testes.
+          </p>
+          <Button asChild variant="ghost" className="px-0">
+            <Link href="/">
+              Voltar para a home
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </Button>
+        </CardFooter>
+      </Card>
     </main>
   );
 }

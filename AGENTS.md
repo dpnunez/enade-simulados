@@ -17,6 +17,13 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - PostgreSQL 17 em Docker Compose para ambiente local.
 - Better Auth para AuthN e AuthZ
 
+## Componentes shadcn
+
+- O shadcn/ui é a principal fonte de componentes do projeto.
+- Sempre que precisarmos de UI reutilizável, a preferência deve ser usar um componente do shadcn existente ou criar um novo componente seguindo o padrão dele.
+- Se houver necessidade de abstração local, use a pasta `src/components` para componentes específicos do app e mantenha esse conteúdo alinhado ao vocabulário visual do shadcn.
+- Evite introduzir componentes visuais paralelos ou bibliotecas alternativas sem necessidade clara.
+
 ## Stack de testes
 
 - Vitest para testes unitários e de integração leves, com `jsdom` como ambiente padrão quando houver renderização de React.
@@ -51,3 +58,4 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - 2026-05-15 — Decisão: usar Prisma como ORM principal. Contexto/impacto: centraliza schema, geração de client e futuras migrações da aplicação.
 - 2026-05-15 — Decisão: usar Next.js 16 com React 19 e TypeScript como base da aplicação. Contexto/impacto: define o framework principal do frontend/server e orienta convenções de desenvolvimento do projeto.
 - 2026-05-15 — Decisão: usar Tailwind CSS 4 para estilização. Contexto/impacto: padroniza a camada visual com utilitários e reduz custo inicial de implementação de interface.
+- 2026-05-16 — Decisão: usar shadcn/ui como base de componentes reutilizáveis, com `components.json`, `lucide-react`, `tw-animate-css` e helper `cn` em `src/lib/utils.ts`. Contexto/impacto: padroniza a biblioteca de UI do projeto e facilita a geração de componentes consistentes sobre Tailwind CSS 4.

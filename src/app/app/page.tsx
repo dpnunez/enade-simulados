@@ -1,13 +1,26 @@
 import { requireAuth } from "@auth/session";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function PrivateHomePage() {
   const session = await requireAuth();
 
   return (
-    <main className="space-y-2">
-      <h1 className="text-2xl font-semibold">Área privada</h1>
-      <p>Qualquer usuário autenticado pode ver esta página.</p>
-      <p className="text-sm text-zinc-600">Role atual: {session.user.role}</p>
-    </main>
+    <Card>
+      <CardHeader>
+        <Badge variant="secondary" className="w-fit">
+          Área privada
+        </Badge>
+        <CardTitle>Qualquer usuário autenticado pode ver esta página.</CardTitle>
+        <CardDescription>
+          Esta tela serve como ponto de entrada para navegação protegida.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <p className="text-sm text-muted-foreground">
+          Role atual: <span className="font-medium">{session.user.role}</span>
+        </p>
+      </CardContent>
+    </Card>
   );
 }
