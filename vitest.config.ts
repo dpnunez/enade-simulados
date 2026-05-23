@@ -34,7 +34,7 @@ export default defineConfig({
       "tests/**/*.test.ts",
       "tests/**/*.test.tsx",
     ],
-    setupFiles: ["./tests/setup/vitest.ts"],
+    setupFiles: ["./src/tests/setup/vitest.ts"],
     poolOptions: {
       threads: {
         isolate: true,
