@@ -28,7 +28,7 @@
 
 Observed ordering is external packages first, then internal aliases, then relative imports. Examples:
 
-- `src/auth/session.ts`: Next imports, then `@auth/auth`, then Prisma type.
+- `src/infra/auth/session.ts`: Next imports, then `@auth/server`, then Prisma type.
 - `src/app/app/layout.tsx`: Next/lucide imports, then auth/UI aliases, then relative `LogoutButton`.
 
 **Component structure:**
@@ -60,7 +60,7 @@ Observed ordering is external packages first, then internal aliases, then relati
 ## Testing Style
 
 - Unit tests use Vitest globals imported explicitly from `vitest`.
-- Mocks that must exist before import use `vi.hoisted`, as in `src/auth/session.test.ts`.
+- Mocks that must exist before import use `vi.hoisted`, as in `src/infra/auth/session.test.ts`.
 - E2E tests use user-visible locators: `getByRole`, `getByText`, `getByLabel`.
 - Test names are currently written in Portuguese.
 

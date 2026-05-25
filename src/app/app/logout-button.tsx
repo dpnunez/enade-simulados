@@ -2,7 +2,7 @@
 
 import { LogOut } from "lucide-react";
 
-import { signOut } from "@auth/auth-client";
+import { signOut } from "@auth/client";
 import { Button } from "@/components/ui/button";
 
 export function LogoutButton() {

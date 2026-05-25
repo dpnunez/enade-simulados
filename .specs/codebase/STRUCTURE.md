@@ -21,10 +21,10 @@
 │   │   ├── api/
 │   │   ├── app/
 │   │   └── login/
-│   ├── auth/
 │   ├── components/
 │   │   └── ui/
 │   ├── infra/
+│   │   ├── auth/
 │   │   └── db/
 │   ├── lib/
 │   └── tests/
@@ -44,8 +44,8 @@
 ### Authentication
 
 **Purpose:** Better Auth configuration, client helpers, session/role helpers.
-**Location:** `src/auth`
-**Key files:** `src/auth/auth.ts`, `src/auth/auth-client.ts`, `src/auth/session.ts`, `src/auth/roles.ts`
+**Location:** `src/infra/auth`
+**Key files:** `src/infra/auth/server.ts`, `src/infra/auth/client.ts`, `src/infra/auth/session.ts`, `src/infra/auth/roles.ts`
 
 ### UI Components
 
@@ -63,7 +63,7 @@
 
 **Purpose:** Unit setup and browser E2E coverage.
 **Location:** `src/tests`, colocated unit tests in source folders
-**Key files:** `src/auth/session.test.ts`, `src/tests/e2e/login.spec.ts`, `src/tests/e2e/admin-authorization.spec.ts`, `src/tests/e2e/global-setup.ts`
+**Key files:** `src/infra/auth/session.test.ts`, `src/tests/e2e/login.spec.ts`, `src/tests/e2e/admin-authorization.spec.ts`, `src/tests/e2e/global-setup.ts`
 
 ### Scripts
 
@@ -76,16 +76,16 @@
 **Authentication:**
 
 - UI/Interface: `src/app/login/page.tsx`, `src/app/app/logout-button.tsx`
-- Business Logic: `src/auth/session.ts`, `src/auth/auth.ts`
+- Business Logic: `src/infra/auth/session.ts`, `src/infra/auth/server.ts`
 - Data Access: Better Auth via Prisma models in `prisma/schema.prisma`
 - Configuration: `.env.example`, `.env.test`, `src/app/api/auth/[...all]/route.ts`
 
 **Authorization by Role:**
 
 - UI/Interface: `src/app/app/admin/page.tsx`, `src/app/app/student/page.tsx`, `src/app/app/teacher/page.tsx`
-- Business Logic: `requireRole` in `src/auth/session.ts`
+- Business Logic: `requireRole` in `src/infra/auth/session.ts`
 - Data Access: `User.role` enum in Prisma
-- Tests: `src/auth/session.test.ts`, `src/tests/e2e/admin-authorization.spec.ts`
+- Tests: `src/infra/auth/session.test.ts`, `src/tests/e2e/admin-authorization.spec.ts`
 
 **Database Setup:**
 

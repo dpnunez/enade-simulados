@@ -11,7 +11,7 @@ export default defineConfig({
       },
       {
         find: /^@auth\/(.*)$/,
-        replacement: `${fileURLToPath(new URL("./src/auth", import.meta.url))}/$1`,
+        replacement: `${fileURLToPath(new URL("./src/infra/auth", import.meta.url))}/$1`,
       },
       {
         find: /^@infra\/(.*)$/,

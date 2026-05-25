@@ -18,7 +18,7 @@ vi.mock("next/navigation", () => ({
   redirect: mocks.redirect,
 }));
 
-vi.mock("@auth/auth", () => ({
+vi.mock("@auth/server", () => ({
   auth: {
     api: {
       getSession: mocks.getSession,

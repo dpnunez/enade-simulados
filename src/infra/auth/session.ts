@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { auth } from "@auth/auth";
+import { auth } from "@auth/server";
 import type { Role } from "@prisma-generated-client";
 
 export async function getCurrentSession() {

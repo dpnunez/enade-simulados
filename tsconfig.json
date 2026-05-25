@@ -21,7 +21,7 @@
     "paths": {
       "@prisma-generated-client": ["./src/generated/prisma/client"],
       "@infra/*": ["./src/infra/*"],
-      "@auth/*": ["./src/auth/*"],
+      "@auth/*": ["./src/infra/auth/*"],
       "@/*": ["./src/*"]
     }
   },
