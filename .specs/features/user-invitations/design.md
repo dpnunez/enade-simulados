@@ -11,7 +11,7 @@ The feature adds a first-party invitation domain around the existing Better Auth
 
 Codebase mapping alignment:
 
-- `.specs/codebase/ARCHITECTURE.md` confirms this should stay a small modular Next.js monolith: App Router UI, thin Route Handlers, feature logic under `src/features`, auth/session helpers under `src/infra/auth`, `src/infra/db/prisma.ts`, and local shadcn-style components.
+- `.specs/codebase/ARCHITECTURE.md` confirms this should stay a small modular Next.js monolith: App Router UI, Route Handlers for HTTP mutations, feature logic under `src/features`, auth/session helpers under `src/infra/auth`, `src/infra/db/prisma.ts`, and local shadcn-style components.
 - `.specs/codebase/CONCERNS.md` flags mutation authorization as a P1 concern. Every admin mutation in this feature must verify an authenticated `ADMIN` in the API/backend boundary, not rely on page visibility or `src/proxy.ts`.
 - `.specs/codebase/CONCERNS.md` also flags E2E database state leakage. Invitation E2E work must add deterministic cleanup for invitation-created users and invitations.
 - `.specs/codebase/INTEGRATIONS.md` confirms no email provider exists yet. The email layer must be an adapter boundary with deterministic dev/test behavior until a provider is selected.
@@ -30,7 +30,6 @@ sequenceDiagram
     actor Invitee
     participant AdminUI as Admin user page
     participant API as Invitation API route
-    participant Controller as Invitation controller
     participant InviteService as Invitation service
     participant DB as PostgreSQL/Prisma
     participant Mail as Email adapter
@@ -40,8 +39,8 @@ sequenceDiagram
     Admin->>AdminUI: Submit email + role
     AdminUI->>API: POST /api/invitations
     API->>API: resolve session and require ADMIN
-    API->>Controller: createInvitation(request)
-    Controller->>InviteService: create pending invite
+    API->>API: validate request and map form errors
+    API->>InviteService: create pending invite
     InviteService->>DB: store token hash + email + role
     InviteService->>Mail: send invite link with raw token
     Invitee->>Register: Open /convites/[token]
@@ -49,8 +48,8 @@ sequenceDiagram
     InviteService->>DB: validate pending invite
     Register-->>Invitee: Show locked email/role + password
     Invitee->>API: POST /api/invitations/accept
-    API->>Controller: acceptInvitation(request)
-    Controller->>InviteService: accept invite transaction
+    API->>API: validate request
+    API->>InviteService: accept invite transaction
     InviteService->>DB: create User + Account, mark accepted
     InviteService->>Auth: account shape usable by Better Auth login
 ```
@@ -74,7 +73,7 @@ sequenceDiagram
 
 ### Feature Organization
 
-Invitation domain and backend logic belongs under `src/features/invitations`, not in a top-level `src/invitations` folder. Next.js Route Handlers stay under `src/app/api` as thin adapters, route-specific UI stays close to its App Router route, and reusable shadcn primitives remain in `src/components/ui`.
+Invitation domain logic belongs under `src/features/invitations`, not in a top-level `src/invitations` folder. Next.js Route Handlers stay under `src/app/api` and own HTTP concerns such as request parsing, session/role checks, Zod validation, and mapping domain errors to form-friendly JSON. Route-specific UI stays close to its App Router route, and reusable shadcn primitives remain in `src/components/ui`.
 
 ```text
 src/
@@ -95,8 +94,6 @@ src/
         accept-invitation-form.tsx
   features/
     invitations/
-      invitation.controller.ts
-      invitation.controller.test.ts
       invitation-email.adapter.ts
       invitation-email.adapter.test.ts
       invitation.service.ts
@@ -114,7 +111,7 @@ src/
 | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Better Auth        | Keep public signup disabled; create accepted invited users with Better Auth password hash and credential account.                                         |
 | Prisma/PostgreSQL  | Add standalone invitation model and enum; use transactions for token acceptance.                                                                          |
-| Next.js App Router | Server Components for route rendering, thin Route Handlers for HTTP, and public dynamic route for invite registration.                                   |
+| Next.js App Router | Server Components for route rendering, Route Handlers for HTTP/API concerns, and public dynamic route for invite registration.                            |
 | Email              | Add a small server-side adapter so SMTP/provider choice is isolated. Initial implementation can be environment-driven and testable without real delivery. |
 
 ---
@@ -170,26 +167,14 @@ The service must check both conditions before creating an invitation and return 
 
 ### Invitation Schemas
 
-- **Purpose**: Own form and API/controller validation schemas for invitation creation, cancellation, and acceptance.
+- **Purpose**: Own form and API validation schemas for invitation creation, cancellation, and acceptance.
 - **Location**: `src/features/invitations/invitation.schema.ts`
 - **Interfaces**:
   - `createInvitationSchema`
   - `cancelInvitationSchema`
   - `acceptInvitationSchema`
 - **Dependencies**: `zod`
-- **Reuses**: Invitation role constraints and password rules used by the service/controllers.
-
-### Invitation Controller
-
-- **Purpose**: Own transport-agnostic request orchestration for create, cancel, list, and accept operations.
-- **Location**: `src/features/invitations/invitation.controller.ts`
-- **Interfaces**:
-  - `createInvitationController(input, actor): Promise<ApiResult<CreateInvitationResponse>>`
-  - `cancelInvitationController(input, actor): Promise<ApiResult<CancelInvitationResponse>>`
-  - `acceptInvitationController(input): Promise<ApiResult<AcceptInvitationResponse>>`
-  - `listAdminInvitationsController(actor): Promise<ApiResult<AdminInvitationManagementResponse>>`
-- **Dependencies**: invitation service, Zod schemas, actor role checks.
-- **Reuses**: The same controller can be called by Next Route Handlers now and a different backend transport later.
+- **Reuses**: Invitation role constraints and password rules used by the service and Route Handlers.
 
 ### Admin User Management Page
 
@@ -204,7 +189,7 @@ The service must check both conditions before creating an invitation and return 
 
 ### Invitation API Routes
 
-- **Purpose**: Provide HTTP endpoints while keeping backend behavior in feature controllers/services.
+- **Purpose**: Provide HTTP endpoints and own Next/API concerns while keeping domain behavior in feature services.
 - **Location**:
   - `src/app/api/invitations/route.ts`
   - `src/app/api/invitations/[invitationId]/cancel/route.ts`
@@ -214,8 +199,9 @@ The service must check both conditions before creating an invitation and return 
   - `POST /api/invitations`: create invitation.
   - `POST /api/invitations/[invitationId]/cancel`: cancel pending invitation.
   - `POST /api/invitations/accept`: accept public invitation.
-- **Dependencies**: `src/infra/auth/server.ts` session API, invitation controller.
-- **Reuses**: Next.js Route Handler as a transport adapter only. Authorization and validation live in feature/controller/service code.
+- **Dependencies**: `src/infra/auth/server.ts` session API, invitation service, invitation schemas.
+- **Responsibilities**: Parse JSON/body input, resolve current session, authorize admin-only operations, run Zod validation, call the service, and map domain errors to HTTP/form responses.
+- **Reuses**: Next.js Route Handlers are the application/API layer for this feature. Domain rules and transactions still live in `invitation.service.ts`.
 
 ### Public Invite Registration Page
 
@@ -286,7 +272,7 @@ interface ResolvedInvitation {
 | Duplicate existing user email | Reject invite creation/acceptance with `EMAIL_ALREADY_REGISTERED`. | Admin sees that the email already has an account; invitee sees that the invite cannot be used. |
 | Duplicate pending invite email | Reject invite creation with `PENDING_INVITATION_EXISTS`. | Admin sees that a pending invitation already exists and can cancel it first. |
 | Email delivery failure        | Surface warning and keep invite traceable. | Admin knows the invite may need manual follow-up. |
-| Non-admin mutation            | Authorize in API/controller boundary and reject. | No data mutation.                                 |
+| Non-admin mutation            | Authorize in API Route Handler and reject. | No data mutation.                                 |
 
 ---
 
@@ -297,9 +283,9 @@ interface ResolvedInvitation {
 | Token storage             | Store SHA-256 hash only; email raw token                   | Avoids storing bearer tokens in plaintext.                                                                                |
 | Invite route              | `/convites/[token]`                                        | Portuguese route matches product language and keeps token out of query parsing.                                           |
 | User creation             | Direct Prisma transaction using Better Auth `hashPassword` | Existing Better Auth signup is disabled by design; seed already validates this account shape.                             |
-| Admin mutations           | Thin Route Handlers calling feature controllers             | Keeps backend behavior less coupled to Next.js and easier to move behind another HTTP/server runtime later.               |
-| Form handling             | `react-hook-form` for editable forms                       | Keeps form state and validation feedback consistent while preserving API/controllers as the trusted mutation boundary.    |
-| Form validation           | Shared `zod` schemas                                       | Keeps client feedback and server validation aligned; API/controllers must re-parse inputs and not trust client validation. |
+| Admin mutations           | Next Route Handlers calling feature services                | Avoids Server Actions while keeping the app simple; HTTP concerns stay in `route.ts`, domain behavior stays in services. |
+| Form handling             | `react-hook-form` for editable forms                       | Keeps form state and validation feedback consistent while preserving API routes/services as the trusted mutation boundary. |
+| Form validation           | Shared `zod` schemas                                       | Keeps client feedback and server validation aligned; Route Handlers must re-parse inputs and not trust client validation. |
 | Email provider            | Adapter boundary first                                     | The repo has no email provider yet; adapter keeps provider choice isolated.                                               |
 | Invite URL base           | `APP_BASE_URL`                                             | Keeps invitation links independent from auth-specific `BETTER_AUTH_URL` and explicit in `.env.example`/`.env.test`.       |
 | Local/test email delivery | `INVITATION_EMAIL_DELIVERY=console`                        | Keeps invitation delivery deterministic without requiring SMTP credentials during development and E2E.                    |

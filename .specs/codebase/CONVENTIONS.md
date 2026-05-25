@@ -38,7 +38,7 @@ Observed ordering is external packages first, then internal aliases, then relati
 - Pages generally fetch/authorize at top level and return shadcn-styled JSX.
 - New or modified forms use `react-hook-form` for client-side form state, validation feedback, pending/submission ergonomics, and integration with shadcn-style fields.
 - Form validation schemas use `zod`; when client-side validation is needed, wire schemas into `react-hook-form` with `@hookform/resolvers/zod`.
-- Server-side API handlers/controllers own authorization and trusted `zod` validation; `react-hook-form` is a UI/form-state layer, not a security boundary.
+- Server-side API handlers own authorization and trusted `zod` validation; `react-hook-form` is a UI/form-state layer, not a security boundary.
 - Route-specific form components should stay close to their route, commonly under `_components`, until they become reusable across multiple surfaces.
 
 **UI style:**

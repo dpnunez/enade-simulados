@@ -12,7 +12,7 @@ This plan now uses `.specs/codebase/TESTING.md`, created by the codebase mapping
 | Layer | Required Test Type | Command |
 | --- | --- | --- |
 | Pure/domain helpers | unit | `pnpm test:unit` |
-| API controllers/services touching auth/db contracts | unit or integration with mocked Prisma/auth boundaries | `pnpm test:unit` |
+| API Route Handlers/services touching auth/db contracts | unit or integration with mocked Prisma/auth boundaries | `pnpm test:unit` |
 | Visible browser flows | e2e | `pnpm test:e2e` |
 | Full confidence gate | unit + e2e | `pnpm test` |
 | Build/type integration | build | `pnpm build` |
@@ -21,7 +21,7 @@ Playwright is configured with `fullyParallel: false` and `workers: 1`, so E2E ta
 
 Relevant mapped concerns:
 
-- `.specs/codebase/CONCERNS.md` P1: Mutations must authorize internally in the API/controller boundary and must not rely on `src/proxy.ts`.
+- `.specs/codebase/CONCERNS.md` P1: Mutations must authorize internally in the API Route Handler boundary and must not rely on `src/proxy.ts`.
 - `.specs/codebase/CONCERNS.md` P1: E2E data is not reset between runs yet, so invitation tests need deterministic cleanup.
 
 ---
@@ -190,7 +190,7 @@ Run `pnpm test:unit`; invitation service tests should pass and existing auth tes
 - [ ] Delivery behavior is selected by `INVITATION_EMAIL_DELIVERY`.
 - [ ] Development/test behavior uses `console` delivery and does not require real external SMTP credentials.
 - [ ] Optional future SMTP settings use `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, and `SMTP_SECURE`.
-- [ ] Failures are returned or thrown in a way API controllers can surface.
+- [ ] Failures are returned or thrown in a way API routes can surface.
 - [ ] Gate check passes: `pnpm test:unit`.
 
 **Tests**: unit
@@ -201,10 +201,10 @@ Run `pnpm test:unit`; email adapter tests should verify URL composition and fail
 
 ---
 
-### T6: Add Invitation API Controllers and Routes
+### T6: Add Invitation API Routes
 
-**What**: Implement transport-light invitation controllers and thin Next Route Handlers for creating, listing, cancelling, and accepting invitations.
-**Where**: `src/features/invitations/invitation.controller.ts`, `src/features/invitations/invitation.controller.test.ts`, `src/app/api/invitations/route.ts`, `src/app/api/invitations/[invitationId]/cancel/route.ts`, `src/app/api/invitations/accept/route.ts`
+**What**: Implement Next Route Handlers for creating, listing, cancelling, and accepting invitations.
+**Where**: `src/app/api/invitations/route.ts`, `src/app/api/invitations/[invitationId]/cancel/route.ts`, `src/app/api/invitations/accept/route.ts`, optional route-handler tests colocated under `src/app/api/invitations/`
 **Depends on**: T5
 **Reuses**: `src/infra/auth/server.ts` session API, invitation service, invitation Zod schemas.
 **Requirement**: INV-01, INV-02, INV-06, INV-07
@@ -216,8 +216,8 @@ Run `pnpm test:unit`; email adapter tests should verify URL composition and fail
 
 **Done when**:
 
-- [ ] Route Handlers are thin adapters that parse HTTP requests and call feature controllers.
-- [ ] Controllers authorize admin mutations internally from an explicit actor/session and do not rely on `src/proxy.ts`, page visibility, or client state.
+- [ ] Route Handlers parse HTTP requests, validate input with Zod, call feature services, and return form-friendly JSON.
+- [ ] Route Handlers authorize admin mutations internally from the current session and do not rely on `src/proxy.ts`, page visibility, or client state.
 - [ ] Create endpoint validates email and role server-side with Zod, even when invoked by a `react-hook-form` client component.
 - [ ] Create endpoint returns distinct form-safe errors for `EMAIL_ALREADY_REGISTERED` and `PENDING_INVITATION_EXISTS`.
 - [ ] Cancel endpoint validates invitation id server-side with Zod.
@@ -230,7 +230,7 @@ Run `pnpm test:unit`; email adapter tests should verify URL composition and fail
 **Gate**: quick
 
 **Verify**:
-Run `pnpm test:unit`; controller tests should pass without requiring browser automation.
+Run `pnpm test:unit`; route/service tests should pass without requiring browser automation.
 
 ---
 
@@ -414,7 +414,7 @@ No task is marked `[P]` because the service, admin UI, public route, and E2E tes
 | T3: Implement Invitation Validation Schemas | One helper module | OK |
 | T4: Implement Invitation Service | One cohesive domain service | OK |
 | T5: Add Invitation Email Adapter | One adapter module | OK |
-| T6: Add Invitation API Controllers and Routes | Controller plus thin route handlers | OK |
+| T6: Add Invitation API Routes | Route handlers plus service integration | OK |
 | T7: Build Admin User Management UI | One route UI surface | OK |
 | T8: Build Public Invite Registration Flow | One public route flow | OK |
 | T9: Add E2E Data Cleanup | One setup/helper concern | OK |
@@ -446,7 +446,7 @@ No task is marked `[P]` because the service, admin UI, public route, and E2E tes
 | T3 | Zod validation schemas | unit | unit | OK |
 | T4 | Domain service/auth DB contract | unit/integration | unit/integration | OK |
 | T5 | Email adapter | unit | unit | OK |
-| T6 | API controllers and route handlers | unit | unit | OK |
+| T6 | API Route Handlers | unit | unit | OK |
 | T7 | Admin route UI | build, later e2e | build | OK, E2E begins once cleanup and full flow exist in T10 |
 | T8 | Public registration route UI/action | build, later e2e | build | OK, E2E begins once cleanup and full flow exist in T10 |
 | T9 | E2E setup/data cleanup | e2e | e2e | OK |

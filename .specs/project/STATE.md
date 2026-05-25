@@ -47,7 +47,7 @@
 **Decision:** Usar `react-hook-form` em formulários novos ou modificados e `zod` para schemas/validações.
 **Reason:** Padroniza estado, validação de UI, validação confiável no servidor e feedback de submissão sem introduzir um padrão diferente por tela.
 **Trade-off:** Formulários simples precisarão de um pequeno Client Component quando houver gerenciamento interativo de campos.
-**Impact:** APIs/controllers server-side continuam responsáveis por autorização e validação confiável com `zod`; `react-hook-form` deve ser tratado como camada de UX integrada aos componentes shadcn, usando `@hookform/resolvers/zod` quando houver validação client-side.
+**Impact:** APIs server-side continuam responsáveis por autorização e validação confiável com `zod`; `react-hook-form` deve ser tratado como camada de UX integrada aos componentes shadcn, usando `@hookform/resolvers/zod` quando houver validação client-side.
 
 ## Active Blockers
 

@@ -70,7 +70,7 @@ Playwright tests use deterministic seed users from `src/tests/e2e/fixtures/users
 | --- | --- | --- | --- |
 | Pure helpers and validation | unit | `src/**/*.test.ts` | `pnpm test:unit` |
 | Auth/session helpers | unit | `src/infra/auth/*.test.ts` | `pnpm test:unit` |
-| API controllers, Route Handlers, and data mutations | unit/integration-light, plus E2E if user-visible | colocated `*.test.ts`; E2E in `src/tests/e2e` | `pnpm test:unit`, `pnpm test:e2e` |
+| API Route Handlers and data mutations | unit/integration-light, plus E2E if user-visible | colocated `*.test.ts`; E2E in `src/tests/e2e` | `pnpm test:unit`, `pnpm test:e2e` |
 | App Router pages/layouts with visible behavior | e2e for critical flows | `src/tests/e2e/*.spec.ts` | `pnpm test:e2e` |
 | Prisma schema/migrations | build plus E2E DB setup | `prisma/**`, `scripts/e2e/**` | `pnpm build`, `pnpm test:e2e` |
 | UI primitives | unit/component if behaviorful; otherwise build | `src/components/ui/**/*.test.tsx` if added | `pnpm test:unit`, `pnpm build` |
