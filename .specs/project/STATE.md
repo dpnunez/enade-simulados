@@ -1,7 +1,7 @@
 # State
 
-**Last Updated:** 2026-05-23T00:00:00-03:00
-**Current Work:** Project initialization - base spec and roadmap
+**Last Updated:** 2026-05-25T00:00:00-03:00
+**Current Work:** Codebase mapped; user invitations feature planned
 
 ---
 
@@ -28,13 +28,27 @@
 **Trade-off:** Customizações devem respeitar o vocabulário do sistema, em vez de introduzir padrões paralelos.
 **Impact:** Componentes novos devem nascer em `src/components` seguindo o padrão já existente.
 
+### AD-004: Cadastro de usuários somente por convite (2026-05-25)
+
+**Decision:** Manter signup público desativado e criar novos usuários reais apenas por convite emitido por ADMIN.
+**Reason:** O produto precisa controlar acesso de alunos e professores e atrelar cada cadastro a email e role definidos administrativamente.
+**Trade-off:** O fluxo de criação fica mais complexo, exigindo token, cancelamento e envio de email.
+**Impact:** A feature de convites deve criar contas compatíveis com Better Auth sem reabrir signup público.
+
+### AD-005: Convite sem relação permanente com usuário (2026-05-25)
+
+**Decision:** Não adicionar campos ou relações de convite ao modelo `User`.
+**Reason:** O convite só valida o momento do cadastro; depois disso, email e role do usuário são suficientes para o domínio atual.
+**Trade-off:** Não haverá trilha direta no banco dizendo qual convite originou qual usuário.
+**Impact:** O modelo `Invitation` deve ser standalone e apenas mudar de status quando consumido ou cancelado.
+
 ## Active Blockers
 
 Nenhum blocker ativo registrado no momento.
 
 ## Lessons Learned
 
-Nenhuma lição registrada ainda.
+- O projeto já tem uma fundação clara para auth/role, mas novas mutações precisam repetir autorização server-side; o `proxy.ts` é apenas uma proteção otimista.
 
 ## Quick Tasks Completed
 
@@ -50,9 +64,10 @@ Nenhuma lição registrada ainda.
 
 ## Todos
 
-- [ ] Criar documentação brownfield de stack, arquitetura, convenções e testes
-- [ ] Especificar a primeira feature de domínio além de autenticação
+- [x] Criar documentação brownfield de stack, arquitetura, convenções e testes
+- [x] Especificar a primeira feature de domínio além de autenticação
 - [ ] Revisar o roadmap quando a área administrativa ganhar CRUD real
+- [ ] Definir provedor de email para envio real de convites em produção
 
 ## Preferences
 

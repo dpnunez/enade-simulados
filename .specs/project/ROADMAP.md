@@ -30,6 +30,12 @@
 - Tela de login
 - Layout privado reutilizável com `shadcn/ui`
 
+**Convites e gestão inicial de usuários** - PLANNED
+
+- Admins criam convites para alunos e professores
+- Cadastro público permanece desativado; novos usuários entram apenas por convite
+- Admins listam usuários, acompanham convites pendentes e cancelam convites
+
 ---
 
 ## Milestone 2: Banco acadêmico e operação do professor
