@@ -18,7 +18,9 @@
 - Primitive UI dependencies: Radix Slot, Label, Separator
 - Icons: `lucide-react`
 - Utility styling: `clsx`, `tailwind-merge`, `class-variance-authority`, `tw-animate-css`
-- State/form handling: local React state and native forms; no dedicated form library observed
+- Form handling: `react-hook-form` for new or modified forms, paired with shadcn-style inputs
+- Form validation: `zod` schemas with `@hookform/resolvers` for client-side resolver integration and server-side trusted validation/actions
+- Local UI state: React state where interaction is not form-oriented
 
 ## Backend
 

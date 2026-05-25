@@ -35,8 +35,8 @@ Hoje o projeto tem autenticação por email e senha com signup público desativa
 
 1. WHEN an authenticated ADMIN submits an email and role `STUDENT` or `TEACHER` THEN system SHALL create a pending invitation with a unique token, email, and role.
 2. WHEN a non-admin attempts to create an invitation THEN system SHALL reject the mutation and not create data.
-3. WHEN the invited email already belongs to an existing user THEN system SHALL reject the invitation with a clear validation message.
-4. WHEN a pending invitation already exists for the same email THEN system SHALL reject duplicate creation or instruct the admin to cancel the pending invite first.
+3. WHEN the invited email already belongs to an existing user THEN system SHALL reject the invitation with an `EMAIL_ALREADY_REGISTERED` validation error and a message specific to an existing account.
+4. WHEN a pending invitation already exists for the same email THEN system SHALL reject duplicate creation with a `PENDING_INVITATION_EXISTS` validation error and a message instructing the admin to cancel the pending invite first.
 5. WHEN an invitation is created THEN system SHALL send an email containing a registration link with the raw token.
 
 **Independent Test**: Login as admin, create a teacher invite, and verify it appears as pending with the expected email and role.
@@ -101,6 +101,8 @@ Hoje o projeto tem autenticação por email e senha com signup público desativa
 - WHEN two requests try to accept the same invitation concurrently THEN system SHALL create at most one user and leave the invite accepted once.
 - WHEN email casing differs THEN system SHALL normalize email before uniqueness checks.
 - WHEN the invited email becomes an existing user before acceptance THEN system SHALL reject acceptance and mark the invite unusable or surface an admin-visible conflict.
+- WHEN an admin invites an email with an existing account THEN system SHALL show a different error than the pending-invite duplicate case.
+- WHEN an admin invites an email with a pending invitation THEN system SHALL show a different error than the existing-account case.
 - WHEN email delivery fails after invitation creation THEN system SHALL record the invite and surface delivery failure to the admin for retry/follow-up.
 
 ---

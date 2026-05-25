@@ -28,6 +28,9 @@
 - `@playwright/test`
 - `vitest`
 - `shadcn`
+- `react-hook-form`
+- `zod`
+- `@hookform/resolvers`
 
 ## Scope
 
@@ -52,6 +55,7 @@
 
 - Technical: O projeto já usa Next.js 16, então mudanças devem respeitar as convenções e breaking changes dessa versão.
 - Technical: O vocabulário visual deve permanecer alinhado ao `shadcn/ui`, evitando bibliotecas paralelas sem necessidade clara.
+- Technical: Formulários novos ou modificados devem usar `react-hook-form` para estado de UI e `zod` para schemas/validação, mantendo validação confiável e autorização no servidor.
 - Technical: Funcionalidades críticas precisam considerar cobertura com Vitest e/ou Playwright conforme o risco do fluxo.
 - Resources: O seed determinístico é a fonte oficial de usuários de teste para autenticação e autorização.
 - Product: A primeira entrega deve priorizar simplicidade operacional e uso real pelo curso antes de recursos mais avançados.

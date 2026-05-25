@@ -12,7 +12,7 @@
 
 **Location:**
 
-- Unit tests can be colocated with source, e.g. `src/auth/session.test.ts`.
+- Unit tests can be colocated with source, e.g. `src/infra/auth/session.test.ts`.
 - E2E tests live in `src/tests/e2e`.
 - Shared setup lives in `src/tests/setup` and `src/tests/e2e/global-setup.ts`.
 - E2E helpers and fixtures live in `src/tests/e2e/helpers` and `src/tests/e2e/fixtures`.
@@ -29,7 +29,7 @@
 **Approach:** Mock framework and app dependencies at module boundaries.
 **Location:** Colocated under source folders.
 
-`src/auth/session.test.ts` uses `vi.hoisted` to define mocks before importing the module under test. It mocks `next/headers`, `next/navigation`, and `@auth/auth`, then asserts `getCurrentSession`, `requireAuth`, and `requireRole`.
+`src/infra/auth/session.test.ts` uses `vi.hoisted` to define mocks before importing the module under test. It mocks `next/headers`, `next/navigation`, and `@auth/server`, then asserts `getCurrentSession`, `requireAuth`, and `requireRole`.
 
 ### Integration-Light Tests
 
@@ -69,8 +69,8 @@ Playwright tests use deterministic seed users from `src/tests/e2e/fixtures/users
 | Code Layer | Required Test Type | Location Pattern | Run Command |
 | --- | --- | --- | --- |
 | Pure helpers and validation | unit | `src/**/*.test.ts` | `pnpm test:unit` |
-| Auth/session helpers | unit | `src/auth/*.test.ts` | `pnpm test:unit` |
-| Server Actions and data mutations | unit/integration-light, plus E2E if user-visible | colocated `*.test.ts`; E2E in `src/tests/e2e` | `pnpm test:unit`, `pnpm test:e2e` |
+| Auth/session helpers | unit | `src/infra/auth/*.test.ts` | `pnpm test:unit` |
+| API controllers, Route Handlers, and data mutations | unit/integration-light, plus E2E if user-visible | colocated `*.test.ts`; E2E in `src/tests/e2e` | `pnpm test:unit`, `pnpm test:e2e` |
 | App Router pages/layouts with visible behavior | e2e for critical flows | `src/tests/e2e/*.spec.ts` | `pnpm test:e2e` |
 | Prisma schema/migrations | build plus E2E DB setup | `prisma/**`, `scripts/e2e/**` | `pnpm build`, `pnpm test:e2e` |
 | UI primitives | unit/component if behaviorful; otherwise build | `src/components/ui/**/*.test.tsx` if added | `pnpm test:unit`, `pnpm build` |

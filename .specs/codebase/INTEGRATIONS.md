@@ -8,10 +8,10 @@
 **Purpose:** Email/password login, session management, Next.js handlers, cookies.
 **Implementation:**
 
-- Config: `src/auth/auth.ts`
-- Browser client: `src/auth/auth-client.ts`
+- Config: `src/infra/auth/server.ts`
+- Browser client: `src/infra/auth/client.ts`
 - Route handler: `src/app/api/auth/[...all]/route.ts`
-- Session helpers: `src/auth/session.ts`
+- Session helpers: `src/infra/auth/session.ts`
 
 **Configuration:**
 
@@ -72,7 +72,18 @@ No queue system or background job framework observed.
 
 ## Email
 
-No email provider or SMTP integration observed yet.
+No production email provider is implemented yet. Invitation delivery should use the configured adapter mode.
+
+**Planned invitation configuration:**
+
+- `APP_BASE_URL`: public application base URL used to build absolute invitation links.
+- `INVITATION_EMAIL_DELIVERY`: delivery mode. Use `console` in local/test until SMTP/provider delivery is implemented.
+- `INVITATION_EMAIL_FROM`: sender label/address for invitation emails.
+- `SMTP_HOST`: optional SMTP host for future `smtp` delivery.
+- `SMTP_PORT`: optional SMTP port for future `smtp` delivery.
+- `SMTP_USER`: optional SMTP username for future `smtp` delivery.
+- `SMTP_PASSWORD`: optional SMTP password for future `smtp` delivery.
+- `SMTP_SECURE`: optional SMTP TLS flag for future `smtp` delivery.
 
 ## File Storage
 

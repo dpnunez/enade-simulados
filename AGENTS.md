@@ -24,6 +24,13 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - Se houver necessidade de abstração local, use a pasta `src/components` para componentes específicos do app e mantenha esse conteúdo alinhado ao vocabulário visual do shadcn.
 - Evite introduzir componentes visuais paralelos ou bibliotecas alternativas sem necessidade clara.
 
+## Formulários
+
+- Use `react-hook-form` para formulários novos ou quando modificar formulários existentes.
+- Use `zod` para schemas e validações de formulário; integre com `react-hook-form` via `@hookform/resolvers/zod` quando houver validação client-side.
+- O `react-hook-form` deve cuidar de estado, validação de UI e feedback de submissão; validação confiável com `zod`, autorização e mutações devem continuar no servidor, preferindo APIs/handlers finos chamando lógica de feature desacoplada do Next.
+- Mantenha campos e controles visuais alinhados ao shadcn/ui.
+
 ## Stack de testes
 
 - Vitest para testes unitários e de integração leves, com `jsdom` como ambiente padrão quando houver renderização de React.

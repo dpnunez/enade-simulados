@@ -42,6 +42,13 @@
 **Trade-off:** Não haverá trilha direta no banco dizendo qual convite originou qual usuário.
 **Impact:** O modelo `Invitation` deve ser standalone e apenas mudar de status quando consumido ou cancelado.
 
+### AD-006: Formulários com react-hook-form e zod (2026-05-25)
+
+**Decision:** Usar `react-hook-form` em formulários novos ou modificados e `zod` para schemas/validações.
+**Reason:** Padroniza estado, validação de UI, validação confiável no servidor e feedback de submissão sem introduzir um padrão diferente por tela.
+**Trade-off:** Formulários simples precisarão de um pequeno Client Component quando houver gerenciamento interativo de campos.
+**Impact:** APIs/controllers server-side continuam responsáveis por autorização e validação confiável com `zod`; `react-hook-form` deve ser tratado como camada de UX integrada aos componentes shadcn, usando `@hookform/resolvers/zod` quando houver validação client-side.
+
 ## Active Blockers
 
 Nenhum blocker ativo registrado no momento.

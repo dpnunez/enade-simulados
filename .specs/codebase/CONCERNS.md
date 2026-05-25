@@ -4,7 +4,7 @@
 
 ## P1: Public Signup Is Disabled but No Production User Provisioning Exists Yet
 
-**Evidence:** `src/auth/auth.ts` sets `emailAndPassword.disableSignUp: true`; `scripts/seed-users.ts` creates deterministic users for local/test usage.
+**Evidence:** `src/infra/auth/server.ts` sets `emailAndPassword.disableSignUp: true`; `scripts/seed-users.ts` creates deterministic users for local/test usage.
 
 **Risk:** Outside seed scripts, there is currently no product flow for creating real teacher/student users.
 
@@ -20,11 +20,11 @@
 
 ## P1: Authorization Relies on Page-Level `requireRole`; No Mutation Pattern Exists Yet
 
-**Evidence:** `src/app/app/admin/page.tsx` calls `requireRole("ADMIN")`. There are no Server Actions or domain mutations yet.
+**Evidence:** `src/app/app/admin/page.tsx` calls `requireRole("ADMIN")`. There are no domain mutations yet.
 
-**Risk:** New mutations could accidentally rely only on UI visibility or proxy checks. Next.js Server Actions can be invoked directly, so each mutation must authorize internally.
+**Risk:** New mutations could accidentally rely only on UI visibility or proxy checks. HTTP endpoints and other server-side mutation boundaries can be invoked directly, so each mutation must authorize internally.
 
-**Fix Approach:** For every Server Action or Route Handler that mutates data, call `requireAuth`/`requireRole` inside the action/handler before touching data. Add unit tests for unauthorized mutation attempts.
+**Fix Approach:** For every API handler/controller that mutates data, resolve the current session and enforce the required role before touching data. Add unit tests for unauthorized mutation attempts.
 
 ## P2: Proxy Cookie Check Is Only an Optimistic Gate
 

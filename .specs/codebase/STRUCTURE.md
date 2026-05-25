@@ -23,6 +23,7 @@
 │   │   └── login/
 │   ├── components/
 │   │   └── ui/
+│   ├── features/
 │   ├── infra/
 │   │   ├── auth/
 │   │   └── db/
@@ -33,7 +34,7 @@
 └── config files
 ```
 
-## Module Organization
+## Feature Organization
 
 ### App Router
 
@@ -52,6 +53,12 @@
 **Purpose:** Local shadcn-style primitives.
 **Location:** `src/components/ui`
 **Key files:** `button.tsx`, `card.tsx`, `input.tsx`, `label.tsx`, `alert.tsx`, `badge.tsx`, `separator.tsx`
+
+### Features
+
+**Purpose:** Product capability code that is not tied to one route and does not belong to shared infrastructure.
+**Location:** `src/features`
+**Key files:** Future features should use folders such as `src/features/invitations`.
 
 ### Database
 

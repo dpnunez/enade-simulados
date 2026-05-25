@@ -12,7 +12,7 @@ This plan now uses `.specs/codebase/TESTING.md`, created by the codebase mapping
 | Layer | Required Test Type | Command |
 | --- | --- | --- |
 | Pure/domain helpers | unit | `pnpm test:unit` |
-| Server Actions/services touching auth/db contracts | unit or integration with mocked Prisma/auth boundaries | `pnpm test:unit` |
+| API controllers/services touching auth/db contracts | unit or integration with mocked Prisma/auth boundaries | `pnpm test:unit` |
 | Visible browser flows | e2e | `pnpm test:e2e` |
 | Full confidence gate | unit + e2e | `pnpm test` |
 | Build/type integration | build | `pnpm build` |
@@ -21,7 +21,7 @@ Playwright is configured with `fullyParallel: false` and `workers: 1`, so E2E ta
 
 Relevant mapped concerns:
 
-- `.specs/codebase/CONCERNS.md` P1: Server Actions must authorize internally with `requireRole`.
+- `.specs/codebase/CONCERNS.md` P1: Mutations must authorize internally in the API/controller boundary and must not rely on `src/proxy.ts`.
 - `.specs/codebase/CONCERNS.md` P1: E2E data is not reset between runs yet, so invitation tests need deterministic cleanup.
 
 ---
@@ -37,13 +37,13 @@ T1 -> T2 -> T3
 ### Phase 2: Mutations and UI
 
 ```text
-T3 -> T4 -> T5 -> T6 -> T7
+T3 -> T4 -> T5 -> T6 -> T7 -> T8
 ```
 
 ### Phase 3: Browser Coverage and Hardening
 
 ```text
-T7 -> T8 -> T9 -> T10
+T8 -> T9 -> T10 -> T11
 ```
 
 ---
@@ -82,7 +82,7 @@ Run `pnpm prisma:generate` and `pnpm build`; both should complete without schema
 ### T2: Create Invitation Token Utilities
 
 **What**: Implement raw token generation and deterministic token hashing.
-**Where**: `src/invitations/invitation-tokens.ts`, `src/invitations/invitation-tokens.test.ts`
+**Where**: `src/features/invitations/invitation-token.service.ts`, `src/features/invitations/invitation-token.service.test.ts`
 **Depends on**: T1
 **Reuses**: Node crypto.
 **Requirement**: INV-01, INV-07
@@ -107,12 +107,41 @@ Run `pnpm test:unit`; token utility tests should pass along with existing tests.
 
 ---
 
-### T3: Implement Invitation Service
+### T3: Implement Invitation Validation Schemas
+
+**What**: Implement Zod schemas for invitation form/action inputs.
+**Where**: `src/features/invitations/invitation.schema.ts`, `src/features/invitations/invitation.schema.test.ts`
+**Depends on**: T2
+**Reuses**: Invitation role constraints and password rules from the spec.
+**Requirement**: INV-01, INV-03, INV-06, INV-07
+
+**Tools**:
+
+- MCP: filesystem
+- Skill: NONE
+
+**Done when**:
+
+- [ ] `createInvitationSchema` validates normalized email and restricts role to `STUDENT`/`TEACHER`.
+- [ ] `cancelInvitationSchema` validates invitation ids.
+- [ ] `acceptInvitationSchema` validates token and password requirements.
+- [ ] Unit tests cover valid inputs, invalid email, invalid role, missing id/token, and weak password.
+- [ ] Gate check passes: `pnpm test:unit`.
+
+**Tests**: unit
+**Gate**: quick
+
+**Verify**:
+Run `pnpm test:unit`; validation schema tests should pass along with existing tests.
+
+---
+
+### T4: Implement Invitation Service
 
 **What**: Implement create, resolve, cancel, list, and accept invitation domain logic.
-**Where**: `src/invitations/invitation-service.ts`, `src/invitations/invitation-service.test.ts`
-**Depends on**: T2
-**Reuses**: `src/infra/db/prisma.ts`, `scripts/seed-users.ts` account creation pattern, Better Auth `hashPassword`.
+**Where**: `src/features/invitations/invitation.service.ts`, `src/features/invitations/invitation.service.test.ts`
+**Depends on**: T3
+**Reuses**: `src/features/invitations/invitation.schema.ts`, `src/infra/db/prisma.ts`, `scripts/seed-users.ts` account creation pattern, Better Auth `hashPassword`.
 **Requirement**: INV-01, INV-03, INV-04, INV-05, INV-06, INV-07
 
 **Tools**:
@@ -123,11 +152,13 @@ Run `pnpm test:unit`; token utility tests should pass along with existing tests.
 **Done when**:
 
 - [ ] Service normalizes email and restricts invite roles to `STUDENT`/`TEACHER`.
-- [ ] Service rejects existing user emails and duplicate pending invitations.
+- [ ] Service reuses Zod validation schemas or schema-derived validated inputs at its boundary.
+- [ ] Service rejects existing user emails with `EMAIL_ALREADY_REGISTERED`.
+- [ ] Service rejects duplicate pending invitations with `PENDING_INVITATION_EXISTS`.
 - [ ] Service resolves only pending tokens.
 - [ ] Service accepts invites in a transaction and creates Better Auth-compatible credential accounts.
 - [ ] Service cancellation prevents future acceptance.
-- [ ] Unit/integration-style tests cover success and main invalid states.
+- [ ] Unit/integration-style tests cover success, existing account, duplicate pending invitation, and main invalid states.
 - [ ] Gate check passes: `pnpm test:unit`.
 
 **Tests**: unit/integration
@@ -138,11 +169,11 @@ Run `pnpm test:unit`; invitation service tests should pass and existing auth tes
 
 ---
 
-### T4: Add Invitation Email Adapter
+### T5: Add Invitation Email Adapter
 
 **What**: Add provider-isolated email sending for invite links.
-**Where**: `src/invitations/invitation-email.ts`, `src/invitations/invitation-email.test.ts`
-**Depends on**: T3
+**Where**: `src/features/invitations/invitation-email.adapter.ts`, `src/features/invitations/invitation-email.adapter.test.ts`
+**Depends on**: T4
 **Reuses**: Invitation service result shape.
 **Requirement**: INV-01
 
@@ -154,9 +185,12 @@ Run `pnpm test:unit`; invitation service tests should pass and existing auth tes
 **Done when**:
 
 - [ ] Adapter exposes `sendInvitationEmail`.
-- [ ] Invite URL is built from a configured app base URL and raw token.
-- [ ] Development/test behavior is deterministic without real external delivery.
-- [ ] Failures are returned or thrown in a way admin actions can surface.
+- [ ] Invite URL is built from `APP_BASE_URL` and the raw token.
+- [ ] Sender is read from `INVITATION_EMAIL_FROM`.
+- [ ] Delivery behavior is selected by `INVITATION_EMAIL_DELIVERY`.
+- [ ] Development/test behavior uses `console` delivery and does not require real external SMTP credentials.
+- [ ] Optional future SMTP settings use `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, and `SMTP_SECURE`.
+- [ ] Failures are returned or thrown in a way API controllers can surface.
 - [ ] Gate check passes: `pnpm test:unit`.
 
 **Tests**: unit
@@ -167,12 +201,12 @@ Run `pnpm test:unit`; email adapter tests should verify URL composition and fail
 
 ---
 
-### T5: Add Admin Invitation Server Actions
+### T6: Add Invitation API Controllers and Routes
 
-**What**: Implement admin-only Server Actions for creating and cancelling invitations.
-**Where**: `src/app/app/admin/actions.ts`, `src/app/app/admin/actions.test.ts`
-**Depends on**: T4
-**Reuses**: `requireRole("ADMIN")`, invitation service, `revalidatePath`.
+**What**: Implement transport-light invitation controllers and thin Next Route Handlers for creating, listing, cancelling, and accepting invitations.
+**Where**: `src/features/invitations/invitation.controller.ts`, `src/features/invitations/invitation.controller.test.ts`, `src/app/api/invitations/route.ts`, `src/app/api/invitations/[invitationId]/cancel/route.ts`, `src/app/api/invitations/accept/route.ts`
+**Depends on**: T5
+**Reuses**: `src/infra/auth/server.ts` session API, invitation service, invitation Zod schemas.
 **Requirement**: INV-01, INV-02, INV-06, INV-07
 
 **Tools**:
@@ -182,29 +216,30 @@ Run `pnpm test:unit`; email adapter tests should verify URL composition and fail
 
 **Done when**:
 
-- [ ] Actions re-authorize with `requireRole("ADMIN")` internally.
-- [ ] Tests prove actions do not rely on `src/proxy.ts`, page visibility, or client state for authorization.
-- [ ] Create action validates email and role server-side.
-- [ ] Cancel action validates invitation id server-side.
-- [ ] Actions return form-friendly success/error states.
-- [ ] Actions revalidate the admin page after mutation.
-- [ ] Tests cover unauthorized rejection and validation errors.
+- [ ] Route Handlers are thin adapters that parse HTTP requests and call feature controllers.
+- [ ] Controllers authorize admin mutations internally from an explicit actor/session and do not rely on `src/proxy.ts`, page visibility, or client state.
+- [ ] Create endpoint validates email and role server-side with Zod, even when invoked by a `react-hook-form` client component.
+- [ ] Create endpoint returns distinct form-safe errors for `EMAIL_ALREADY_REGISTERED` and `PENDING_INVITATION_EXISTS`.
+- [ ] Cancel endpoint validates invitation id server-side with Zod.
+- [ ] Accept endpoint validates token/password server-side with Zod.
+- [ ] API responses are form-friendly JSON success/error states.
+- [ ] Tests cover unauthorized rejection, validation errors, existing-account email, and duplicate-pending-invite email.
 - [ ] Gate check passes: `pnpm test:unit`.
 
 **Tests**: unit
 **Gate**: quick
 
 **Verify**:
-Run `pnpm test:unit`; admin action tests should pass without requiring browser automation.
+Run `pnpm test:unit`; controller tests should pass without requiring browser automation.
 
 ---
 
-### T6: Build Admin User Management UI
+### T7: Build Admin User Management UI
 
 **What**: Replace the placeholder admin page with user listing, invite form, pending invites table, and cancel controls.
-**Where**: `src/app/app/admin/page.tsx`, optional `src/app/app/admin/*`
-**Depends on**: T5
-**Reuses**: Existing private layout, shadcn UI components, `requireRole("ADMIN")`.
+**Where**: `src/app/app/admin/page.tsx`, optional route-local components under `src/app/app/admin/_components/*`
+**Depends on**: T6
+**Reuses**: Existing private layout, shadcn UI components, `requireRole("ADMIN")`, invitation Zod schemas.
 **Requirement**: INV-01, INV-05, INV-06
 
 **Tools**:
@@ -217,6 +252,8 @@ Run `pnpm test:unit`; admin action tests should pass without requiring browser a
 - [ ] Admin page shows registered users with email, role, created date.
 - [ ] Admin page shows pending invitations with email, role, status, and creation date.
 - [ ] Admin page includes invite form for email and `STUDENT`/`TEACHER`.
+- [ ] Invite creation form is a route-local Client Component using `react-hook-form`, `zodResolver`, and shadcn-style fields.
+- [ ] Invite creation form surfaces distinct messages for `EMAIL_ALREADY_REGISTERED` and `PENDING_INVITATION_EXISTS`.
 - [ ] Pending invite rows include cancel action.
 - [ ] Empty states render for no pending invites.
 - [ ] UI uses existing shadcn visual vocabulary.
@@ -226,16 +263,16 @@ Run `pnpm test:unit`; admin action tests should pass without requiring browser a
 **Gate**: build
 
 **Verify**:
-Run `pnpm build`; admin page should compile as a Server Component with action-backed forms.
+Run `pnpm build`; admin page should compile with route-local `react-hook-form` components and API-backed mutations.
 
 ---
 
-### T7: Build Public Invite Registration Flow
+### T8: Build Public Invite Registration Flow
 
 **What**: Add token route and password-only registration form for invited users.
-**Where**: `src/app/convites/[token]/page.tsx`, `src/app/convites/[token]/actions.ts`, optional local form component.
-**Depends on**: T6
-**Reuses**: Login page form styling, invitation service.
+**Where**: `src/app/convites/[token]/page.tsx`, optional route-local form component under `src/app/convites/[token]/_components/*`
+**Depends on**: T7
+**Reuses**: Login page form styling, invitation service, invitation Zod schemas.
 **Requirement**: INV-03, INV-04, INV-07
 
 **Tools**:
@@ -248,7 +285,8 @@ Run `pnpm build`; admin page should compile as a Server Component with action-ba
 - [ ] Valid token page renders locked email and role fields.
 - [ ] Invalid, cancelled, and accepted tokens render a no-form error state.
 - [ ] Only password is editable.
-- [ ] Submit creates the user, marks invite accepted, and navigates toward login or private app flow.
+- [ ] Password form is a route-local Client Component using `react-hook-form`, `zodResolver`, and shadcn-style fields.
+- [ ] Submit calls `POST /api/invitations/accept`, creates the user, marks invite accepted, and navigates toward login or private app flow.
 - [ ] Password validation errors keep user on the form.
 - [ ] Gate check passes: `pnpm build`.
 
@@ -260,11 +298,11 @@ Run `pnpm build`; dynamic invite page should compile and not expose token hashes
 
 ---
 
-### T8: Add E2E Data Cleanup for Invitation Flows
+### T9: Add E2E Data Cleanup for Invitation Flows
 
 **What**: Make Playwright setup deterministic for invitation-created data.
 **Where**: `scripts/e2e/prepare-test-db.ts`, optional helper under `src/tests/e2e/helpers/`
-**Depends on**: T7
+**Depends on**: T8
 **Reuses**: `.specs/codebase/CONCERNS.md` P1 finding, existing seed users.
 **Requirement**: INV-07
 
@@ -288,11 +326,11 @@ Run `pnpm test:e2e` twice; both runs should start from deterministic invitation 
 
 ---
 
-### T9: Add E2E Coverage for Invitation Lifecycle
+### T10: Add E2E Coverage for Invitation Lifecycle
 
 **What**: Add browser tests for admin invite creation, invite acceptance, login, and cancellation.
 **Where**: `src/tests/e2e/invitations.spec.ts`, optional fixtures/helpers under `src/tests/e2e/`
-**Depends on**: T8
+**Depends on**: T9
 **Reuses**: `src/tests/e2e/helpers/login.ts`, deterministic seed users.
 **Requirement**: INV-01, INV-03, INV-04, INV-05, INV-06
 
@@ -304,6 +342,7 @@ Run `pnpm test:e2e` twice; both runs should start from deterministic invitation 
 **Done when**:
 
 - [ ] E2E creates an invite as admin and sees it pending.
+- [ ] E2E verifies existing-account email and duplicate-pending-invite email show distinct validation messages.
 - [ ] E2E opens the invite link, confirms email/role are locked, sets password, and logs in.
 - [ ] E2E cancels a second invite and verifies the link cannot register.
 - [ ] Test data is deterministic and isolated from development DB.
@@ -317,11 +356,11 @@ Run `pnpm test:e2e`; invitation lifecycle specs should pass with existing login/
 
 ---
 
-### T10: Final Feature Gate and Traceability Update
+### T11: Final Feature Gate and Traceability Update
 
 **What**: Run full gates, update requirement statuses, and record final decisions.
 **Where**: `.specs/features/user-invitations/spec.md`, `.specs/features/user-invitations/tasks.md`, `.specs/project/STATE.md`
-**Depends on**: T9
+**Depends on**: T10
 **Reuses**: TLC spec docs.
 **Requirement**: INV-01 through INV-07
 
@@ -354,10 +393,10 @@ Phase 1:
   T1 -> T2 -> T3
 
 Phase 2:
-  T3 -> T4 -> T5 -> T6 -> T7
+  T3 -> T4 -> T5 -> T6 -> T7 -> T8
 
 Phase 3:
-  T7 -> T8 -> T9 -> T10
+  T8 -> T9 -> T10 -> T11
 ```
 
 No task is marked `[P]` because the service, admin UI, public route, and E2E test data all share the same auth/invitation contract. Playwright is also configured as single-worker/non-parallel.
@@ -372,14 +411,15 @@ No task is marked `[P]` because the service, admin UI, public route, and E2E tes
 | --- | --- | --- |
 | T1: Add Invitation Schema | Prisma model/migration | OK |
 | T2: Create Invitation Token Utilities | One helper module | OK |
-| T3: Implement Invitation Service | One cohesive domain service | OK |
-| T4: Add Invitation Email Adapter | One adapter module | OK |
-| T5: Add Admin Invitation Server Actions | One action file + tests | OK |
-| T6: Build Admin User Management UI | One route UI surface | OK |
-| T7: Build Public Invite Registration Flow | One public route flow | OK |
-| T8: Add E2E Data Cleanup | One setup/helper concern | OK |
-| T9: Add E2E Coverage | One browser lifecycle spec | OK |
-| T10: Final Feature Gate and Traceability Update | Verification/documentation | OK |
+| T3: Implement Invitation Validation Schemas | One helper module | OK |
+| T4: Implement Invitation Service | One cohesive domain service | OK |
+| T5: Add Invitation Email Adapter | One adapter module | OK |
+| T6: Add Invitation API Controllers and Routes | Controller plus thin route handlers | OK |
+| T7: Build Admin User Management UI | One route UI surface | OK |
+| T8: Build Public Invite Registration Flow | One public route flow | OK |
+| T9: Add E2E Data Cleanup | One setup/helper concern | OK |
+| T10: Add E2E Coverage | One browser lifecycle spec | OK |
+| T11: Final Feature Gate and Traceability Update | Verification/documentation | OK |
 
 ### Diagram-Definition Cross-Check
 
@@ -395,6 +435,7 @@ No task is marked `[P]` because the service, admin UI, public route, and E2E tes
 | T8 | T7 | T7 -> T8 | Match |
 | T9 | T8 | T8 -> T9 | Match |
 | T10 | T9 | T9 -> T10 | Match |
+| T11 | T10 | T10 -> T11 | Match |
 
 ### Test Co-Location Validation
 
@@ -402,14 +443,15 @@ No task is marked `[P]` because the service, admin UI, public route, and E2E tes
 | --- | --- | --- | --- | --- |
 | T1 | Prisma schema/generated types | build | build | OK |
 | T2 | Pure helper | unit | unit | OK |
-| T3 | Domain service/auth DB contract | unit/integration | unit/integration | OK |
-| T4 | Email adapter | unit | unit | OK |
-| T5 | Server Actions | unit | unit | OK |
-| T6 | Admin route UI | build, later e2e | build | OK, E2E begins once cleanup and full flow exist in T9 |
-| T7 | Public registration route UI/action | build, later e2e | build | OK, E2E begins once cleanup and full flow exist in T9 |
-| T8 | E2E setup/data cleanup | e2e | e2e | OK |
-| T9 | Browser flow | e2e | e2e | OK |
-| T10 | Docs/gates | full | full | OK |
+| T3 | Zod validation schemas | unit | unit | OK |
+| T4 | Domain service/auth DB contract | unit/integration | unit/integration | OK |
+| T5 | Email adapter | unit | unit | OK |
+| T6 | API controllers and route handlers | unit | unit | OK |
+| T7 | Admin route UI | build, later e2e | build | OK, E2E begins once cleanup and full flow exist in T10 |
+| T8 | Public registration route UI/action | build, later e2e | build | OK, E2E begins once cleanup and full flow exist in T10 |
+| T9 | E2E setup/data cleanup | e2e | e2e | OK |
+| T10 | Browser flow | e2e | e2e | OK |
+| T11 | Docs/gates | full | full | OK |
 
 ---
 

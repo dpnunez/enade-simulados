@@ -10,8 +10,8 @@
 flowchart TD
     Browser --> Proxy["src/proxy.ts"]
     Proxy --> AppRouter["src/app routes/layouts/pages"]
-    AppRouter --> Session["src/auth/session.ts"]
-    Session --> BetterAuth["src/auth/auth.ts"]
+    AppRouter --> Session["src/infra/auth/session.ts"]
+    Session --> BetterAuth["src/infra/auth/server.ts"]
     BetterAuth --> Prisma["src/infra/db/prisma.ts"]
     Prisma --> Postgres["PostgreSQL 17"]
     AppRouter --> UI["src/components/ui"]
@@ -37,7 +37,7 @@ flowchart TD
 
 ### Server-Side Authorization Helpers
 
-**Location:** `src/auth/session.ts`
+**Location:** `src/infra/auth/session.ts`
 **Purpose:** Centralize real session lookup and role authorization.
 **Implementation:** `getCurrentSession()` calls `auth.api.getSession` with `next/headers`; `requireAuth()` redirects to `/login`; `requireRole(role)` redirects unauthorized users to `/app`.
 **Example:** `src/app/app/admin/page.tsx` calls `requireRole("ADMIN")`.
@@ -47,7 +47,7 @@ flowchart TD
 **Location:** `src/app/api/auth/[...all]/route.ts`
 **Purpose:** Expose Better Auth HTTP endpoints to Next.js.
 **Implementation:** `toNextJsHandler(auth)` exports `GET` and `POST`.
-**Example:** Login uses `signIn.email` from `src/auth/auth-client.ts`, which talks to these endpoints.
+**Example:** Login uses `signIn.email` from `src/infra/auth/client.ts`, which talks to these endpoints.
 
 ### Prisma Client Singleton
 
@@ -71,7 +71,7 @@ flowchart TD
 sequenceDiagram
     actor User
     participant Login as src/app/login/page.tsx
-    participant Client as src/auth/auth-client.ts
+    participant Client as src/infra/auth/client.ts
     participant Route as /api/auth/[...all]
     participant Auth as Better Auth
     participant DB as Prisma/PostgreSQL
@@ -92,7 +92,7 @@ sequenceDiagram
     actor User
     participant Proxy as src/proxy.ts
     participant Layout as src/app/app/layout.tsx
-    participant Session as src/auth/session.ts
+    participant Session as src/infra/auth/session.ts
     participant Auth as Better Auth
 
     User->>Proxy: GET /app/*
@@ -110,16 +110,17 @@ sequenceDiagram
 
 ## Code Organization
 
-**Approach:** Layered by framework area plus small domain folders. Current domain is mostly authentication; future features are expected to add focused modules under `src`.
+**Approach:** Layered by framework area plus product feature folders. Current domain is mostly authentication; future features are expected to add focused folders under `src/features`.
 
 **Structure:**
 
 - `src/app`: App Router pages, layouts, and route handlers
-- `src/auth`: Better Auth config, client, session helpers, role constants, unit tests
+- `src/infra/auth`: Better Auth config, client, session helpers, role constants, unit tests
 - `src/components/ui`: shadcn-style primitives
+- `src/features`: product capability code shared across routes without implying strict module isolation
 - `src/infra/db`: Prisma client infrastructure
 - `src/tests`: setup and E2E test suite
 - `scripts`: seed and E2E database/server orchestration
 - `prisma`: schema and migrations
 
-**Module boundaries:** Auth and database helpers are imported through TypeScript aliases (`@auth/*`, `@infra/*`, `@prisma-generated-client`, `@/*`). UI primitives are local and imported from `@/components/ui/*`.
+**Feature boundaries:** Auth and database helpers are imported through TypeScript aliases (`@auth/*`, `@infra/*`, `@prisma-generated-client`, `@/*`). UI primitives are local and imported from `@/components/ui/*`. Feature folders under `src/features` group product capabilities while allowing direct imports when the dependency is explicit and useful.
