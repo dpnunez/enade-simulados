@@ -1,7 +1,7 @@
 # User Invitations Tasks
 
 **Design**: `.specs/features/user-invitations/design.md`
-**Status**: Draft
+**Status**: In Progress - Phase 1 complete
 
 ---
 
@@ -31,7 +31,7 @@ Relevant mapped concerns:
 ### Phase 1: Data Foundation
 
 ```text
-T1 -> T2 -> T3
+T1 ✅ -> T2 ✅ -> T3 ✅
 ```
 
 ### Phase 2: Mutations and UI
@@ -52,6 +52,8 @@ T8 -> T9 -> T10 -> T11
 
 ### T1: Add Invitation Schema
 
+**Status**: ✅ Done - 2026-05-26
+
 **What**: Add standalone Prisma `InvitationStatus` and `Invitation`.
 **Where**: `prisma/schema.prisma`, `prisma/migrations/*`
 **Depends on**: None
@@ -65,11 +67,11 @@ T8 -> T9 -> T10 -> T11
 
 **Done when**:
 
-- [ ] Prisma schema has invitation lifecycle fields and token hash uniqueness.
-- [ ] `User` model remains unchanged; invitation acceptance only creates the normal Better Auth-compatible user/account records.
-- [ ] Migration is generated and checked in.
-- [ ] Prisma client generation succeeds.
-- [ ] Gate check passes: `pnpm build`.
+- [x] Prisma schema has invitation lifecycle fields and token hash uniqueness.
+- [x] `User` model remains unchanged; invitation acceptance only creates the normal Better Auth-compatible user/account records.
+- [x] Migration is generated and checked in.
+- [x] Prisma client generation succeeds.
+- [x] Gate check passes: `pnpm build`.
 
 **Tests**: build
 **Gate**: build
@@ -77,9 +79,14 @@ T8 -> T9 -> T10 -> T11
 **Verify**:
 Run `pnpm prisma:generate` and `pnpm build`; both should complete without schema/type errors.
 
+**Verified**:
+`pnpm prisma:generate` passed. `pnpm build` passed.
+
 ---
 
 ### T2: Create Invitation Token Utilities
+
+**Status**: ✅ Done - 2026-05-26
 
 **What**: Implement raw token generation and deterministic token hashing.
 **Where**: `src/features/invitations/invitation-token.service.ts`, `src/features/invitations/invitation-token.service.test.ts`
@@ -94,10 +101,10 @@ Run `pnpm prisma:generate` and `pnpm build`; both should complete without schema
 
 **Done when**:
 
-- [ ] `generateInvitationToken` returns URL-safe high-entropy tokens.
-- [ ] `hashInvitationToken` is deterministic and never returns the raw token.
-- [ ] Unit tests cover URL safety and hash determinism.
-- [ ] Gate check passes: `pnpm test:unit`.
+- [x] `generateInvitationToken` returns URL-safe high-entropy tokens.
+- [x] `hashInvitationToken` is deterministic and never returns the raw token.
+- [x] Unit tests cover URL safety and hash determinism.
+- [x] Gate check passes: `pnpm test:unit`.
 
 **Tests**: unit
 **Gate**: quick
@@ -105,9 +112,14 @@ Run `pnpm prisma:generate` and `pnpm build`; both should complete without schema
 **Verify**:
 Run `pnpm test:unit`; token utility tests should pass along with existing tests.
 
+**Verified**:
+`pnpm test:unit` passed with token utility coverage.
+
 ---
 
 ### T3: Implement Invitation Validation Schemas
+
+**Status**: ✅ Done - 2026-05-26
 
 **What**: Implement Zod schemas for invitation form/action inputs.
 **Where**: `src/features/invitations/invitation.schema.ts`, `src/features/invitations/invitation.schema.test.ts`
@@ -122,17 +134,20 @@ Run `pnpm test:unit`; token utility tests should pass along with existing tests.
 
 **Done when**:
 
-- [ ] `createInvitationSchema` validates normalized email and restricts role to `STUDENT`/`TEACHER`.
-- [ ] `cancelInvitationSchema` validates invitation ids.
-- [ ] `acceptInvitationSchema` validates token and password requirements.
-- [ ] Unit tests cover valid inputs, invalid email, invalid role, missing id/token, and weak password.
-- [ ] Gate check passes: `pnpm test:unit`.
+- [x] `createInvitationSchema` validates normalized email and restricts role to `STUDENT`/`TEACHER`.
+- [x] `cancelInvitationSchema` validates invitation ids.
+- [x] `acceptInvitationSchema` validates token and password requirements.
+- [x] Unit tests cover valid inputs, invalid email, invalid role, missing id/token, and weak password.
+- [x] Gate check passes: `pnpm test:unit`.
 
 **Tests**: unit
 **Gate**: quick
 
 **Verify**:
 Run `pnpm test:unit`; validation schema tests should pass along with existing tests.
+
+**Verified**:
+`pnpm test:unit` passed with validation schema coverage.
 
 ---
 

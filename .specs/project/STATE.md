@@ -1,7 +1,7 @@
 # State
 
-**Last Updated:** 2026-05-25T00:00:00-03:00
-**Current Work:** Codebase mapped; user invitations feature planned
+**Last Updated:** 2026-05-26T11:10:00-03:00
+**Current Work:** user-invitations - T4 next; T1-T3 complete
 
 ---
 
@@ -57,6 +57,13 @@ Nenhum blocker ativo registrado no momento.
 
 - O projeto já tem uma fundação clara para auth/role, mas novas mutações precisam repetir autorização server-side; o `proxy.ts` é apenas uma proteção otimista.
 
+### L-001: Validar emails com espaços antes da normalização em Zod
+
+**Context:** Implementação da fase 1 de `user-invitations`, nos schemas de validação.
+**Problem:** `z.email().trim()` valida o email antes de remover espaços, então entradas como `"  Teacher@Enade.Local  "` falham.
+**Solution:** Usar `z.string().trim().email().transform(...)` para aparar espaços antes da validação e então normalizar casing.
+**Prevents:** Falhas indevidas em formulários quando o usuário cola emails com espaços acidentais.
+
 ## Quick Tasks Completed
 
 | #   | Description                         | Date       | Commit | Status  |
@@ -73,6 +80,8 @@ Nenhum blocker ativo registrado no momento.
 
 - [x] Criar documentação brownfield de stack, arquitetura, convenções e testes
 - [x] Especificar a primeira feature de domínio além de autenticação
+- [x] Completar `user-invitations` T1-T3: data foundation
+- [ ] Continuar `user-invitations` em T4: invitation service
 - [ ] Revisar o roadmap quando a área administrativa ganhar CRUD real
 - [ ] Definir provedor de email para envio real de convites em produção
 

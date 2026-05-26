@@ -111,15 +111,17 @@ Hoje o projeto tem autenticação por email e senha com signup público desativa
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| INV-01 | P1: Admin Envia Convite | Tasks | Pending |
+| INV-01 | P1: Admin Envia Convite | Phase 1 + Phase 2 | In Progress - data model, token utility, and create-input schema complete |
 | INV-02 | P1: Admin Envia Convite | Tasks | Pending |
-| INV-03 | P1: Convidado Aceita Convite | Tasks | Pending |
+| INV-03 | P1: Convidado Aceita Convite | Phase 1 + Phase 2 | In Progress - data model and accept-input schema complete |
 | INV-04 | P1: Convidado Aceita Convite | Tasks | Pending |
 | INV-05 | P1: Admin Lista Usuários e Convites | Tasks | Pending |
-| INV-06 | P1: Admin Cancela Convite Pendente | Tasks | Pending |
-| INV-07 | Edge Cases: token/security/concurrency | Tasks | Pending |
+| INV-06 | P1: Admin Cancela Convite Pendente | Phase 1 + Phase 2 | In Progress - cancellation status model and cancel-input schema complete |
+| INV-07 | Edge Cases: token/security/concurrency | Phase 1 + Phase 2/3 | In Progress - token hash storage model, URL-safe token generation, and email normalization schema complete |
 
 **Coverage:** 7 total, 7 mapped to draft tasks, 0 unmapped.
+
+**Implementation Progress:** Phase 1 Data Foundation completed on 2026-05-26: Prisma invitation schema/migration, token utilities, validation schemas, Prisma client generation, unit tests, and build gate.
 
 ---
 

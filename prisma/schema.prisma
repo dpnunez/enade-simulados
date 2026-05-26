@@ -18,6 +18,12 @@ enum Role {
   TEACHER
 }
 
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  CANCELLED
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String
@@ -71,4 +77,19 @@ model Verification {
   updatedAt  DateTime @updatedAt
 
   @@unique([identifier, value])
+}
+
+model Invitation {
+  id          String           @id @default(cuid())
+  email       String
+  role        Role
+  status      InvitationStatus @default(PENDING)
+  tokenHash   String           @unique
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  acceptedAt  DateTime?
+  cancelledAt DateTime?
+
+  @@index([email, status])
+  @@index([status, createdAt])
 }
