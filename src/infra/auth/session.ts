@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { auth } from "@auth/server";
 import type { Role } from "@prisma-generated-client";
+import { hasRole } from "./authorization";
 
 export async function getCurrentSession() {
   return auth.api.getSession({
@@ -23,7 +24,7 @@ export async function requireAuth() {
 export async function requireRole(role: Role) {
   const session = await requireAuth();
 
-  if (session.user.role !== role) {
+  if (!hasRole(session, role)) {
     redirect("/app");
   }
 

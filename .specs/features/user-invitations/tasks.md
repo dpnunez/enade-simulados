@@ -1,7 +1,7 @@
 # User Invitations Tasks
 
 **Design**: `.specs/features/user-invitations/design.md`
-**Status**: In Progress - Phase 1 complete
+**Status**: In Progress - Phase 2 backend in progress (T4-T6 implemented)
 
 ---
 
@@ -153,6 +153,8 @@ Run `pnpm test:unit`; validation schema tests should pass along with existing te
 
 ### T4: Implement Invitation Service
 
+**Status**: ✅ Done - 2026-05-26
+
 **What**: Implement create, resolve, cancel, list, and accept invitation domain logic.
 **Where**: `src/features/invitations/invitation.service.ts`, `src/features/invitations/invitation.service.test.ts`
 **Depends on**: T3
@@ -166,15 +168,15 @@ Run `pnpm test:unit`; validation schema tests should pass along with existing te
 
 **Done when**:
 
-- [ ] Service normalizes email and restricts invite roles to `STUDENT`/`TEACHER`.
-- [ ] Service reuses Zod validation schemas or schema-derived validated inputs at its boundary.
-- [ ] Service rejects existing user emails with `EMAIL_ALREADY_REGISTERED`.
-- [ ] Service rejects duplicate pending invitations with `PENDING_INVITATION_EXISTS`.
-- [ ] Service resolves only pending tokens.
-- [ ] Service accepts invites in a transaction and creates Better Auth-compatible credential accounts.
-- [ ] Service cancellation prevents future acceptance.
-- [ ] Unit/integration-style tests cover success, existing account, duplicate pending invitation, and main invalid states.
-- [ ] Gate check passes: `pnpm test:unit`.
+- [x] Service normalizes email and restricts invite roles to `STUDENT`/`TEACHER`.
+- [x] Service reuses Zod validation schemas or schema-derived validated inputs at its boundary.
+- [x] Service rejects existing user emails with `EMAIL_ALREADY_REGISTERED`.
+- [x] Service rejects duplicate pending invitations with `PENDING_INVITATION_EXISTS`.
+- [x] Service resolves only pending tokens.
+- [x] Service accepts invites in a transaction and creates Better Auth-compatible credential accounts.
+- [x] Service cancellation prevents future acceptance.
+- [x] Unit/integration-style tests cover success, existing account, duplicate pending invitation, and main invalid states.
+- [x] Gate check passes: `pnpm test:unit`.
 
 **Tests**: unit/integration
 **Gate**: quick
@@ -185,6 +187,8 @@ Run `pnpm test:unit`; invitation service tests should pass and existing auth tes
 ---
 
 ### T5: Add Invitation Email Adapter
+
+**Status**: ✅ Done - 2026-05-26
 
 **What**: Add provider-isolated email sending for invite links.
 **Where**: `src/features/invitations/invitation-email.adapter.ts`, `src/features/invitations/invitation-email.adapter.test.ts`
@@ -199,14 +203,14 @@ Run `pnpm test:unit`; invitation service tests should pass and existing auth tes
 
 **Done when**:
 
-- [ ] Adapter exposes `sendInvitationEmail`.
-- [ ] Invite URL is built from `APP_BASE_URL` and the raw token.
-- [ ] Sender is read from `INVITATION_EMAIL_FROM`.
-- [ ] Delivery behavior is selected by `INVITATION_EMAIL_DELIVERY`.
-- [ ] Development/test behavior uses `console` delivery and does not require real external SMTP credentials.
-- [ ] Optional future SMTP settings use `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, and `SMTP_SECURE`.
-- [ ] Failures are returned or thrown in a way API routes can surface.
-- [ ] Gate check passes: `pnpm test:unit`.
+- [x] Adapter exposes `sendInvitationEmail`.
+- [x] Invite URL is built from `APP_BASE_URL` and the raw token.
+- [x] Sender is read from `INVITATION_EMAIL_FROM`.
+- [x] Delivery behavior is selected by `INVITATION_EMAIL_DELIVERY`.
+- [x] Development/test behavior uses `console` delivery and does not require real external SMTP credentials.
+- [x] Optional future SMTP settings use `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, and `SMTP_SECURE`.
+- [x] Failures are returned or thrown in a way API routes can surface.
+- [x] Gate check passes: `pnpm test:unit`.
 
 **Tests**: unit
 **Gate**: quick
@@ -214,9 +218,14 @@ Run `pnpm test:unit`; invitation service tests should pass and existing auth tes
 **Verify**:
 Run `pnpm test:unit`; email adapter tests should verify URL composition and failure behavior.
 
+**Verified**:
+`src/features/invitations/invitation-email.adapter.test.ts` added with coverage for URL composition, console delivery, and SMTP missing-config failure. `pnpm test:unit` passed.
+
 ---
 
 ### T6: Add Invitation API Routes
+
+**Status**: ✅ Done - 2026-05-26
 
 **What**: Implement Next Route Handlers for creating, listing, cancelling, and accepting invitations.
 **Where**: `src/app/api/invitations/route.ts`, `src/app/api/invitations/[invitationId]/cancel/route.ts`, `src/app/api/invitations/accept/route.ts`, optional route-handler tests colocated under `src/app/api/invitations/`
@@ -231,15 +240,15 @@ Run `pnpm test:unit`; email adapter tests should verify URL composition and fail
 
 **Done when**:
 
-- [ ] Route Handlers parse HTTP requests, validate input with Zod, call feature services, and return form-friendly JSON.
-- [ ] Route Handlers authorize admin mutations internally from the current session and do not rely on `src/proxy.ts`, page visibility, or client state.
-- [ ] Create endpoint validates email and role server-side with Zod, even when invoked by a `react-hook-form` client component.
-- [ ] Create endpoint returns distinct form-safe errors for `EMAIL_ALREADY_REGISTERED` and `PENDING_INVITATION_EXISTS`.
-- [ ] Cancel endpoint validates invitation id server-side with Zod.
-- [ ] Accept endpoint validates token/password server-side with Zod.
-- [ ] API responses are form-friendly JSON success/error states.
+- [x] Route Handlers parse HTTP requests, validate input with Zod, call feature services, and return form-friendly JSON.
+- [x] Route Handlers authorize admin mutations internally from the current session and do not rely on `src/proxy.ts`, page visibility, or client state.
+- [x] Create endpoint validates email and role server-side with Zod, even when invoked by a `react-hook-form` client component.
+- [x] Create endpoint returns distinct form-safe errors for `EMAIL_ALREADY_REGISTERED` and `PENDING_INVITATION_EXISTS`.
+- [x] Cancel endpoint validates invitation id server-side with Zod.
+- [x] Accept endpoint validates token/password server-side with Zod.
+- [x] API responses are form-friendly JSON success/error states.
 - [ ] Tests cover unauthorized rejection, validation errors, existing-account email, and duplicate-pending-invite email.
-- [ ] Gate check passes: `pnpm test:unit`.
+- [x] Gate check passes: `pnpm test:unit`.
 
 **Tests**: unit
 **Gate**: quick
