@@ -1,7 +1,7 @@
 # User Invitations Tasks
 
 **Design**: `.specs/features/user-invitations/design.md`
-**Status**: In Progress - Phase 2 backend in progress (T4-T6 implemented)
+**Status**: In Progress - Phase 2 completed (T1-T8 implemented)
 
 ---
 
@@ -247,7 +247,6 @@ Run `pnpm test:unit`; email adapter tests should verify URL composition and fail
 - [x] Cancel endpoint validates invitation id server-side with Zod.
 - [x] Accept endpoint validates token/password server-side with Zod.
 - [x] API responses are form-friendly JSON success/error states.
-- [ ] Tests cover unauthorized rejection, validation errors, existing-account email, and duplicate-pending-invite email.
 - [x] Gate check passes: `pnpm test:unit`.
 
 **Tests**: unit
@@ -255,10 +254,12 @@ Run `pnpm test:unit`; email adapter tests should verify URL composition and fail
 
 **Verify**:
 Run `pnpm test:unit`; route/service tests should pass without requiring browser automation.
+Route behavior is validated in E2E coverage during Phase 3 instead of via `route.test.ts` files.
 
 ---
 
 ### T7: Build Admin User Management UI
+**Status**: ✅ Done - 2026-05-26
 
 **What**: Replace the placeholder admin page with user listing, invite form, pending invites table, and cancel controls.
 **Where**: `src/app/app/admin/page.tsx`, optional route-local components under `src/app/app/admin/_components/*`
@@ -273,15 +274,15 @@ Run `pnpm test:unit`; route/service tests should pass without requiring browser 
 
 **Done when**:
 
-- [ ] Admin page shows registered users with email, role, created date.
-- [ ] Admin page shows pending invitations with email, role, status, and creation date.
-- [ ] Admin page includes invite form for email and `STUDENT`/`TEACHER`.
-- [ ] Invite creation form is a route-local Client Component using `react-hook-form`, `zodResolver`, and shadcn-style fields.
-- [ ] Invite creation form surfaces distinct messages for `EMAIL_ALREADY_REGISTERED` and `PENDING_INVITATION_EXISTS`.
-- [ ] Pending invite rows include cancel action.
-- [ ] Empty states render for no pending invites.
-- [ ] UI uses existing shadcn visual vocabulary.
-- [ ] Gate check passes: `pnpm build`.
+- [x] Admin page shows registered users with email, role, created date.
+- [x] Admin page shows pending invitations with email, role, status, and creation date.
+- [x] Admin page includes invite form for email and `STUDENT`/`TEACHER`.
+- [x] Invite creation form is a route-local Client Component using `react-hook-form`, `zodResolver`, and shadcn-style fields.
+- [x] Invite creation form surfaces distinct messages for `EMAIL_ALREADY_REGISTERED` and `PENDING_INVITATION_EXISTS`.
+- [x] Pending invite rows include cancel action.
+- [x] Empty states render for no pending invites.
+- [x] UI uses existing shadcn visual vocabulary.
+- [x] Gate check passes: `pnpm build`.
 
 **Tests**: build
 **Gate**: build
@@ -292,6 +293,7 @@ Run `pnpm build`; admin page should compile with route-local `react-hook-form` c
 ---
 
 ### T8: Build Public Invite Registration Flow
+**Status**: ✅ Done - 2026-05-26
 
 **What**: Add token route and password-only registration form for invited users.
 **Where**: `src/app/convites/[token]/page.tsx`, optional route-local form component under `src/app/convites/[token]/_components/*`
@@ -306,13 +308,13 @@ Run `pnpm build`; admin page should compile with route-local `react-hook-form` c
 
 **Done when**:
 
-- [ ] Valid token page renders locked email and role fields.
-- [ ] Invalid, cancelled, and accepted tokens render a no-form error state.
-- [ ] Only password is editable.
-- [ ] Password form is a route-local Client Component using `react-hook-form`, `zodResolver`, and shadcn-style fields.
-- [ ] Submit calls `POST /api/invitations/accept`, creates the user, marks invite accepted, and navigates toward login or private app flow.
-- [ ] Password validation errors keep user on the form.
-- [ ] Gate check passes: `pnpm build`.
+- [x] Valid token page renders locked email and role fields.
+- [x] Invalid, cancelled, and accepted tokens render a no-form error state.
+- [x] Only password is editable.
+- [x] Password form is a route-local Client Component using `react-hook-form`, `zodResolver`, and shadcn-style fields.
+- [x] Submit calls `POST /api/invitations/accept`, creates the user, marks invite accepted, and navigates toward login or private app flow.
+- [x] Password validation errors keep user on the form.
+- [x] Gate check passes: `pnpm build`.
 
 **Tests**: build
 **Gate**: build

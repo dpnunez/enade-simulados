@@ -67,7 +67,7 @@ async function main() {
     await adminClient.end();
   }
 
-  run("pnpm", ["prisma", "migrate", "deploy"]);
+  run("pnpm", ["prisma", "migrate", "reset", "--force"]);
   run("pnpm", ["db:seed:users"]);
 }
 
