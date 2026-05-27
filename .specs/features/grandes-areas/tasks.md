@@ -173,14 +173,14 @@ T7 -> T8 -> T9
 
 **Done when**:
 
-- [ ] Component uses `react-hook-form` with `zodResolver`.
-- [ ] Create mode posts to `/api/subject-fields`.
-- [ ] Edit mode patches `/api/subject-fields/[subjectFieldId]`.
-- [ ] Form includes title, description, and color fields.
-- [ ] Color field includes a native color input plus hex text input or an equivalent accessible control.
-- [ ] Submission states, success state, and error state are visible and accessible.
-- [ ] Successful create resets the form; successful edit exits or reports edit completion cleanly.
-- [ ] Gate check passes: `pnpm build`.
+- [x] Component uses `react-hook-form` with `zodResolver`.
+- [x] Create mode posts to `/api/subject-fields`.
+- [x] Edit mode patches `/api/subject-fields/[subjectFieldId]`.
+- [x] Form includes title, description, and color fields.
+- [x] Color field includes a native color input plus hex text input or an equivalent accessible control.
+- [x] Submission states, success state, and error state are visible and accessible.
+- [x] Successful create resets the form; successful edit exits or reports edit completion cleanly.
+- [x] Gate check passes: `pnpm build`.
 
 **Tests**: build
 **Gate**: build
