@@ -9,6 +9,7 @@ const mocks = vi.hoisted(() => ({
       findFirst: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
+      delete: vi.fn(),
     },
   },
 }));
@@ -18,6 +19,7 @@ vi.mock("@infra/db/prisma", () => ({ prisma: mocks.prisma }));
 import {
   SubjectFieldDomainError,
   createSubjectField,
+  deleteSubjectField,
   listSubjectFields,
   updateSubjectField,
 } from "./subject-field.service";
@@ -171,6 +173,29 @@ describe("subject-field.service", () => {
         "teacher_1",
       ),
     ).rejects.toMatchObject({
+      code: "SUBJECT_FIELD_NOT_FOUND",
+    } satisfies Partial<SubjectFieldDomainError>);
+  });
+
+  it("deletes a subject field by teacher", async () => {
+    mocks.prisma.subjectField.delete.mockResolvedValue({ id: "sf_1" });
+
+    await deleteSubjectField("sf_1", "teacher_2");
+
+    expect(mocks.prisma.subjectField.delete).toHaveBeenCalledWith({
+      where: { id: "sf_1" },
+    });
+  });
+
+  it("maps not-found delete", async () => {
+    mocks.prisma.subjectField.delete.mockRejectedValue(
+      new Prisma.PrismaClientKnownRequestError("Record not found", {
+        code: "P2025",
+        clientVersion: "test",
+      }),
+    );
+
+    await expect(deleteSubjectField("sf_missing", "teacher_1")).rejects.toMatchObject({
       code: "SUBJECT_FIELD_NOT_FOUND",
     } satisfies Partial<SubjectFieldDomainError>);
   });

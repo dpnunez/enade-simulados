@@ -118,3 +118,20 @@ export async function updateSubjectField(
     mapSubjectFieldWriteError(error);
   }
 }
+
+export async function deleteSubjectField(
+  subjectFieldId: string,
+  actorUserId: string,
+) {
+  void actorUserId;
+
+  const id = subjectFieldIdSchema.parse(subjectFieldId);
+
+  try {
+    return await prisma.subjectField.delete({
+      where: { id },
+    });
+  } catch (error) {
+    mapSubjectFieldWriteError(error);
+  }
+}

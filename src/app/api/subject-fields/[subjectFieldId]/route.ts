@@ -10,6 +10,7 @@ import {
 import type { SubjectFieldInput } from "@/features/subject-fields/subject-field.schema";
 import {
   SubjectFieldDomainError,
+  deleteSubjectField,
   updateSubjectField,
 } from "@/features/subject-fields/subject-field.service";
 
@@ -64,6 +65,47 @@ export async function PATCH(
       body as SubjectFieldInput,
       session.user.id,
     );
+    return Response.json({ success: true, subjectField });
+  } catch (error) {
+    if (error instanceof SubjectFieldDomainError) {
+      return Response.json(
+        { success: false, error: error.code },
+        { status: statusForDomainError(error) },
+      );
+    }
+    throw error;
+  }
+}
+
+export async function DELETE(
+  _request: Request,
+  context: RouteContext<"/api/subject-fields/[subjectFieldId]">,
+) {
+  const session = await auth.api.getSession({ headers: await headers() });
+
+  if (!session || !hasRole(session, "TEACHER")) {
+    return Response.json(
+      { success: false, error: "UNAUTHORIZED" },
+      { status: 401 },
+    );
+  }
+
+  const { subjectFieldId } = await context.params;
+  const parsedId = subjectFieldIdSchema.safeParse(subjectFieldId);
+
+  if (!parsedId.success) {
+    return Response.json(
+      {
+        success: false,
+        error: "VALIDATION_ERROR",
+        issues: parsedId.error.issues,
+      },
+      { status: 400 },
+    );
+  }
+
+  try {
+    const subjectField = await deleteSubjectField(parsedId.data, session.user.id);
     return Response.json({ success: true, subjectField });
   } catch (error) {
     if (error instanceof SubjectFieldDomainError) {

@@ -17,8 +17,10 @@ flowchart TD
     Page --> Form["SubjectFieldForm client component"]
     Form --> ApiCreate["POST /api/subject-fields"]
     Form --> ApiUpdate["PATCH /api/subject-fields/[subjectFieldId]"]
+    List --> ApiDelete["DELETE /api/subject-fields/[subjectFieldId]"]
     ApiCreate --> ServerAuth["Better Auth session + hasRole"]
     ApiUpdate --> ServerAuth
+    ApiDelete --> ServerAuth
     ServerAuth --> Service["subject-field.service.ts"]
     Service --> Prisma["Prisma SubjectField model"]
 ```
@@ -87,6 +89,7 @@ flowchart TD
   - `listSubjectFields(): Promise<SubjectFieldListItem[]>`
   - `createSubjectField(input, actorUserId): Promise<SubjectField>`
   - `updateSubjectField(id, input, actorUserId): Promise<SubjectField>`
+  - `deleteSubjectField(id, actorUserId): Promise<SubjectField>`
 - **Dependencies**: Prisma client, Zod schemas.
 - **Reuses**: Error-class pattern from invitation service.
 
@@ -99,6 +102,7 @@ flowchart TD
 - **Interfaces**:
   - `POST /api/subject-fields` creates a grande area.
   - `PATCH /api/subject-fields/[subjectFieldId]` updates a grande area.
+  - `DELETE /api/subject-fields/[subjectFieldId]` deletes a grande area.
 - **Dependencies**: `auth.api.getSession`, `hasRole`, schemas, service.
 - **Reuses**: Invitation route handler response style.
 
@@ -118,10 +122,11 @@ flowchart TD
 
 ### Subject Fields List
 
-- **Purpose**: Show existing records, empty state, color swatches, and edit controls for all records.
+- **Purpose**: Show existing records, empty state, color swatches, edit controls, and delete controls for all records.
 - **Location**: `src/app/app/professor/grandes-areas/_components/subject-fields-list.tsx`
 - **Dependencies**: Subject field list DTO, form component for edit mode.
 - **Reuses**: Existing card/list styling vocabulary.
+- **Delete behavior**: Uses a confirmation step before calling `DELETE /api/subject-fields/[subjectFieldId]`; confirmed deletion removes the item from local state and refreshes server data.
 
 ---
 
@@ -171,6 +176,7 @@ interface SubjectFieldInput {
 | Duplicate title | Service throws `SUBJECT_FIELD_TITLE_EXISTS` and database unique constraint protects concurrent writes | Form shows a specific duplicate title message. |
 | Unauthorized user | Page redirects via `requireRole`; API returns `401` | Student/admin cannot access or mutate. |
 | Non-teacher edit | API authorization returns `401` | Student/admin cannot mutate data. |
+| Non-teacher delete | API authorization returns `401` | Student/admin cannot mutate data. |
 | Missing record | Service throws `SUBJECT_FIELD_NOT_FOUND` | UI can show failure and refresh list. |
 | Concurrent duplicate create | DB unique constraint plus service mapping | One request succeeds; the other gets duplicate error. |
 
@@ -182,10 +188,11 @@ interface SubjectFieldInput {
 | --- | --- | --- |
 | Visibility | Teachers list all grandes areas | The prompt asks for existing grandes areas and helps prevent duplicate academic umbrellas. |
 | Edit permission | Any authenticated `TEACHER` can edit any grande area | Matches the requested shared professor catalog workflow. |
+| Delete permission | Any authenticated `TEACHER` can delete any grande area after confirmation | Matches the new requested shared professor catalog workflow while guarding destructive action. |
 | Technical naming language | Database entities, variables, types, file names, feature folders, and API routes in English; front routes and visible UI text in Portuguese | Keeps code/API boundaries conventional while matching user-facing Portuguese navigation. |
 | Duplicate strategy | Catalog-wide unique `titleNormalized` | Enforces that two grandes areas cannot have the same title, including casing/spacing variations. |
 | Color format | Store normalized uppercase `#RRGGBB` | Simple, predictable, and directly renderable in UI. |
-| Delete support | Excluded for now | Avoids future referential decisions before materias exist. |
+| Delete support | Enabled with explicit confirmation | The user requested deletion now; future materia relations may later require blocking or soft-delete rules. |
 
 ---
 

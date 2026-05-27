@@ -1,8 +1,10 @@
 "use client";
 
-import { Pencil } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { Alert, AlertDescription, AlertIcon, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,8 +29,12 @@ function creatorLabel(subjectField: SubjectFieldListItem) {
 }
 
 export function SubjectFieldsList({ subjectFields }: SubjectFieldsListProps) {
+  const router = useRouter();
   const [items, setItems] = useState(subjectFields);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [confirmingDeleteId, setConfirmingDeleteId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   function updateSavedItem(saved: Partial<SubjectFieldListItem> & { id: string }) {
     setItems((current) =>
@@ -45,6 +51,32 @@ export function SubjectFieldsList({ subjectFields }: SubjectFieldsListProps) {
     setEditingId(null);
   }
 
+  async function deleteSubjectField(subjectFieldId: string) {
+    setDeletingId(subjectFieldId);
+    setDeleteError(null);
+
+    const response = await fetch(`/api/subject-fields/${subjectFieldId}`, {
+      method: "DELETE",
+    });
+    const payload = await response.json();
+
+    setDeletingId(null);
+
+    if (!response.ok || !payload.success) {
+      if (payload.error === "SUBJECT_FIELD_NOT_FOUND") {
+        setDeleteError("Esta grande area nao foi encontrada. Atualize a lista e tente novamente.");
+      } else {
+        setDeleteError("Nao foi possivel deletar a grande area.");
+      }
+      return;
+    }
+
+    setItems((current) => current.filter((item) => item.id !== subjectFieldId));
+    setConfirmingDeleteId(null);
+    setEditingId((current) => (current === subjectFieldId ? null : current));
+    router.refresh();
+  }
+
   if (items.length === 0) {
     return (
       <div className="rounded-md border border-dashed p-6 text-sm text-muted-foreground">
@@ -57,6 +89,8 @@ export function SubjectFieldsList({ subjectFields }: SubjectFieldsListProps) {
     <div className="space-y-3">
       {items.map((subjectField) => {
         const isEditing = editingId === subjectField.id;
+        const isConfirmingDelete = confirmingDeleteId === subjectField.id;
+        const isDeleting = deletingId === subjectField.id;
 
         return (
           <Card key={subjectField.id} className="rounded-md">
@@ -77,22 +111,78 @@ export function SubjectFieldsList({ subjectFields }: SubjectFieldsListProps) {
                   {subjectField.description}
                 </p>
               </div>
-              <Button
-                type="button"
-                size="sm"
-                variant={isEditing ? "secondary" : "outline"}
-                onClick={() => setEditingId(isEditing ? null : subjectField.id)}
-                aria-expanded={isEditing}
-              >
-                <Pencil aria-hidden="true" />
-                Editar
-              </Button>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={isEditing ? "secondary" : "outline"}
+                  onClick={() => setEditingId(isEditing ? null : subjectField.id)}
+                  aria-expanded={isEditing}
+                >
+                  <Pencil aria-hidden="true" />
+                  Editar
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => {
+                    setDeleteError(null);
+                    setConfirmingDeleteId(subjectField.id);
+                  }}
+                >
+                  <Trash2 aria-hidden="true" />
+                  Deletar
+                </Button>
+              </div>
             </CardHeader>
             <CardContent className="space-y-4 p-4 pt-0">
+              {deleteError && isConfirmingDelete ? (
+                <Alert variant="destructive" role="alert">
+                  <AlertIcon />
+                  <div>
+                    <AlertTitle>Falha ao deletar</AlertTitle>
+                    <AlertDescription>{deleteError}</AlertDescription>
+                  </div>
+                </Alert>
+              ) : null}
               <p className="text-sm text-muted-foreground">
                 Criada por {creatorLabel(subjectField)}. Atualizada em{" "}
                 {formatDate(subjectField.updatedAt)}.
               </p>
+              {isConfirmingDelete ? (
+                <div className="space-y-3 rounded-md border border-destructive/40 p-4">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium">Confirmar delecao</p>
+                    <p className="text-sm text-muted-foreground">
+                      Esta acao remove a grande area "{subjectField.title}" do catalogo.
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-2 sm:flex-row">
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      disabled={isDeleting}
+                      onClick={() => deleteSubjectField(subjectField.id)}
+                    >
+                      {isDeleting ? "Deletando..." : "Confirmar delecao"}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={isDeleting}
+                      onClick={() => {
+                        setConfirmingDeleteId(null);
+                        setDeleteError(null);
+                      }}
+                    >
+                      Cancelar
+                    </Button>
+                  </div>
+                </div>
+              ) : null}
               {isEditing ? (
                 <div className="rounded-md border p-4">
                   <SubjectFieldForm

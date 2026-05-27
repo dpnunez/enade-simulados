@@ -4,6 +4,7 @@ const mocks = vi.hoisted(() => ({
   headers: vi.fn(async () => new Headers()),
   getSession: vi.fn(),
   hasRole: vi.fn(),
+  deleteSubjectField: vi.fn(),
   updateSubjectField: vi.fn(),
 }));
 
@@ -20,12 +21,13 @@ vi.mock("@/features/subject-fields/subject-field.service", async () => {
 
   return {
     SubjectFieldDomainError: actual.SubjectFieldDomainError,
+    deleteSubjectField: mocks.deleteSubjectField,
     updateSubjectField: mocks.updateSubjectField,
   };
 });
 
 import { SubjectFieldDomainError } from "@/features/subject-fields/subject-field.service";
-import { PATCH } from "./route";
+import { DELETE, PATCH } from "./route";
 
 function context(subjectFieldId: string) {
   return {
@@ -135,5 +137,71 @@ describe("PATCH /api/subject-fields/[subjectFieldId]", () => {
     });
     expect(duplicateResponse.status).toBe(409);
     expect(notFoundResponse.status).toBe(404);
+  });
+});
+
+describe("DELETE /api/subject-fields/[subjectFieldId]", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("rejects unauthorized requests before deleting data", async () => {
+    mocks.getSession.mockResolvedValue({ user: { id: "user_1", role: "STUDENT" } });
+    mocks.hasRole.mockReturnValue(false);
+
+    const response = await DELETE(
+      new Request("http://localhost/api/subject-fields/sf_1", {
+        method: "DELETE",
+      }),
+      context("sf_1"),
+    );
+
+    await expect(response.json()).resolves.toEqual({
+      success: false,
+      error: "UNAUTHORIZED",
+    });
+    expect(response.status).toBe(401);
+    expect(mocks.deleteSubjectField).not.toHaveBeenCalled();
+  });
+
+  it("deletes subject field for teacher requests", async () => {
+    const subjectField = { id: "sf_1", title: "Calculo" };
+    mocks.getSession.mockResolvedValue({ user: { id: "teacher_1", role: "TEACHER" } });
+    mocks.hasRole.mockReturnValue(true);
+    mocks.deleteSubjectField.mockResolvedValue(subjectField);
+
+    const response = await DELETE(
+      new Request("http://localhost/api/subject-fields/sf_1", {
+        method: "DELETE",
+      }),
+      context("sf_1"),
+    );
+
+    await expect(response.json()).resolves.toEqual({
+      success: true,
+      subjectField,
+    });
+    expect(mocks.deleteSubjectField).toHaveBeenCalledWith("sf_1", "teacher_1");
+  });
+
+  it("returns stable not-found error codes for delete", async () => {
+    mocks.getSession.mockResolvedValue({ user: { id: "teacher_1", role: "TEACHER" } });
+    mocks.hasRole.mockReturnValue(true);
+    mocks.deleteSubjectField.mockRejectedValue(
+      new SubjectFieldDomainError("SUBJECT_FIELD_NOT_FOUND"),
+    );
+
+    const response = await DELETE(
+      new Request("http://localhost/api/subject-fields/sf_missing", {
+        method: "DELETE",
+      }),
+      context("sf_missing"),
+    );
+
+    await expect(response.json()).resolves.toEqual({
+      success: false,
+      error: "SUBJECT_FIELD_NOT_FOUND",
+    });
+    expect(response.status).toBe(404);
   });
 });

@@ -1,7 +1,7 @@
 # Grandes Areas Tasks
 
 **Design**: `.specs/features/grandes-areas/design.md`
-**Status**: Phase 1 complete
+**Status**: Phase 2 complete
 
 ---
 
@@ -105,11 +105,11 @@ T7 -> T8 -> T9
 
 ### T3: Implement Subject Field Service ✅
 
-**What**: Implement list, create, update, duplicate handling, and teacher-only mutation rules.
+**What**: Implement list, create, update, delete, duplicate handling, and teacher-only mutation rules.
 **Where**: `src/features/subject-fields/subject-field.service.ts`, `src/features/subject-fields/subject-field.service.test.ts`
 **Depends on**: T2
 **Reuses**: Prisma singleton and domain error pattern from `src/features/invitations/invitation.service.ts`.
-**Requirement**: GA-01, GA-03, GA-05, GA-06
+**Requirement**: GA-01, GA-03, GA-05, GA-06, GA-07
 
 **Tools**:
 
@@ -121,8 +121,9 @@ T7 -> T8 -> T9
 - [x] `listSubjectFields` returns existing records ordered by `updatedAt desc`.
 - [x] `createSubjectField` validates input, derives `titleNormalized`, stores `createdById`, and rejects duplicate titles across the catalog.
 - [x] `updateSubjectField` validates input, rejects duplicate titles across the catalog except for the same record being edited, and updates allowed fields for any authenticated teacher passed by the API boundary.
+- [x] `deleteSubjectField` deletes any record for any authenticated teacher passed by the API boundary.
 - [x] Known domain failures map to explicit error codes: duplicate and not found.
-- [x] Unit/integration-light tests cover create success, duplicate create with casing/spacing variation, list ordering, update by a teacher, same-title self update, duplicate update rejection, and not-found update.
+- [x] Unit/integration-light tests cover create success, duplicate create with casing/spacing variation, list ordering, update by a teacher, same-title self update, duplicate update rejection, not-found update, delete by a teacher, and not-found delete.
 - [x] Gate check passes: `pnpm test:unit`.
 
 **Tests**: unit/integration-light
@@ -132,11 +133,11 @@ T7 -> T8 -> T9
 
 ### T4: Add Subject Fields API Routes
 
-**What**: Implement create and update Route Handlers with server-side teacher authorization.
+**What**: Implement create, update, and delete Route Handlers with server-side teacher authorization.
 **Where**: `src/app/api/subject-fields/route.ts`, `src/app/api/subject-fields/[subjectFieldId]/route.ts`
 **Depends on**: T3
 **Reuses**: `src/app/api/invitations/route.ts`, `src/infra/auth/server.ts`, `src/infra/auth/authorization.ts`.
-**Requirement**: GA-01, GA-02, GA-05, GA-06
+**Requirement**: GA-01, GA-02, GA-05, GA-06, GA-07
 
 **Tools**:
 
@@ -148,9 +149,10 @@ T7 -> T8 -> T9
 - [x] Relevant Next.js 16 route handler docs under `node_modules/next/dist/docs/` are checked before editing.
 - [x] `POST /api/subject-fields` validates JSON, requires `TEACHER`, calls the service, and returns form-friendly JSON.
 - [x] `PATCH /api/subject-fields/[subjectFieldId]` validates id/body, requires `TEACHER`, calls the service, and returns form-friendly JSON.
-- [x] Unauthorized requests return `401` and create/update no data.
+- [x] `DELETE /api/subject-fields/[subjectFieldId]` validates id, requires `TEACHER`, calls the service, and returns form-friendly JSON.
+- [x] Unauthorized requests return `401` and create/update/delete no data.
 - [x] Domain errors return stable error codes for duplicate and not-found cases.
-- [x] Unit tests or service-backed route tests cover unauthorized create/update and duplicate handling where practical.
+- [x] Unit tests or service-backed route tests cover unauthorized create/update/delete, duplicate handling, and not-found delete where practical.
 - [x] Gate check passes: `pnpm test:unit`.
 
 **Tests**: unit/integration-light
@@ -189,11 +191,11 @@ T7 -> T8 -> T9
 
 ### T6: Build Subject Fields List Component
 
-**What**: Build the list UI with empty state, color swatches, metadata, and edit controls for all records.
+**What**: Build the list UI with empty state, color swatches, metadata, edit controls, and confirmed delete controls for all records.
 **Where**: `src/app/app/professor/grandes-areas/_components/subject-fields-list.tsx`
 **Depends on**: T5
 **Reuses**: shadcn-style `Card`, `Badge`, `Button`, and local form component.
-**Requirement**: GA-03, GA-04, GA-05
+**Requirement**: GA-03, GA-04, GA-05, GA-07
 
 **Tools**:
 
@@ -206,6 +208,9 @@ T7 -> T8 -> T9
 - [x] Each row/card shows title, description, color swatch, hex value, creator email/name when available, and update date.
 - [x] Edit control is available for every listed grande area to authenticated teachers.
 - [x] Edit interaction reuses the form component and updates without layout overlap.
+- [x] Delete control is available beside edit for every listed grande area.
+- [x] Delete interaction requires confirmation before calling the API.
+- [x] Confirmed delete removes the grande area from the list.
 - [x] UI text fits at mobile and desktop widths.
 - [x] Gate check passes: `pnpm build`.
 
@@ -244,11 +249,11 @@ T7 -> T8 -> T9
 
 ### T8: Add E2E Coverage for Teacher Flow
 
-**What**: Cover the main browser flow for teacher create, list, edit, and student denial.
+**What**: Cover the main browser flow for teacher create, list, edit, delete, and student denial.
 **Where**: `src/tests/e2e/subject-fields.spec.ts`, optional helper under `src/tests/e2e/helpers/subject-fields.ts`
 **Depends on**: T7
 **Reuses**: `src/tests/e2e/helpers/auth.ts`, `src/tests/e2e/fixtures/users.ts`.
-**Requirement**: GA-01, GA-03, GA-04, GA-05
+**Requirement**: GA-01, GA-03, GA-04, GA-05, GA-07
 
 **Tools**:
 
@@ -261,6 +266,7 @@ T7 -> T8 -> T9
 - [ ] Teacher can open the page and see heading "Gerenciar grandes areas".
 - [ ] Teacher can create a grande area and see it listed with color.
 - [ ] Teacher can edit a listed grande area and see updated values after refresh.
+- [ ] Teacher can delete a listed grande area only after confirmation and no longer sees it after refresh.
 - [ ] Student cannot access the page.
 - [ ] Gate check passes: `pnpm test:e2e`.
 

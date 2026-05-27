@@ -2,13 +2,14 @@
 
 ## Problem Statement
 
-Professores precisam organizar o futuro banco de materias e questoes em agrupadores pedagogicos mais amplos. A grande area funciona como um guarda-chuva de materias relacionadas, por exemplo "Calculo" agrupando Calculo 1, 2, 3, A e B, mas esta entrega deve cobrir somente o cadastro, edicao e listagem da grande area.
+Professores precisam organizar o futuro banco de materias e questoes em agrupadores pedagogicos mais amplos. A grande area funciona como um guarda-chuva de materias relacionadas, por exemplo "Calculo" agrupando Calculo 1, 2, 3, A e B, e esta entrega deve cobrir cadastro, edicao, listagem e delecao da grande area.
 
 ## Goals
 
 - [ ] Permitir que professores criem grandes areas com titulo, descricao e cor hexadecimal.
 - [ ] Permitir que professores vejam as grandes areas existentes em uma tela unica.
 - [ ] Permitir que qualquer professor edite titulo, descricao e cor de qualquer grande area.
+- [ ] Permitir que qualquer professor delete uma grande area apos confirmacao explicita.
 - [ ] Garantir que titulos de grandes areas sejam unicos no catalogo inteiro.
 - [ ] Preparar o modelo de dados para futura associacao de materias sem implementar materias agora.
 
@@ -18,7 +19,6 @@ Professores precisam organizar o futuro banco de materias e questoes em agrupado
 | --- | --- |
 | Cadastro de materias | O objetivo atual e somente cadastrar a grande area. |
 | Relacao materia-grande area | Depende da feature futura de materias. |
-| Remocao de grandes areas | Nao foi solicitada e pode criar risco quando materias existirem. |
 | Permissoes para ADMIN gerenciar grandes areas | A responsabilidade da feature foi definida para professores. |
 | Paleta predefinida obrigatoria | A regra solicitada e aceitar uma cor hexadecimal atribuida a area. |
 
@@ -80,6 +80,25 @@ Professores precisam organizar o futuro banco de materias e questoes em agrupado
 
 ---
 
+### P1: Professor Deleta Grande Area MVP
+
+**User Story**: As a teacher, I want to delete any grande area with confirmation so that I can remove catalog entries created by mistake.
+
+**Why P1**: O usuario pediu explicitamente delecao ao lado do botao de editar, com confirmacao antes da mutacao destrutiva.
+
+**Acceptance Criteria**:
+
+1. WHEN an authenticated TEACHER sees a listed grande area THEN system SHALL show a delete control beside the edit control.
+2. WHEN the teacher clicks delete THEN system SHALL ask for confirmation before calling the mutation boundary.
+3. WHEN the teacher cancels confirmation THEN system SHALL preserve the existing grande area.
+4. WHEN the teacher confirms deletion THEN system SHALL delete the grande area and remove it from the list.
+5. WHEN a non-teacher attempts to delete a grande area through the mutation boundary THEN system SHALL reject the request and preserve the data.
+6. WHEN the grande area no longer exists during delete THEN system SHALL return a not-found error and leave the list reloadable.
+
+**Independent Test**: Login as teacher, create "Calculo Temporario", delete it with confirmation, and verify it no longer appears in the list after refresh.
+
+---
+
 ## Edge Cases
 
 - WHEN title has leading/trailing or repeated internal spaces THEN system SHALL normalize it for duplicate checks while preserving a clean display title.
@@ -87,6 +106,7 @@ Professores precisam organizar o futuro banco de materias e questoes em agrupado
 - WHEN color is submitted without `#`, with shorthand `#FFF`, or with invalid characters THEN system SHALL reject it and request `#RRGGBB`.
 - WHEN two create requests submit the same title concurrently THEN system SHALL allow at most one record.
 - WHEN a grande area no longer exists during edit THEN system SHALL return a not-found error and leave the list reloadable.
+- WHEN a grande area no longer exists during delete THEN system SHALL return a not-found error and leave the list reloadable.
 - WHEN a user has a stale session cookie THEN system SHALL still enforce real server-side authorization before rendering or mutating data.
 
 ---
@@ -101,8 +121,9 @@ Professores precisam organizar o futuro banco de materias e questoes em agrupado
 | GA-04 | P1: Professor Lista Grandes Areas | Design | Pending |
 | GA-05 | P1: Professor Edita Qualquer Grande Area | Design | Pending |
 | GA-06 | Edge Cases: validacao, duplicidade e concorrencia | Design | Pending |
+| GA-07 | P1: Professor Deleta Grande Area | Design | Pending |
 
-**Coverage:** 6 total, 6 mapped to draft tasks, 0 unmapped.
+**Coverage:** 7 total, 7 mapped to draft tasks, 0 unmapped.
 
 ---
 
@@ -112,6 +133,7 @@ Professores precisam organizar o futuro banco de materias e questoes em agrupado
 - [ ] The creation form and list are visible on the same page.
 - [ ] Created grandes areas show title, description, hex color, color swatch, and creator metadata.
 - [ ] Any teacher can edit an existing grande area without leaving the management flow.
+- [ ] Any teacher can delete an existing grande area only after confirming the destructive action.
 - [ ] The database and service reject duplicate grande area titles across the whole catalog.
 - [ ] Students cannot access or mutate grandes areas.
 - [ ] Core validation/service rules have unit coverage and the main browser flow has E2E coverage.
