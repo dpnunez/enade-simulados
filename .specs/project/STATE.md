@@ -1,6 +1,6 @@
 # State
 
-**Last Updated:** 2026-05-27T18:25:00-03:00
+**Last Updated:** 2026-05-27T19:53:58-03:00
 
 ---
 
@@ -55,6 +55,41 @@
 **Trade-off:** Um professor pode alterar uma grande area criada por outro, entao historico/auditoria mais detalhada pode ser necessario em uma fase futura.
 **Impact:** O modelo `SubjectField` deve registrar `createdById`, mas servicos e rotas de update devem validar apenas a role `TEACHER`, nao ownership.
 
+### AD-008: Questoes com alternativas filhas e uma correta por booleano (2026-05-27)
+
+**Decision:** Modelar `QuestionAlternative` como entidade filha de `Question`, com `position`, `contentMarkdown` e `isCorrect`; a regra de uma unica correta sera protegida por validacao transacional e indice unico parcial no banco.
+**Reason:** Evita relacao circular obrigatoria com `correctAlternativeId`, simplifica criacao/edicao atomica e deixa a leitura futura de simulados direta.
+**Trade-off:** A regra "pelo menos uma correta" continua sendo responsabilidade do servico, pois o banco protege melhor "no maximo uma correta" com indice parcial.
+**Impact:** A feature de questoes deve substituir alternativas transacionalmente em updates e manter testes cobrindo exatamente uma alternativa correta.
+
+### AD-010: Formulario de questoes inicia com 5 alternativas (2026-05-27)
+
+**Decision:** O formulario de criacao de questoes deve iniciar com 5 alternativas por padrao.
+**Reason:** O usuario definiu 5 como quantidade default de alternativas.
+**Trade-off:** A validacao pode continuar aceitando uma faixa operacional, mas a experiencia inicial deve refletir o padrao pedagogico esperado.
+**Impact:** `QuestionForm` deve montar o estado inicial com 5 alternativas vazias e o E2E deve verificar esse default.
+
+### AD-011: Listagem e criacao de questoes em telas separadas (2026-05-27)
+
+**Decision:** A listagem de questoes ficara em `/app/professor/questoes` e a criacao em `/app/professor/questoes/nova`.
+**Reason:** O usuario definiu que criar questao e listar questoes serao duas telas diferentes.
+**Trade-off:** O fluxo ganha uma navegacao extra, mas a tela de listagem fica mais limpa e a criacao pode acomodar o editor markdown e alternativas sem competir por espaco.
+**Impact:** A page de listagem nao deve renderizar o formulario de criacao; a page de criacao deve buscar grandes areas e retornar para a listagem apos sucesso.
+
+### AD-012: Edicao de questoes em rota dedicada por id (2026-05-27)
+
+**Decision:** A edicao de questoes ficara em `/app/professor/questoes/[id]`.
+**Reason:** O usuario definiu uma rota dedicada para editar o conteudo de uma questao existente.
+**Trade-off:** A listagem deixa de ter edicao inline, mas a tela dedicada comporta melhor editor markdown, alternativas e validacoes.
+**Impact:** `QuestionsList` deve linkar para a rota de edicao; a page `[id]` deve carregar a questao e grandes areas server-side e reutilizar `QuestionForm` em modo edit.
+
+### AD-009: Cascade de grande area sera plano posterior (2026-05-27)
+
+**Decision:** A primeira implementacao de questoes nao mudara imediatamente a delecao de `SubjectField` para cascade; contagem e cascade ficaram em `.specs/features/subject-field-question-rollup`.
+**Reason:** O usuario pediu deixar esse side effect por ultimo ou em outro plano posterior.
+**Trade-off:** Durante a primeira feature, grandes areas com questoes devem continuar protegidas contra delecao em cascade ate a fase seguinte.
+**Impact:** A relacao `Question.subjectFieldId` deve comecar sem cascade para `SubjectField`; a mudanca para cascade sera feita no plano posterior.
+
 ## Active Blockers
 
 Nenhum blocker ativo registrado no momento.
@@ -88,6 +123,8 @@ Nenhum blocker ativo registrado no momento.
 - [x] Especificar a primeira feature de domínio além de autenticação
 - [x] Completar `user-invitations` T1-T11: convites, aceite, cancelamento, UI admin, E2E e gates finais
 - [x] Implementar `.specs/features/grandes-areas/tasks.md`: CRUD de grandes areas para professores, E2E e gates finais
+- [x] Planejar `.specs/features/questions`: cadastro de questoes com alternativas e editor markdown
+- [x] Planejar `.specs/features/subject-field-question-rollup`: contagem e cascade posterior em grandes areas
 - [ ] Revisar o roadmap quando a área administrativa ganhar CRUD real
 - [ ] Definir provedor de email para envio real de convites em produção
 
