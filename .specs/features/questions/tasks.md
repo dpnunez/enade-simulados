@@ -191,12 +191,12 @@ T10 -> T11 -> T12
 
 **Done when**:
 
-- [ ] Dependency is installed with pnpm.
-- [ ] Editor wrapper renders client-side only with SSR disabled.
-- [ ] Editor accepts `value` and emits markdown via `onChange`.
-- [ ] Basic plugins are enabled for headings, lists, quote, thematic break, markdown shortcuts, and toolbar controls that are useful for question text.
-- [ ] CSS is loaded according to MDXEditor docs without breaking app styles.
-- [ ] Gate check passes: `pnpm build`.
+- [x] Dependency is installed with pnpm.
+- [x] Editor wrapper renders client-side only with SSR disabled.
+- [x] Editor accepts `value` and emits markdown via `onChange`.
+- [x] Basic plugins are enabled for headings, lists, quote, thematic break, markdown shortcuts, and toolbar controls that are useful for question text.
+- [x] CSS is loaded according to MDXEditor docs without breaking app styles.
+- [x] Gate check passes: `pnpm build`.
 
 **Tests**: build; E2E in T11
 **Gate**: build
