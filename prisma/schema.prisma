@@ -24,6 +24,19 @@ enum InvitationStatus {
   CANCELLED
 }
 
+enum QuestionDifficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum QuestionSource {
+  ENADE
+  MANUAL
+  ADAPTED
+  OTHER
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String
@@ -36,6 +49,7 @@ model User {
   sessions      Session[]
   accounts      Account[]
   subjectFields SubjectField[]
+  questions     Question[]
 }
 
 model Session {
@@ -105,7 +119,42 @@ model SubjectField {
   createdBy       User     @relation(fields: [createdById], references: [id], onDelete: Restrict)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+  questions       Question[]
 
   @@index([createdById])
   @@index([updatedAt])
+}
+
+model Question {
+  id                       String                @id @default(cuid())
+  descriptionMarkdown      String
+  difficulty               QuestionDifficulty
+  source                   QuestionSource?
+  year                     Int?
+  subjectFieldId           String
+  subjectField             SubjectField          @relation(fields: [subjectFieldId], references: [id], onDelete: Restrict)
+  correctAnswerExplanation String?
+  createdById              String
+  createdBy                User                  @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  createdAt                DateTime              @default(now())
+  updatedAt                DateTime              @updatedAt
+  alternatives             QuestionAlternative[]
+
+  @@index([subjectFieldId])
+  @@index([createdById])
+  @@index([updatedAt])
+}
+
+model QuestionAlternative {
+  id              String   @id @default(cuid())
+  questionId      String
+  question        Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  contentMarkdown String
+  position        Int
+  isCorrect       Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([questionId, position])
+  @@index([questionId])
 }
