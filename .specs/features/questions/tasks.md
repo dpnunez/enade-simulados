@@ -249,11 +249,11 @@ T10 -> T11 -> T12
 
 **Done when**:
 
-- [ ] Question description uses MDXEditor and stores markdown in `descriptionMarkdown`.
-- [ ] Correct-answer explanation remains a plain optional text control mapped to `correctAnswerExplanation`.
-- [ ] Form validation errors remain visible near the editor fields.
-- [ ] Existing edit values load correctly into the editor.
-- [ ] Gate check passes: `pnpm build`.
+- [x] Question description uses MDXEditor and stores markdown in `descriptionMarkdown`.
+- [x] Correct-answer explanation remains a plain optional text control mapped to `correctAnswerExplanation`.
+- [x] Form validation errors remain visible near the editor fields.
+- [x] Existing edit values load correctly into the editor.
+- [x] Gate check passes: `pnpm build`.
 
 **Tests**: build; E2E in T11
 **Gate**: build

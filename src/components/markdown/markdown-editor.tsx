@@ -2,7 +2,7 @@
 
 import type { MDXEditorMethods, MDXEditorProps } from "@mdxeditor/editor";
 import dynamic from "next/dynamic";
-import { forwardRef } from "react";
+import { forwardRef, useEffect, useRef } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -73,8 +73,15 @@ export function MarkdownEditor({
   ariaLabel,
   className,
 }: MarkdownEditorProps) {
+  const editorRef = useRef<MDXEditorMethods>(null);
+
+  useEffect(() => {
+    editorRef.current?.setMarkdown(value);
+  }, [value]);
+
   return (
     <LoadedMarkdownEditor
+      ref={editorRef}
       markdown={value}
       onChange={onChange}
       ariaLabel={ariaLabel}

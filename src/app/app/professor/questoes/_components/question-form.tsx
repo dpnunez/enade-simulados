@@ -4,12 +4,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useState } from "react";
-import { useFieldArray, useForm } from "react-hook-form";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 
 import { Alert, AlertDescription, AlertIcon, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { MarkdownEditor } from "@/components/markdown/markdown-editor";
 import {
   questionInputSchema,
   type QuestionInput,
@@ -204,13 +205,20 @@ export function QuestionForm({
 
       <div className="space-y-2">
         <Label htmlFor={`${formId}-description`}>Enunciado</Label>
-        <textarea
-          id={`${formId}-description`}
-          rows={8}
-          placeholder="Digite o enunciado da questao em markdown."
-          aria-invalid={Boolean(form.formState.errors.descriptionMarkdown)}
-          className="flex min-h-44 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
-          {...form.register("descriptionMarkdown")}
+        <Controller
+          control={form.control}
+          name="descriptionMarkdown"
+          render={({ field }) => (
+            <MarkdownEditor
+              value={field.value}
+              onChange={field.onChange}
+              ariaLabel="Enunciado da questao"
+              className={cn(
+                form.formState.errors.descriptionMarkdown &&
+                  "border-destructive focus-within:ring-2 focus-within:ring-destructive/30",
+              )}
+            />
+          )}
         />
         {form.formState.errors.descriptionMarkdown ? (
           <p className="text-sm text-destructive">
