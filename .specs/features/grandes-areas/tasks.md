@@ -145,13 +145,13 @@ T7 -> T8 -> T9
 
 **Done when**:
 
-- [ ] Relevant Next.js 16 route handler docs under `node_modules/next/dist/docs/` are checked before editing.
-- [ ] `POST /api/subject-fields` validates JSON, requires `TEACHER`, calls the service, and returns form-friendly JSON.
-- [ ] `PATCH /api/subject-fields/[subjectFieldId]` validates id/body, requires `TEACHER`, calls the service, and returns form-friendly JSON.
-- [ ] Unauthorized requests return `401` and create/update no data.
-- [ ] Domain errors return stable error codes for duplicate and not-found cases.
-- [ ] Unit tests or service-backed route tests cover unauthorized create/update and duplicate handling where practical.
-- [ ] Gate check passes: `pnpm test:unit`.
+- [x] Relevant Next.js 16 route handler docs under `node_modules/next/dist/docs/` are checked before editing.
+- [x] `POST /api/subject-fields` validates JSON, requires `TEACHER`, calls the service, and returns form-friendly JSON.
+- [x] `PATCH /api/subject-fields/[subjectFieldId]` validates id/body, requires `TEACHER`, calls the service, and returns form-friendly JSON.
+- [x] Unauthorized requests return `401` and create/update no data.
+- [x] Domain errors return stable error codes for duplicate and not-found cases.
+- [x] Unit tests or service-backed route tests cover unauthorized create/update and duplicate handling where practical.
+- [x] Gate check passes: `pnpm test:unit`.
 
 **Tests**: unit/integration-light
 **Gate**: quick
