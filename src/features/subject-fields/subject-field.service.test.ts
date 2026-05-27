@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { Prisma } from "@prisma-generated-client";
 
 const mocks = vi.hoisted(() => ({
   prisma: {
@@ -152,7 +153,12 @@ describe("subject-field.service", () => {
 
   it("maps not-found update", async () => {
     mocks.prisma.subjectField.findFirst.mockResolvedValue(null);
-    mocks.prisma.subjectField.update.mockRejectedValue({ code: "P2025" });
+    mocks.prisma.subjectField.update.mockRejectedValue(
+      new Prisma.PrismaClientKnownRequestError("Record not found", {
+        code: "P2025",
+        clientVersion: "test",
+      }),
+    );
 
     await expect(
       updateSubjectField(

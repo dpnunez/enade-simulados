@@ -1,4 +1,5 @@
 import { prisma } from "@infra/db/prisma";
+import { Prisma } from "@prisma-generated-client";
 
 import {
   subjectFieldIdSchema,
@@ -19,21 +20,27 @@ export class SubjectFieldDomainError extends Error {
 
 export type SubjectFieldListItem = Awaited<ReturnType<typeof listSubjectFields>>[number];
 
-function isPrismaErrorCode(error: unknown, code: string) {
-  return (
-    typeof error === "object" &&
-    error !== null &&
-    "code" in error &&
-    error.code === code
-  );
+const prismaKnownRequestErrorCode = {
+  uniqueConstraintFailed: "P2002",
+  requiredRecordNotFound: "P2025",
+} as const;
+
+function getPrismaErrorCode(error: unknown) {
+  if (!(error instanceof Prisma.PrismaClientKnownRequestError)) {
+    return null;
+  }
+
+  return error.code;
 }
 
 function mapSubjectFieldWriteError(error: unknown): never {
-  if (isPrismaErrorCode(error, "P2002")) {
+  const prismaErrorCode = getPrismaErrorCode(error);
+
+  if (prismaErrorCode === prismaKnownRequestErrorCode.uniqueConstraintFailed) {
     throw new SubjectFieldDomainError("SUBJECT_FIELD_TITLE_EXISTS");
   }
 
-  if (isPrismaErrorCode(error, "P2025")) {
+  if (prismaErrorCode === prismaKnownRequestErrorCode.requiredRecordNotFound) {
     throw new SubjectFieldDomainError("SUBJECT_FIELD_NOT_FOUND");
   }
 
