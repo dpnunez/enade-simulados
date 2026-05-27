@@ -105,6 +105,7 @@ flowchart TD
   - `DELETE /api/subject-fields/[subjectFieldId]` deletes a grande area.
 - **Dependencies**: `auth.api.getSession`, `hasRole`, schemas, service.
 - **Reuses**: Invitation route handler response style.
+- **Testing**: Route handlers are not covered by individual `route.test.ts` files; authorization, success, validation-facing behavior, and destructive delete confirmation are covered through the T8 browser E2E flow, while service/domain rules stay covered by service unit tests.
 
 ### Teacher Management Page
 
@@ -200,4 +201,5 @@ interface SubjectFieldInput {
 
 - Before editing Next.js route/page code, read the relevant Next.js 16 docs in `node_modules/next/dist/docs/` as required by `AGENTS.md`.
 - The `CONCERNS.md` P1 about mutation authorization applies here: every API handler must authorize internally.
+- Do not add individual unit tests for `src/app/api/subject-fields/**/route.ts`; use service unit tests for domain rules and T8 E2E for route behavior.
 - The `CONCERNS.md` P1 about E2E database leakage applies here: the E2E test must clean deterministic `SubjectField` rows it creates.

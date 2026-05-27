@@ -12,7 +12,8 @@ This plan uses `.specs/codebase/TESTING.md`:
 | Layer | Required Test Type | Command |
 | --- | --- | --- |
 | Pure validation/helpers | unit | `pnpm test:unit` |
-| Services/API mutations | unit/integration-light with mocked boundaries where practical | `pnpm test:unit` |
+| Services/domain mutations | unit/integration-light with mocked boundaries where practical | `pnpm test:unit` |
+| API route handlers | E2E through visible flows; build for type checks | `pnpm test:e2e`, `pnpm build` |
 | Visible browser flow | e2e | `pnpm test:e2e` |
 | Prisma schema/migrations | build plus E2E DB setup | `pnpm build`, `pnpm test:e2e` |
 | Full confidence gate | unit + e2e | `pnpm test` |
@@ -20,6 +21,7 @@ This plan uses `.specs/codebase/TESTING.md`:
 Relevant concerns:
 
 - Mutations must authorize internally and must not rely on `src/proxy.ts` or page visibility.
+- Subject-field API route handlers do not have individual `route.test.ts` files; route behavior is covered by the browser E2E flow in T8.
 - E2E data is not reset between runs, so subject-field browser tests must clean their deterministic records.
 - Prisma schema changes require `pnpm prisma:generate` and `pnpm build`.
 
@@ -152,11 +154,12 @@ T7 -> T8 -> T9
 - [x] `DELETE /api/subject-fields/[subjectFieldId]` validates id, requires `TEACHER`, calls the service, and returns form-friendly JSON.
 - [x] Unauthorized requests return `401` and create/update/delete no data.
 - [x] Domain errors return stable error codes for duplicate and not-found cases.
-- [x] Unit tests or service-backed route tests cover unauthorized create/update/delete, duplicate handling, and not-found delete where practical.
-- [x] Gate check passes: `pnpm test:unit`.
+- [x] No individual `route.test.ts` files are kept for subject-field route handlers.
+- [x] Route behavior is delegated to T8 E2E coverage for teacher create/update/delete and student denial.
+- [x] Gate check passes: `pnpm build`.
 
-**Tests**: unit/integration-light
-**Gate**: quick
+**Tests**: build; E2E in T8
+**Gate**: build
 
 ---
 
@@ -327,7 +330,7 @@ No tasks are marked `[P]` in this draft because the implementation is narrow, fi
 | T1 | One data model/migration foundation | Pass |
 | T2 | One validation schema module with colocated tests | Pass |
 | T3 | One service module with colocated tests | Pass |
-| T4 | One API boundary group for create/update | Pass |
+| T4 | One API boundary group for create/update/delete | Pass |
 | T5 | One form component | Pass |
 | T6 | One list component | Pass |
 | T7 | One page/navigation integration | Pass |
@@ -355,7 +358,7 @@ No tasks are marked `[P]` in this draft because the implementation is narrow, fi
 | T1 | Prisma schema/migration | build plus E2E DB setup | `pnpm build`; E2E in T8 | Pass |
 | T2 | Pure validation | unit | colocated `*.test.ts`, `pnpm test:unit` | Pass |
 | T3 | Service/data mutation rules | unit/integration-light | colocated `*.test.ts`, `pnpm test:unit` | Pass |
-| T4 | API mutation boundary | unit/integration-light plus E2E if visible | route/service tests where practical, E2E in T8 | Pass |
+| T4 | API mutation boundary | E2E through visible flow; build for type checks | no individual route tests; `pnpm build`, E2E in T8 | Pass |
 | T5 | UI form component | build unless behaviorful component test added | `pnpm build`, E2E in T8 | Pass |
 | T6 | UI list component | build unless behaviorful component test added | `pnpm build`, E2E in T8 | Pass |
 | T7 | App Router visible page | e2e for critical flow | `pnpm build`, E2E in T8 | Pass |
