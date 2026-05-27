@@ -6,12 +6,12 @@ Professores precisam organizar o futuro banco de materias e questoes em agrupado
 
 ## Goals
 
-- [ ] Permitir que professores criem grandes areas com titulo, descricao e cor hexadecimal.
-- [ ] Permitir que professores vejam as grandes areas existentes em uma tela unica.
-- [ ] Permitir que qualquer professor edite titulo, descricao e cor de qualquer grande area.
-- [ ] Permitir que qualquer professor delete uma grande area apos confirmacao explicita.
-- [ ] Garantir que titulos de grandes areas sejam unicos no catalogo inteiro.
-- [ ] Preparar o modelo de dados para futura associacao de materias sem implementar materias agora.
+- [x] Permitir que professores criem grandes areas com titulo, descricao e cor hexadecimal.
+- [x] Permitir que professores vejam as grandes areas existentes em uma tela unica.
+- [x] Permitir que qualquer professor edite titulo, descricao e cor de qualquer grande area.
+- [x] Permitir que qualquer professor delete uma grande area apos confirmacao explicita.
+- [x] Garantir que titulos de grandes areas sejam unicos no catalogo inteiro.
+- [x] Preparar o modelo de dados para futura associacao de materias sem implementar materias agora.
 
 ## Out of Scope
 
@@ -115,13 +115,13 @@ Professores precisam organizar o futuro banco de materias e questoes em agrupado
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| GA-01 | P1: Professor Cria Grande Area | Design | Pending |
-| GA-02 | P1: Professor Cria Grande Area | Design | Pending |
-| GA-03 | P1: Professor Lista Grandes Areas | Design | Pending |
-| GA-04 | P1: Professor Lista Grandes Areas | Design | Pending |
-| GA-05 | P1: Professor Edita Qualquer Grande Area | Design | Pending |
-| GA-06 | Edge Cases: validacao, duplicidade e concorrencia | Design | Pending |
-| GA-07 | P1: Professor Deleta Grande Area | Design | Pending |
+| GA-01 | P1: Professor Cria Grande Area | Execute | Done |
+| GA-02 | P1: Professor Cria Grande Area | Execute | Done |
+| GA-03 | P1: Professor Lista Grandes Areas | Execute | Done |
+| GA-04 | P1: Professor Lista Grandes Areas | Execute | Done |
+| GA-05 | P1: Professor Edita Qualquer Grande Area | Execute | Done |
+| GA-06 | Edge Cases: validacao, duplicidade e concorrencia | Execute | Done |
+| GA-07 | P1: Professor Deleta Grande Area | Execute | Done |
 
 **Coverage:** 7 total, 7 mapped to draft tasks, 0 unmapped.
 
@@ -129,11 +129,11 @@ Professores precisam organizar o futuro banco de materias e questoes em agrupado
 
 ## Success Criteria
 
-- [ ] `teacher@enade.local` can create a grande area from the page titled "Gerenciar grandes areas".
-- [ ] The creation form and list are visible on the same page.
-- [ ] Created grandes areas show title, description, hex color, color swatch, and creator metadata.
-- [ ] Any teacher can edit an existing grande area without leaving the management flow.
-- [ ] Any teacher can delete an existing grande area only after confirming the destructive action.
-- [ ] The database and service reject duplicate grande area titles across the whole catalog.
-- [ ] Students cannot access or mutate grandes areas.
-- [ ] Core validation/service rules have unit coverage and the main browser flow has E2E coverage.
+- [x] `teacher@enade.local` can create a grande area from the page titled "Gerenciar grandes areas".
+- [x] The creation form and list are visible on the same page.
+- [x] Created grandes areas show title, description, hex color, color swatch, and creator metadata.
+- [x] Any teacher can edit an existing grande area without leaving the management flow.
+- [x] Any teacher can delete an existing grande area only after confirming the destructive action.
+- [x] The database and service reject duplicate grande area titles across the whole catalog.
+- [x] Students cannot access or mutate grandes areas.
+- [x] Core validation/service rules have unit coverage and the main browser flow has E2E coverage.

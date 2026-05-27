@@ -1,7 +1,7 @@
 # Grandes Areas Tasks
 
 **Design**: `.specs/features/grandes-areas/design.md`
-**Status**: Phase 2 complete
+**Status**: Complete
 
 ---
 
@@ -265,13 +265,13 @@ T7 -> T8 -> T9
 
 **Done when**:
 
-- [ ] Test cleans deterministic `SubjectField` records before use to avoid state leakage.
-- [ ] Teacher can open the page and see heading "Gerenciar grandes areas".
-- [ ] Teacher can create a grande area and see it listed with color.
-- [ ] Teacher can edit a listed grande area and see updated values after refresh.
-- [ ] Teacher can delete a listed grande area only after confirmation and no longer sees it after refresh.
-- [ ] Student cannot access the page.
-- [ ] Gate check passes: `pnpm test:e2e`.
+- [x] Test cleans deterministic `SubjectField` records before use to avoid state leakage.
+- [x] Teacher can open the page and see heading "Gerenciar grandes areas".
+- [x] Teacher can create a grande area and see it listed with color.
+- [x] Teacher can edit a listed grande area and see updated values after refresh.
+- [x] Teacher can delete a listed grande area only after confirmation and no longer sees it after refresh.
+- [x] Student cannot access the page.
+- [x] Gate check passes: `pnpm test:e2e`.
 
 **Tests**: e2e
 **Gate**: e2e
@@ -293,11 +293,11 @@ T7 -> T8 -> T9
 
 **Done when**:
 
-- [ ] `pnpm test:unit` passes.
-- [ ] `pnpm test:e2e` passes.
-- [ ] `pnpm build` passes.
-- [ ] Requirement traceability statuses are updated.
-- [ ] Any implementation deviations are documented with `SPEC_DEVIATION`.
+- [x] `pnpm test:unit` passes.
+- [x] `pnpm test:e2e` passes.
+- [x] `pnpm build` passes.
+- [x] Requirement traceability statuses are updated.
+- [x] Any implementation deviations are documented with `SPEC_DEVIATION`.
 
 **Tests**: full/build
 **Gate**: full

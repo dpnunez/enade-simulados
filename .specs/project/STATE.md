@@ -1,6 +1,6 @@
 # State
 
-**Last Updated:** 2026-05-27T00:00:00-03:00
+**Last Updated:** 2026-05-27T18:25:00-03:00
 
 ---
 
@@ -87,9 +87,9 @@ Nenhum blocker ativo registrado no momento.
 - [x] Criar documentação brownfield de stack, arquitetura, convenções e testes
 - [x] Especificar a primeira feature de domínio além de autenticação
 - [x] Completar `user-invitations` T1-T11: convites, aceite, cancelamento, UI admin, E2E e gates finais
+- [x] Implementar `.specs/features/grandes-areas/tasks.md`: CRUD de grandes areas para professores, E2E e gates finais
 - [ ] Revisar o roadmap quando a área administrativa ganhar CRUD real
 - [ ] Definir provedor de email para envio real de convites em produção
-- [ ] Implementar `.specs/features/grandes-areas/tasks.md` quando a feature for aprovada
 
 ## Preferences
 
