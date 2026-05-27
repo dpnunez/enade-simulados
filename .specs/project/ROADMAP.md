@@ -24,13 +24,13 @@
 - Rotas privadas protegidas
 - Restrições básicas para áreas administrativas
 
-**Base visual do MVP** - IN PROGRESS
+**Base visual do MVP** - COMPLETE
 
 - Home pública inicial
 - Tela de login
 - Layout privado reutilizável com `shadcn/ui`
 
-**Convites e gestão inicial de usuários** - PLANNED
+**Convites e gestão inicial de usuários** - COMPLETE
 
 - Admins criam convites para alunos e professores
 - Cadastro público permanece desativado; novos usuários entram apenas por convite
@@ -43,6 +43,12 @@
 **Goal:** Permitir que professores mantenham a base pedagógica mínima para os simulados.
 
 ### Features
+
+**Gestão de grandes áreas** - PLANNED
+
+- Criar, listar e editar grandes áreas como agrupadores de matérias
+- Registrar título, descrição, cor hexadecimal e professor criador
+- Preparar base para a futura relação entre grandes áreas e matérias
 
 **Gestão de matérias** - PLANNED
 

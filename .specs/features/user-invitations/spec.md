@@ -6,10 +6,10 @@ Hoje o projeto tem autenticação por email e senha com signup público desativa
 
 ## Goals
 
-- [ ] Permitir que admins convidem alunos e professores por email, com token único.
-- [ ] Permitir que o convidado cadastre apenas a senha, mantendo email e role fixos pelo convite.
-- [ ] Garantir que novos usuários reais sejam criados no formato compatível com Better Auth.
-- [ ] Permitir que admins listem usuários, convites pendentes e cancelem convites ainda não usados.
+- [x] Permitir que admins convidem alunos e professores por email, com token único.
+- [x] Permitir que o convidado cadastre apenas a senha, mantendo email e role fixos pelo convite.
+- [x] Garantir que novos usuários reais sejam criados no formato compatível com Better Auth.
+- [x] Permitir que admins listem usuários, convites pendentes e cancelem convites ainda não usados.
 
 ## Out of Scope
 
@@ -111,24 +111,24 @@ Hoje o projeto tem autenticação por email e senha com signup público desativa
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| INV-01 | P1: Admin Envia Convite | Phase 1 + Phase 2 | Implemented |
-| INV-02 | P1: Admin Envia Convite | Tasks | Implemented |
-| INV-03 | P1: Convidado Aceita Convite | Phase 1 + Phase 2 | Implemented |
-| INV-04 | P1: Convidado Aceita Convite | Tasks | Implemented |
-| INV-05 | P1: Admin Lista Usuários e Convites | Tasks | Implemented |
-| INV-06 | P1: Admin Cancela Convite Pendente | Phase 1 + Phase 2 | Implemented |
-| INV-07 | Edge Cases: token/security/concurrency | Phase 1 + Phase 2/3 | Partially implemented |
+| INV-01 | P1: Admin Envia Convite | Phase 1 + Phase 2 | Verified |
+| INV-02 | P1: Admin Envia Convite | Tasks | Verified |
+| INV-03 | P1: Convidado Aceita Convite | Phase 1 + Phase 2 | Verified |
+| INV-04 | P1: Convidado Aceita Convite | Tasks | Verified |
+| INV-05 | P1: Admin Lista Usuários e Convites | Tasks | Verified |
+| INV-06 | P1: Admin Cancela Convite Pendente | Phase 1 + Phase 2 | Verified |
+| INV-07 | Edge Cases: token/security/concurrency | Phase 1 + Phase 2/3 | Verified |
 
-**Coverage:** 7 total, 7 mapped to draft tasks, 0 unmapped.
+**Coverage:** 7 total, 7 mapped to completed tasks, 7 verified, 0 unmapped.
 
-**Implementation Progress:** Phase 1 Data Foundation completed on 2026-05-26: Prisma invitation schema/migration, token utilities, validation schemas, Prisma client generation, unit tests, and build gate.
+**Implementation Progress:** Feature completed on 2026-05-27: data foundation, invitation services, email adapter, API routes, admin UI, public invite acceptance flow, E2E lifecycle coverage, and final traceability were completed.
 
 ---
 
 ## Success Criteria
 
-- [ ] Admin can create an invite for `student@example.com` or `teacher@example.com` without public signup.
-- [ ] Invite acceptance creates a login-capable Better Auth credential account with the correct role.
-- [ ] Email and role are never editable by the invited user during registration.
-- [ ] Cancelled, accepted, and malformed tokens cannot create users.
-- [ ] The main admin flow is covered by E2E and the core invitation rules are covered by automated tests.
+- [x] Admin can create an invite for `student@example.com` or `teacher@example.com` without public signup.
+- [x] Invite acceptance creates a login-capable Better Auth credential account with the correct role.
+- [x] Email and role are never editable by the invited user during registration.
+- [x] Cancelled, accepted, and malformed tokens cannot create users.
+- [x] The main admin flow is covered by E2E and the core invitation rules are covered by automated tests.

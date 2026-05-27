@@ -1,7 +1,7 @@
 # User Invitations Tasks
 
 **Design**: `.specs/features/user-invitations/design.md`
-**Status**: In Progress - Phase 2 completed (T1-T8 implemented)
+**Status**: Done - completed on 2026-05-27
 
 ---
 
@@ -37,13 +37,13 @@ T1 ✅ -> T2 ✅ -> T3 ✅
 ### Phase 2: Mutations and UI
 
 ```text
-T3 -> T4 -> T5 -> T6 -> T7 -> T8
+T3 -> T4 ✅ -> T5 ✅ -> T6 ✅ -> T7 ✅ -> T8 ✅
 ```
 
 ### Phase 3: Browser Coverage and Hardening
 
 ```text
-T8 -> T9 -> T10 -> T11
+T8 -> T9 ✅ -> T10 ✅ -> T11 ✅
 ```
 
 ---
@@ -325,6 +325,7 @@ Run `pnpm build`; dynamic invite page should compile and not expose token hashes
 ---
 
 ### T9: Add E2E Data Cleanup for Invitation Flows
+**Status**: ✅ Done - 2026-05-27
 
 **What**: Make Playwright setup deterministic for invitation-created data.
 **Where**: `scripts/e2e/prepare-test-db.ts`, optional helper under `src/tests/e2e/helpers/`
@@ -339,10 +340,10 @@ Run `pnpm build`; dynamic invite page should compile and not expose token hashes
 
 **Done when**:
 
-- [ ] E2E setup removes invitation test data without deleting seed users.
-- [ ] Cleanup covers standalone `Invitation` rows and invite-created users by deterministic email namespace.
-- [ ] Cleanup is safe to run repeatedly.
-- [ ] Gate check passes: `pnpm test:e2e`.
+- [x] E2E setup removes invitation test data without deleting seed users.
+- [x] Cleanup covers standalone `Invitation` rows and invite-created users by deterministic email namespace.
+- [x] Cleanup is safe to run repeatedly.
+- [x] Gate check passes: `pnpm test:e2e`.
 
 **Tests**: e2e
 **Gate**: e2e
@@ -353,6 +354,7 @@ Run `pnpm test:e2e` twice; both runs should start from deterministic invitation 
 ---
 
 ### T10: Add E2E Coverage for Invitation Lifecycle
+**Status**: ✅ Done - 2026-05-27
 
 **What**: Add browser tests for admin invite creation, invite acceptance, login, and cancellation.
 **Where**: `src/tests/e2e/invitations.spec.ts`, optional fixtures/helpers under `src/tests/e2e/`
@@ -367,12 +369,12 @@ Run `pnpm test:e2e` twice; both runs should start from deterministic invitation 
 
 **Done when**:
 
-- [ ] E2E creates an invite as admin and sees it pending.
-- [ ] E2E verifies existing-account email and duplicate-pending-invite email show distinct validation messages.
-- [ ] E2E opens the invite link, confirms email/role are locked, sets password, and logs in.
-- [ ] E2E cancels a second invite and verifies the link cannot register.
-- [ ] Test data is deterministic and isolated from development DB.
-- [ ] Gate check passes: `pnpm test:e2e`.
+- [x] E2E creates an invite as admin and sees it pending.
+- [x] E2E verifies existing-account email and duplicate-pending-invite email show distinct validation messages.
+- [x] E2E opens the invite link, confirms email/role are locked, sets password, and logs in.
+- [x] E2E cancels a second invite and verifies the link cannot register.
+- [x] Test data is deterministic and isolated from development DB.
+- [x] Gate check passes: `pnpm test:e2e`.
 
 **Tests**: e2e
 **Gate**: full
@@ -383,6 +385,7 @@ Run `pnpm test:e2e`; invitation lifecycle specs should pass with existing login/
 ---
 
 ### T11: Final Feature Gate and Traceability Update
+**Status**: ✅ Done - 2026-05-27
 
 **What**: Run full gates, update requirement statuses, and record final decisions.
 **Where**: `.specs/features/user-invitations/spec.md`, `.specs/features/user-invitations/tasks.md`, `.specs/project/STATE.md`
@@ -397,10 +400,10 @@ Run `pnpm test:e2e`; invitation lifecycle specs should pass with existing login/
 
 **Done when**:
 
-- [ ] Full test gate passes: `pnpm test`.
-- [ ] Build gate passes: `pnpm build`.
-- [ ] Requirement traceability marks implemented requirements as verified.
-- [ ] STATE records email-provider decision and any deferred improvements.
+- [x] Full test gate passes: `pnpm test`.
+- [x] Build gate passes: `pnpm build`.
+- [x] Requirement traceability marks implemented requirements as verified.
+- [x] STATE records email-provider decision and any deferred improvements.
 
 **Tests**: full
 **Gate**: full
@@ -481,9 +484,8 @@ No task is marked `[P]` because the service, admin UI, public route, and E2E tes
 
 ---
 
-## Open Decisions Before Execute
+## Completion Notes
 
-- Email provider for production is not present in the repo. The implementation should start with an adapter and deterministic dev/test delivery, then wire SMTP/provider when credentials are available.
-- Decide whether successful invite acceptance should auto-login the new user or redirect to `/login`. The safer MVP default is redirect to `/login` with a success message.
-
-Before execution, choose tools per task. Available here: filesystem shell/apply_patch, Browser plugin for local browser checks, and `tlc-spec-driven`.
+- Feature marked complete on 2026-05-27.
+- Production email provider remains deferred; current implementation keeps the adapter boundary and deterministic development/test delivery.
+- Invite acceptance uses the completed MVP flow and keeps email/role locked to the invitation.

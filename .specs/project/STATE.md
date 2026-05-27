@@ -1,7 +1,6 @@
 # State
 
-**Last Updated:** 2026-05-26T11:10:00-03:00
-**Current Work:** user-invitations - T4 next; T1-T3 complete
+**Last Updated:** 2026-05-27T00:00:00-03:00
 
 ---
 
@@ -49,6 +48,13 @@
 **Trade-off:** Formulários simples precisarão de um pequeno Client Component quando houver gerenciamento interativo de campos.
 **Impact:** APIs server-side continuam responsáveis por autorização e validação confiável com `zod`; `react-hook-form` deve ser tratado como camada de UX integrada aos componentes shadcn, usando `@hookform/resolvers/zod` quando houver validação client-side.
 
+### AD-007: Grandes areas como catalogo compartilhado editavel por professores (2026-05-27)
+
+**Decision:** Professores poderao listar e editar todas as grandes areas existentes; `createdById` fica apenas como auditoria de criacao.
+**Reason:** O catalogo de grandes areas e compartilhado entre professores, e qualquer docente deve poder corrigir ou evoluir uma grande area ja cadastrada.
+**Trade-off:** Um professor pode alterar uma grande area criada por outro, entao historico/auditoria mais detalhada pode ser necessario em uma fase futura.
+**Impact:** O modelo `SubjectField` deve registrar `createdById`, mas servicos e rotas de update devem validar apenas a role `TEACHER`, nao ownership.
+
 ## Active Blockers
 
 Nenhum blocker ativo registrado no momento.
@@ -66,9 +72,9 @@ Nenhum blocker ativo registrado no momento.
 
 ## Quick Tasks Completed
 
-| #   | Description                         | Date       | Commit | Status  |
-| --- | ----------------------------------- | ---------- | ------ | ------- |
-| 001 | Inicialização de `.specs/project`   | 2026-05-23 | -      | ✅ Done |
+| #   | Description                       | Date       | Commit | Status  |
+| --- | --------------------------------- | ---------- | ------ | ------- |
+| 001 | Inicialização de `.specs/project` | 2026-05-23 | -      | ✅ Done |
 
 ## Deferred Ideas
 
@@ -80,10 +86,10 @@ Nenhum blocker ativo registrado no momento.
 
 - [x] Criar documentação brownfield de stack, arquitetura, convenções e testes
 - [x] Especificar a primeira feature de domínio além de autenticação
-- [x] Completar `user-invitations` T1-T3: data foundation
-- [ ] Continuar `user-invitations` em T4: invitation service
+- [x] Completar `user-invitations` T1-T11: convites, aceite, cancelamento, UI admin, E2E e gates finais
 - [ ] Revisar o roadmap quando a área administrativa ganhar CRUD real
 - [ ] Definir provedor de email para envio real de convites em produção
+- [ ] Implementar `.specs/features/grandes-areas/tasks.md` quando a feature for aprovada
 
 ## Preferences
 
