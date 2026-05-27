@@ -74,15 +74,15 @@ T10 -> T11 -> T12
 
 **Done when**:
 
-- [ ] Enums are named `QuestionDifficulty` and `QuestionSource`.
-- [ ] `Question` has `descriptionMarkdown`, `difficulty`, `source`, `year`, `subjectFieldId`, `correctAnswerExplanation`, `createdById`, `createdAt`, and `updatedAt`.
-- [ ] `Question.subjectFieldId` references `SubjectField.id` with delete behavior intentionally kept non-cascade for this phase.
-- [ ] `Question.createdById` references `User.id` for audit.
-- [ ] `QuestionAlternative` has `contentMarkdown`, `position`, and `isCorrect`.
-- [ ] `QuestionAlternative.questionId` references `Question.id` with `onDelete: Cascade`.
-- [ ] Migration includes a database-level guard for at most one correct alternative per question.
-- [ ] Prisma client generation succeeds.
-- [ ] Gate check passes: `pnpm build`.
+- [x] Enums are named `QuestionDifficulty` and `QuestionSource`.
+- [x] `Question` has `descriptionMarkdown`, `difficulty`, `source`, `year`, `subjectFieldId`, `correctAnswerExplanation`, `createdById`, `createdAt`, and `updatedAt`.
+- [x] `Question.subjectFieldId` references `SubjectField.id` with delete behavior intentionally kept non-cascade for this phase.
+- [x] `Question.createdById` references `User.id` for audit.
+- [x] `QuestionAlternative` has `contentMarkdown`, `position`, and `isCorrect`.
+- [x] `QuestionAlternative.questionId` references `Question.id` with `onDelete: Cascade`.
+- [x] Migration includes a database-level guard for at most one correct alternative per question.
+- [x] Prisma client generation succeeds.
+- [x] Gate check passes: `pnpm build`.
 
 **Tests**: build
 **Gate**: build
@@ -104,15 +104,15 @@ T10 -> T11 -> T12
 
 **Done when**:
 
-- [ ] Schema trims markdown fields and normalizes empty optional fields to `null`.
-- [ ] Schema validates difficulty and optional source enums.
-- [ ] Schema validates optional integer year.
-- [ ] Schema validates required `subjectFieldId`.
-- [ ] Schema validates 2 to 8 alternatives.
-- [ ] Schema validates alternative markdown content.
-- [ ] Schema enforces exactly one correct alternative.
-- [ ] Unit tests cover valid input, empty description, invalid difficulty, omitted source/year, invalid source, invalid year, missing subject field id, too few alternatives, empty alternative, zero correct alternatives, and two correct alternatives.
-- [ ] Gate check passes: `pnpm test:unit`.
+- [x] Schema trims markdown fields and normalizes empty optional fields to `null`.
+- [x] Schema validates difficulty and optional source enums.
+- [x] Schema validates optional integer year.
+- [x] Schema validates required `subjectFieldId`.
+- [x] Schema validates 2 to 8 alternatives.
+- [x] Schema validates alternative markdown content.
+- [x] Schema enforces exactly one correct alternative.
+- [x] Unit tests cover valid input, empty description, invalid difficulty, omitted source/year, invalid source, invalid year, missing subject field id, too few alternatives, empty alternative, zero correct alternatives, and two correct alternatives.
+- [x] Gate check passes: `pnpm test:unit`.
 
 **Tests**: unit
 **Gate**: quick
@@ -134,14 +134,14 @@ T10 -> T11 -> T12
 
 **Done when**:
 
-- [ ] `listQuestions` returns questions ordered by `updatedAt desc` with subject field and alternatives.
-- [ ] `getQuestionForEdit` returns one question with subject field and alternatives or throws `QUESTION_NOT_FOUND`.
-- [ ] `createQuestion` validates input, checks subject field existence, creates question and alternatives in one transaction, and stores `createdById`.
-- [ ] `updateQuestion` validates input, checks question and subject field existence, updates question fields, and replaces alternatives transactionally.
-- [ ] `deleteQuestion` deletes the question and relies on cascade to delete alternatives.
-- [ ] Domain errors include `QUESTION_NOT_FOUND`, `QUESTION_SUBJECT_FIELD_NOT_FOUND`, and stable validation/write failure mapping as needed.
-- [ ] Unit/integration-light tests cover list ordering, get-for-edit success, get-for-edit not found, create success, missing subject field, invalid correct count, update success with replaced alternatives, not-found update, transactional rollback on invalid update, delete success, and not-found delete.
-- [ ] Gate check passes: `pnpm test:unit`.
+- [x] `listQuestions` returns questions ordered by `updatedAt desc` with subject field and alternatives.
+- [x] `getQuestionForEdit` returns one question with subject field and alternatives or throws `QUESTION_NOT_FOUND`.
+- [x] `createQuestion` validates input, checks subject field existence, creates question and alternatives in one transaction, and stores `createdById`.
+- [x] `updateQuestion` validates input, checks question and subject field existence, updates question fields, and replaces alternatives transactionally.
+- [x] `deleteQuestion` deletes the question and relies on cascade to delete alternatives.
+- [x] Domain errors include `QUESTION_NOT_FOUND`, `QUESTION_SUBJECT_FIELD_NOT_FOUND`, and stable validation/write failure mapping as needed.
+- [x] Unit/integration-light tests cover list ordering, get-for-edit success, get-for-edit not found, create success, missing subject field, invalid correct count, update success with replaced alternatives, not-found update, transactional rollback on invalid update, delete success, and not-found delete.
+- [x] Gate check passes: `pnpm test:unit`.
 
 **Tests**: unit/integration-light
 **Gate**: quick
@@ -163,13 +163,13 @@ T10 -> T11 -> T12
 
 **Done when**:
 
-- [ ] Relevant Next.js 16 route handler docs under `node_modules/next/dist/docs/` are checked before editing.
-- [ ] `POST /api/questions` validates JSON, requires `TEACHER`, calls the service, and returns form-friendly JSON.
-- [ ] `PATCH /api/questions/[questionId]` validates id/body, requires `TEACHER`, calls the service, and returns form-friendly JSON.
-- [ ] `DELETE /api/questions/[questionId]` validates id, requires `TEACHER`, calls the service, and returns form-friendly JSON.
-- [ ] Unauthorized requests return `401` and mutate no data.
-- [ ] Domain errors return stable error codes.
-- [ ] Gate check passes: `pnpm build`.
+- [x] Relevant Next.js 16 route handler docs under `node_modules/next/dist/docs/` are checked before editing.
+- [x] `POST /api/questions` validates JSON, requires `TEACHER`, calls the service, and returns form-friendly JSON.
+- [x] `PATCH /api/questions/[questionId]` validates id/body, requires `TEACHER`, calls the service, and returns form-friendly JSON.
+- [x] `DELETE /api/questions/[questionId]` validates id, requires `TEACHER`, calls the service, and returns form-friendly JSON.
+- [x] Unauthorized requests return `401` and mutate no data.
+- [x] Domain errors return stable error codes.
+- [x] Gate check passes: `pnpm build`.
 
 **Tests**: build; E2E in T11
 **Gate**: build
