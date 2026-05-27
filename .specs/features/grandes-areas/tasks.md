@@ -202,12 +202,12 @@ T7 -> T8 -> T9
 
 **Done when**:
 
-- [ ] Empty state renders when the list is empty.
-- [ ] Each row/card shows title, description, color swatch, hex value, creator email/name when available, and update date.
-- [ ] Edit control is available for every listed grande area to authenticated teachers.
-- [ ] Edit interaction reuses the form component and updates without layout overlap.
-- [ ] UI text fits at mobile and desktop widths.
-- [ ] Gate check passes: `pnpm build`.
+- [x] Empty state renders when the list is empty.
+- [x] Each row/card shows title, description, color swatch, hex value, creator email/name when available, and update date.
+- [x] Edit control is available for every listed grande area to authenticated teachers.
+- [x] Edit interaction reuses the form component and updates without layout overlap.
+- [x] UI text fits at mobile and desktop widths.
+- [x] Gate check passes: `pnpm build`.
 
 **Tests**: build
 **Gate**: build
