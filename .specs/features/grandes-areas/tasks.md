@@ -229,13 +229,13 @@ T7 -> T8 -> T9
 
 **Done when**:
 
-- [ ] Relevant Next.js 16 page/App Router docs under `node_modules/next/dist/docs/` are checked before editing.
-- [ ] Page calls `requireRole("TEACHER")`.
-- [ ] Page title is exactly "Gerenciar grandes areas".
-- [ ] Creation form appears above the list.
-- [ ] Page fetches grandes areas server-side and passes them to the list.
-- [ ] Navigation exposes the page at the Portuguese front route `/app/professor/grandes-areas` without breaking existing links.
-- [ ] Gate check passes: `pnpm build`.
+- [x] Relevant Next.js 16 page/App Router docs under `node_modules/next/dist/docs/` are checked before editing.
+- [x] Page calls `requireRole("TEACHER")`.
+- [x] Page title is exactly "Gerenciar grandes areas".
+- [x] Creation form appears above the list.
+- [x] Page fetches grandes areas server-side and passes them to the list.
+- [x] Navigation exposes the page at the Portuguese front route `/app/professor/grandes-areas` without breaking existing links.
+- [x] Gate check passes: `pnpm build`.
 
 **Tests**: e2e required for visible flow, implemented in T8
 **Gate**: build

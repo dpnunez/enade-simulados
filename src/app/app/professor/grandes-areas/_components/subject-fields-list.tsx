@@ -30,9 +30,17 @@ export function SubjectFieldsList({ subjectFields }: SubjectFieldsListProps) {
   const [items, setItems] = useState(subjectFields);
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  function updateSavedItem(saved: SubjectFieldListItem) {
+  function updateSavedItem(saved: Partial<SubjectFieldListItem> & { id: string }) {
     setItems((current) =>
-      current.map((item) => (item.id === saved.id ? saved : item)),
+      current.map((item) =>
+        item.id === saved.id
+          ? {
+              ...item,
+              ...saved,
+              createdBy: item.createdBy,
+            }
+          : item,
+      ),
     );
     setEditingId(null);
   }

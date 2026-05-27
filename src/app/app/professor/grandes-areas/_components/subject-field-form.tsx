@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { useEffect, useId, useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -19,10 +20,11 @@ type SubjectFieldFormValue = Pick<
   SubjectFieldListItem,
   "id" | "title" | "description" | "colorHex"
 >;
+type SavedSubjectField = SubjectFieldFormValue & Partial<SubjectFieldListItem>;
 
 type SubjectFieldFormProps = {
   subjectField?: SubjectFieldFormValue;
-  onSaved?: (subjectField: SubjectFieldListItem) => void;
+  onSaved?: (subjectField: SavedSubjectField) => void;
   onCancel?: () => void;
   className?: string;
 };
@@ -63,6 +65,7 @@ export function SubjectFieldForm({
   onCancel,
   className,
 }: SubjectFieldFormProps) {
+  const router = useRouter();
   const formId = useId();
   const isEditing = Boolean(subjectField);
   const [error, setError] = useState<string | null>(null);
@@ -105,6 +108,7 @@ export function SubjectFieldForm({
       setSuccess("Grande area criada com sucesso.");
     }
     onSaved?.(payload.subjectField);
+    router.refresh();
   }
 
   return (
