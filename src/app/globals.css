@@ -1,7 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@mdxeditor/editor/style.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -132,5 +131,86 @@
   body {
     @apply min-h-full bg-background text-foreground;
     font-family: var(--font-sans);
+  }
+}
+
+@layer components {
+  .mdxeditor [contenteditable="true"] {
+    line-height: 1.6;
+  }
+
+  .mdxeditor [contenteditable="true"] h1,
+  .mdxeditor [contenteditable="true"] h2,
+  .mdxeditor [contenteditable="true"] h3,
+  .mdxeditor [contenteditable="true"] h4,
+  .mdxeditor [contenteditable="true"] h5,
+  .mdxeditor [contenteditable="true"] h6 {
+    margin-block: 0.85em 0.45em;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .mdxeditor [contenteditable="true"] h1 {
+    font-size: 2em;
+  }
+
+  .mdxeditor [contenteditable="true"] h2 {
+    font-size: 1.5em;
+  }
+
+  .mdxeditor [contenteditable="true"] h3 {
+    font-size: 1.25em;
+  }
+
+  .mdxeditor [contenteditable="true"] h4 {
+    font-size: 1.125em;
+  }
+
+  .mdxeditor [contenteditable="true"] h5,
+  .mdxeditor [contenteditable="true"] h6 {
+    font-size: 1em;
+  }
+
+  .mdxeditor [contenteditable="true"] p,
+  .mdxeditor [contenteditable="true"] blockquote,
+  .mdxeditor [contenteditable="true"] ul,
+  .mdxeditor [contenteditable="true"] ol,
+  .mdxeditor [contenteditable="true"] pre {
+    margin-block: 0.75em;
+  }
+
+  .mdxeditor [contenteditable="true"] ul,
+  .mdxeditor [contenteditable="true"] ol {
+    padding-inline-start: 1.5em;
+  }
+
+  .mdxeditor [contenteditable="true"] ul {
+    list-style-type: disc;
+  }
+
+  .mdxeditor [contenteditable="true"] ol {
+    list-style-type: decimal;
+  }
+
+  .mdxeditor [contenteditable="true"] ul ul,
+  .mdxeditor [contenteditable="true"] ol ul {
+    list-style-type: circle;
+  }
+
+  .mdxeditor [contenteditable="true"] ul ul ul,
+  .mdxeditor [contenteditable="true"] ol ul ul {
+    list-style-type: square;
+  }
+
+  .mdxeditor [contenteditable="true"] blockquote {
+    border-inline-start: 3px solid var(--border);
+    padding-inline-start: 1em;
+    color: var(--muted-foreground);
+  }
+
+  .mdxeditor [contenteditable="true"] hr {
+    margin-block: 1.25em;
+    border: 0;
+    border-top: 1px solid var(--border);
   }
 }

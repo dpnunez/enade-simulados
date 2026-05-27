@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useId, useState } from "react";
+import { type FormEvent, useEffect, useId, useRef, useState } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 
 import { Alert, AlertDescription, AlertIcon, AlertTitle } from "@/components/ui/alert";
@@ -30,6 +30,7 @@ type QuestionFormProps = {
   question?: QuestionEditable;
   onSaved?: (question: SavedQuestion) => void;
   onCancel?: () => void;
+  afterSaveHref?: string;
   className?: string;
 };
 
@@ -93,6 +94,7 @@ export function QuestionForm({
   question,
   onSaved,
   onCancel,
+  afterSaveHref,
   className,
 }: QuestionFormProps) {
   const router = useRouter();
@@ -100,6 +102,8 @@ export function QuestionForm({
   const isEditing = Boolean(question);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const descriptionDraftRef = useRef(valuesFromQuestion(question).descriptionMarkdown);
+  const [descriptionResetKey, setDescriptionResetKey] = useState(0);
   const form = useForm<QuestionInput>({
     resolver: zodResolver(questionInputSchema),
     defaultValues: valuesFromQuestion(question),
@@ -110,10 +114,21 @@ export function QuestionForm({
   });
 
   useEffect(() => {
-    form.reset(valuesFromQuestion(question));
+    const nextValues = valuesFromQuestion(question);
+    descriptionDraftRef.current = nextValues.descriptionMarkdown;
+    form.reset(nextValues);
+    setDescriptionResetKey((current) => current + 1);
     setError(null);
     setSuccess(null);
   }, [form, question]);
+
+  function syncDescriptionDraft() {
+    form.setValue("descriptionMarkdown", descriptionDraftRef.current, {
+      shouldDirty: true,
+      shouldValidate: true,
+      shouldTouch: true,
+    });
+  }
 
   function markCorrect(index: number) {
     alternatives.fields.forEach((_, alternativeIndex) => {
@@ -161,11 +176,22 @@ export function QuestionForm({
     if (isEditing) {
       setSuccess("Questao atualizada com sucesso.");
     } else {
+      descriptionDraftRef.current = emptyValues.descriptionMarkdown;
       form.reset(emptyValues);
+      setDescriptionResetKey((current) => current + 1);
       setSuccess("Questao criada com sucesso.");
     }
     onSaved?.(payload.question);
+    if (afterSaveHref) {
+      router.push(afterSaveHref);
+    }
     router.refresh();
+  }
+
+  function handleFormSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    syncDescriptionDraft();
+    void form.handleSubmit(onSubmit)(event);
   }
 
   if (subjectFields.length === 0) {
@@ -183,7 +209,7 @@ export function QuestionForm({
   }
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className={cn("space-y-6", className)}>
+    <form onSubmit={handleFormSubmit} className={cn("space-y-6", className)}>
       {error ? (
         <Alert variant="destructive" role="alert">
           <AlertIcon />
@@ -211,7 +237,11 @@ export function QuestionForm({
           render={({ field }) => (
             <MarkdownEditor
               value={field.value}
-              onChange={field.onChange}
+              onChange={(value) => {
+                descriptionDraftRef.current = value;
+              }}
+              onBlur={syncDescriptionDraft}
+              resetKey={descriptionResetKey}
               ariaLabel="Enunciado da questao"
               className={cn(
                 form.formState.errors.descriptionMarkdown &&

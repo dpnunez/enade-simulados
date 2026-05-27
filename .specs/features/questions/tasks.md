@@ -275,14 +275,14 @@ T10 -> T11 -> T12
 
 **Done when**:
 
-- [ ] Empty state renders when no questions exist.
-- [ ] Each listed question shows subject field title, difficulty, source/year when present, updated date, and a markdown/plain-text preview.
-- [ ] Alternatives summary shows count and identifies that one correct answer exists without exposing it too noisily in list view.
-- [ ] Edit control is available for every question and links to `/app/professor/questoes/[id]`.
-- [ ] Delete control requires confirmation before calling the API.
-- [ ] Confirmed delete removes the question from the local list and refreshes server data.
-- [ ] UI text fits at mobile and desktop widths.
-- [ ] Gate check passes: `pnpm build`.
+- [x] Empty state renders when no questions exist.
+- [x] Each listed question shows subject field title, difficulty, source/year when present, updated date, and a markdown/plain-text preview.
+- [x] Alternatives summary shows count and identifies that one correct answer exists without exposing it too noisily in list view.
+- [x] Edit control is available for every question and links to `/app/professor/questoes/[id]`.
+- [x] Delete control requires confirmation before calling the API.
+- [x] Confirmed delete removes the question from the local list and refreshes server data.
+- [x] UI text fits at mobile and desktop widths.
+- [x] Gate check passes: `pnpm build`.
 
 **Tests**: build; E2E in T11
 **Gate**: build
@@ -304,22 +304,22 @@ T10 -> T11 -> T12
 
 **Done when**:
 
-- [ ] Relevant Next.js 16 page/App Router docs under `node_modules/next/dist/docs/` are checked before editing.
-- [ ] List, create, and edit pages call `requireRole("TEACHER")`.
-- [ ] List page title is exactly "Gerenciar questoes".
-- [ ] Create page title is exactly "Criar questao".
-- [ ] Edit page title is exactly "Editar questao".
-- [ ] List page fetches questions server-side and does not render the create form.
-- [ ] List page exposes a clear action linking to `/app/professor/questoes/nova`.
-- [ ] List page edit actions link to `/app/professor/questoes/[id]`.
-- [ ] Create page fetches subject fields server-side and renders the creation form.
-- [ ] Edit page fetches subject fields and the selected question server-side, then renders the form prefilled.
-- [ ] Successful create returns the teacher to `/app/professor/questoes` or otherwise makes the created question visible from the list.
-- [ ] Successful edit returns the teacher to `/app/professor/questoes` or otherwise makes the edited question visible from the list.
-- [ ] Navigation exposes `/app/professor/questoes` for teachers.
-- [ ] Create page gracefully handles no subject fields.
-- [ ] Edit page gracefully handles missing question.
-- [ ] Gate check passes: `pnpm build`.
+- [x] Relevant Next.js 16 page/App Router docs under `node_modules/next/dist/docs/` are checked before editing.
+- [x] List, create, and edit pages call `requireRole("TEACHER")`.
+- [x] List page title is exactly "Gerenciar questoes".
+- [x] Create page title is exactly "Criar questao".
+- [x] Edit page title is exactly "Editar questao".
+- [x] List page fetches questions server-side and does not render the create form.
+- [x] List page exposes a clear action linking to `/app/professor/questoes/nova`.
+- [x] List page edit actions link to `/app/professor/questoes/[id]`.
+- [x] Create page fetches subject fields server-side and renders the creation form.
+- [x] Edit page fetches subject fields and the selected question server-side, then renders the form prefilled.
+- [x] Successful create returns the teacher to `/app/professor/questoes` or otherwise makes the created question visible from the list.
+- [x] Successful edit returns the teacher to `/app/professor/questoes` or otherwise makes the edited question visible from the list.
+- [x] Navigation exposes `/app/professor/questoes` for teachers.
+- [x] Create page gracefully handles no subject fields.
+- [x] Edit page gracefully handles missing question.
+- [x] Gate check passes: `pnpm build`.
 
 **Tests**: e2e required for visible flow, implemented in T11
 **Gate**: build
@@ -341,9 +341,9 @@ T10 -> T11 -> T12
 
 **Done when**:
 
-- [ ] Helper can clean deterministic question rows by title/content marker or subject field marker.
-- [ ] Helper can ensure a deterministic subject field exists for question tests.
-- [ ] Helper deletes alternatives through question cascade or explicit cleanup.
+- [x] Helper can clean deterministic question rows by title/content marker or subject field marker.
+- [x] Helper can ensure a deterministic subject field exists for question tests.
+- [x] Helper deletes alternatives through question cascade or explicit cleanup.
 - [ ] Gate check passes as part of T11.
 
 **Tests**: e2e helper

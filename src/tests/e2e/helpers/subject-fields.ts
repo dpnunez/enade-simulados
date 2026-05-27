@@ -12,6 +12,14 @@ export async function eraseSubjectFieldE2eData() {
     connection: process.env.DATABASE_URL,
   });
 
+  await db("Question")
+    .whereIn("subjectFieldId", (builder) => {
+      builder
+        .select("id")
+        .from("SubjectField")
+        .where("title", "like", `${SUBJECT_FIELD_E2E_TITLE_PREFIX}%`);
+    })
+    .del();
   await db("SubjectField")
     .where("title", "like", `${SUBJECT_FIELD_E2E_TITLE_PREFIX}%`)
     .del();

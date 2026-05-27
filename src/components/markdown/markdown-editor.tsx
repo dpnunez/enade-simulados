@@ -1,6 +1,7 @@
 "use client";
 
 import type { MDXEditorMethods, MDXEditorProps } from "@mdxeditor/editor";
+import "@mdxeditor/editor/style.css";
 import dynamic from "next/dynamic";
 import { forwardRef, useEffect, useRef } from "react";
 
@@ -9,11 +10,14 @@ import { cn } from "@/lib/utils";
 type MarkdownEditorProps = {
   value: string;
   onChange: (value: string) => void;
+  onBlur?: () => void;
+  resetKey?: string | number;
   ariaLabel?: string;
   className?: string;
 };
 
 type LoadedEditorProps = Pick<MDXEditorProps, "markdown" | "onChange"> & {
+  onBlur?: () => void;
   ariaLabel?: string;
   className?: string;
 };
@@ -22,11 +26,12 @@ const LoadedMarkdownEditor = dynamic(
   () =>
     import("@mdxeditor/editor").then((editor) => {
       const Editor = forwardRef<MDXEditorMethods, LoadedEditorProps>(
-        ({ markdown, onChange, ariaLabel, className }, ref) => (
+        ({ markdown, onChange, onBlur, ariaLabel, className }, ref) => (
           <editor.MDXEditor
             ref={ref}
             markdown={markdown}
             onChange={onChange}
+            onBlur={onBlur}
             aria-label={ariaLabel}
             className={cn(
               "min-h-56 rounded-md border border-input bg-background text-foreground",
@@ -70,6 +75,8 @@ const LoadedMarkdownEditor = dynamic(
 export function MarkdownEditor({
   value,
   onChange,
+  onBlur,
+  resetKey,
   ariaLabel,
   className,
 }: MarkdownEditorProps) {
@@ -77,13 +84,18 @@ export function MarkdownEditor({
 
   useEffect(() => {
     editorRef.current?.setMarkdown(value);
-  }, [value]);
+  }, [resetKey]);
 
   return (
     <LoadedMarkdownEditor
       ref={editorRef}
       markdown={value}
-      onChange={onChange}
+      onChange={(markdown, initialMarkdownNormalize) => {
+        if (!initialMarkdownNormalize) {
+          onChange(markdown);
+        }
+      }}
+      onBlur={onBlur}
       ariaLabel={ariaLabel}
       className={className}
     />
