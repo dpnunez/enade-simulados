@@ -218,16 +218,16 @@ T10 -> T11 -> T12
 
 **Done when**:
 
-- [ ] Component uses `react-hook-form` with `zodResolver`.
-- [ ] Create mode posts to `/api/questions`.
-- [ ] Edit mode patches `/api/questions/[questionId]`.
-- [ ] Form includes markdown description, difficulty, source, year, subject field, explanation, and alternatives.
-- [ ] Subject field select is populated from server-provided options.
-- [ ] Create mode initializes 5 alternatives by default.
-- [ ] Alternatives can be added, removed, reordered, and marked as the single correct option.
-- [ ] Submission states, success state, and error state are visible and accessible.
-- [ ] Successful create resets to a useful blank state; successful edit exits or reports completion cleanly.
-- [ ] Gate check passes: `pnpm build`.
+- [x] Component uses `react-hook-form` with `zodResolver`.
+- [x] Create mode posts to `/api/questions`.
+- [x] Edit mode patches `/api/questions/[questionId]`.
+- [x] Form includes markdown description, difficulty, source, year, subject field, explanation, and alternatives.
+- [x] Subject field select is populated from server-provided options.
+- [x] Create mode initializes 5 alternatives by default.
+- [x] Alternatives can be added, removed, reordered, and marked as the single correct option.
+- [x] Submission states, success state, and error state are visible and accessible.
+- [x] Successful create resets to a useful blank state; successful edit exits or reports completion cleanly.
+- [x] Gate check passes: `pnpm build`.
 
 **Tests**: build; E2E in T11
 **Gate**: build
