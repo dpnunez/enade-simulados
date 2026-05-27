@@ -1,4 +1,5 @@
 import type { Role } from "@prisma-generated-client";
+import { appendFile, mkdir } from "node:fs/promises";
 
 export interface SendInvitationEmailInput {
   email: string;
@@ -23,6 +24,24 @@ export async function sendInvitationEmail(input: SendInvitationEmailInput) {
       role: input.role,
       inviteUrl,
     });
+
+    const logFileName = process.env.INVITATION_EMAIL_LOG_FILE_NAME;
+    const logDir = process.env.INVITATION_EMAIL_LOG_DIR;
+    if (logFileName && logDir) {
+      const logEntry =
+        JSON.stringify({
+          from,
+          to: input.email,
+          role: input.role,
+          inviteUrl,
+        }) + "\n";
+
+      await mkdir(logDir, { recursive: true });
+      await appendFile(`${logDir}/${logFileName}`, logEntry, {
+        encoding: "utf8",
+      });
+    }
+
     return;
   }
 

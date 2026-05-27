@@ -5,7 +5,12 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-import { Alert, AlertDescription, AlertIcon, AlertTitle } from "@/components/ui/alert";
+import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  AlertTitle,
+} from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -50,18 +55,22 @@ export function AcceptInviteForm({ token, email, role }: Props) {
         </Alert>
       ) : null}
       <div className="space-y-2">
-        <Label>Email</Label>
-        <Input value={email} disabled readOnly />
+        <Label htmlFor="invite-email">Email</Label>
+        <Input id="invite-email" value={email} disabled readOnly />
       </div>
       <div className="space-y-2">
-        <Label>Papel</Label>
-        <Input value={role} disabled readOnly />
+        <Label htmlFor="invite-role">Papel</Label>
+        <Input id="invite-role" value={role} disabled readOnly />
       </div>
       <div className="space-y-2">
         <Label htmlFor="password">Senha</Label>
         <Input id="password" type="password" {...form.register("password")} />
       </div>
-      <Button type="submit" disabled={form.formState.isSubmitting}>
+      <Button
+        data-testid="accept-invite-button"
+        type="submit"
+        disabled={form.formState.isSubmitting}
+      >
         {form.formState.isSubmitting ? "Finalizando..." : "Concluir cadastro"}
       </Button>
     </form>

@@ -5,7 +5,7 @@ import { spawnSync } from "node:child_process";
 import { Client } from "pg";
 
 function quoteIdentifier(value: string) {
-  return `"${value.replaceAll("\"", "\"\"")}"`;
+  return `"${value.replaceAll('"', '""')}"`;
 }
 
 function getDatabaseName(databaseUrl: string) {
@@ -58,7 +58,9 @@ async function main() {
     );
 
     if (result.rowCount === 0) {
-      await adminClient.query(`CREATE DATABASE ${quoteIdentifier(databaseName)}`);
+      await adminClient.query(
+        `CREATE DATABASE ${quoteIdentifier(databaseName)}`,
+      );
       console.log(`Database de teste criado: ${databaseName}`);
     } else {
       console.log(`Database de teste já existe: ${databaseName}`);

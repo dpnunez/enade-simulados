@@ -18,7 +18,7 @@ export default async function PrivateHomePage() {
       </CardHeader>
       <CardContent>
         <p className="text-sm text-muted-foreground">
-          Role atual: <span className="font-medium">{session.user.role}</span>
+          Role atual: <span className="font-medium" data-testid="current-role">{session.user.role}</span>
         </p>
       </CardContent>
     </Card>

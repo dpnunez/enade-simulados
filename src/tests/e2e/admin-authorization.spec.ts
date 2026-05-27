@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 import { TEST_USERS } from "./fixtures/users";
-import { loginAs } from "./helpers/login";
+import { loginAs } from "./helpers/auth";
 
 test("bloqueia student na rota admin e redireciona para /app", async ({
   page,
@@ -17,8 +17,8 @@ test("bloqueia student na rota admin e redireciona para /app", async ({
     }),
   ).toBeVisible();
   await expect(
-    page.getByText(
-      new RegExp(`Role atual:\\s*${TEST_USERS.student.role}`),
-    ).first(),
+    page
+      .getByText(new RegExp(`Role atual:\\s*${TEST_USERS.student.role}`))
+      .first(),
   ).toBeVisible();
 });

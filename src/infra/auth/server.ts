@@ -12,6 +12,9 @@ export const auth = betterAuth({
     enabled: true,
     disableSignUp: true,
   },
+  rateLimit: {
+    enabled: process.env.BETTER_AUTH_RATE_LIMIT_DISABLED !== "true",
+  },
   user: {
     additionalFields: {
       role: {

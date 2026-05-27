@@ -18,7 +18,10 @@ export async function GET() {
   });
 
   if (!hasRole(session, "ADMIN")) {
-    return Response.json({ success: false, error: "UNAUTHORIZED" }, { status: 401 });
+    return Response.json(
+      { success: false, error: "UNAUTHORIZED" },
+      { status: 401 },
+    );
   }
 
   const [users, invitations] = await Promise.all([
@@ -44,7 +47,10 @@ export async function POST(request: Request) {
   });
 
   if (!hasRole(session, "ADMIN")) {
-    return Response.json({ success: false, error: "UNAUTHORIZED" }, { status: 401 });
+    return Response.json(
+      { success: false, error: "UNAUTHORIZED" },
+      { status: 401 },
+    );
   }
 
   const body = await request.json();
