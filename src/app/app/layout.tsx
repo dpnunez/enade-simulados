@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BookOpenCheck, ShieldCheck, UserRound } from "lucide-react";
+import { BookOpenCheck, ClipboardList, ShieldCheck, UserRound } from "lucide-react";
 
 import { requireAuth } from "@auth/session";
 import { Badge } from "@/components/ui/badge";
@@ -49,12 +49,20 @@ export default async function PrivateLayout({
               <Link href="/app/teacher">Teacher</Link>
             </Button>
             {session.user.role === "TEACHER" ? (
-              <Button asChild variant="outline" size="sm">
-                <Link href="/app/professor/grandes-areas">
-                  <BookOpenCheck aria-hidden="true" />
-                  Grandes areas
-                </Link>
-              </Button>
+              <>
+                <Button asChild variant="outline" size="sm">
+                  <Link href="/app/professor/grandes-areas">
+                    <BookOpenCheck aria-hidden="true" />
+                    Grandes areas
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" size="sm">
+                  <Link href="/app/professor/questoes">
+                    <ClipboardList aria-hidden="true" />
+                    Questoes
+                  </Link>
+                </Button>
+              </>
             ) : null}
           </nav>
         </CardContent>

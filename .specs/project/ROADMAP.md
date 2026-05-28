@@ -59,7 +59,15 @@
 
 - Criar questões objetivas com alternativas
 - Definir resposta correta, explicação e dificuldade
-- Suportar anexos/imagens quando necessário
+- Associar cada questão a uma grande área
+- Editar enunciado markdown com `@mdxeditor/editor`
+- Suportar anexos/imagens quando necessário em fase futura
+
+**Rollup de questões em grandes áreas** - PLANNED
+
+- Mostrar quantidade de questões por grande área
+- Deletar grande área com cascade para questões e alternativas
+- Implementar somente após a gestão de questões
 
 **Experiência administrativa inicial** - PLANNED
 

@@ -1,6 +1,6 @@
 # Tech Stack
 
-**Analyzed:** 2026-05-25
+**Analyzed:** 2026-05-28
 
 ## Core
 
@@ -17,6 +17,7 @@
 - Component system: shadcn-style local components in `src/components/ui`
 - Primitive UI dependencies: Radix Slot, Label, Separator
 - Icons: `lucide-react`
+- Markdown editing: `@mdxeditor/editor` wrapped by `src/components/markdown/markdown-editor.tsx`
 - Utility styling: `clsx`, `tailwind-merge`, `class-variance-authority`, `tw-animate-css`
 - Form handling: `react-hook-form` for new or modified forms, paired with shadcn-style inputs
 - Form validation: `zod` schemas with `@hookform/resolvers` for client-side resolver integration and server-side trusted validation/actions
@@ -30,6 +31,7 @@
 - ORM: Prisma 7.8.0, generated client output to `src/generated/prisma`
 - Database: PostgreSQL 17 via Docker Compose
 - Database adapter: `@prisma/adapter-pg` with `pg`
+- Domain modules: invitations, subject fields, and questions under `src/features`
 
 ## Testing
 
@@ -38,12 +40,14 @@
 - Assertions: `@testing-library/jest-dom`
 - Component testing library present: `@testing-library/react`
 - E2E: Playwright 1.56.0, Chromium project
+- Database helpers: `knex` is present for E2E database preparation scripts
 
 ## External Services
 
 - Database: local PostgreSQL container from `docker-compose.yml`
 - Authentication/session service: Better Auth hosted inside the Next.js app, not external SaaS
-- Email/file storage/queues: none implemented yet
+- Invitation email: local adapter boundary implemented, currently console/test-oriented unless SMTP/provider is added
+- File storage/queues: none implemented yet
 
 ## Development Tools
 
