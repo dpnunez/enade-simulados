@@ -1,7 +1,7 @@
 # Subject Field Question Rollup Design
 
 **Spec**: `.specs/features/subject-field-question-rollup/spec.md`
-**Status**: Draft
+**Status**: Implemented
 
 ---
 

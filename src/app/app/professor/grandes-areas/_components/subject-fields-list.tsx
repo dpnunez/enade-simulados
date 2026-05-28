@@ -28,6 +28,10 @@ function creatorLabel(subjectField: SubjectFieldListItem) {
   return subjectField.createdBy.name ?? subjectField.createdBy.email;
 }
 
+function questionCountLabel(count: number) {
+  return count === 1 ? "1 questao" : `${count} questoes`;
+}
+
 export function SubjectFieldsList({ subjectFields }: SubjectFieldsListProps) {
   const router = useRouter();
   const [items, setItems] = useState(subjectFields);
@@ -106,6 +110,9 @@ export function SubjectFieldsList({ subjectFields }: SubjectFieldsListProps) {
                     {subjectField.title}
                   </CardTitle>
                   <Badge variant="outline">{subjectField.colorHex}</Badge>
+                  <Badge variant="secondary">
+                    {questionCountLabel(subjectField._count.questions)}
+                  </Badge>
                 </div>
                 <p className="break-words text-sm text-muted-foreground">
                   {subjectField.description}

@@ -1,6 +1,6 @@
 # State
 
-**Last Updated:** 2026-05-27T19:53:58-03:00
+**Last Updated:** 2026-05-28T12:54:53-03:00
 
 ---
 
@@ -90,6 +90,13 @@
 **Trade-off:** Durante a primeira feature, grandes areas com questoes devem continuar protegidas contra delecao em cascade ate a fase seguinte.
 **Impact:** A relacao `Question.subjectFieldId` deve comecar sem cascade para `SubjectField`; a mudanca para cascade sera feita no plano posterior.
 
+### AD-013: Grandes areas deletam questoes em cascade (2026-05-28)
+
+**Decision:** A relacao `Question.subjectFieldId` agora usa `onDelete: Cascade`, e a listagem de grandes areas mostra `_count.questions`.
+**Reason:** A feature `.specs/features/subject-field-question-rollup` foi implementada apos a entrega principal de questoes.
+**Trade-off:** Deletar uma grande area remove questoes e alternativas relacionadas sem confirmacao extra especifica para esse impacto.
+**Impact:** Testes e rotinas de limpeza que removem grandes areas devem considerar que questoes vinculadas e alternativas tambem serao removidas pelo banco.
+
 ## Active Blockers
 
 Nenhum blocker ativo registrado no momento.
@@ -125,6 +132,7 @@ Nenhum blocker ativo registrado no momento.
 - [x] Implementar `.specs/features/grandes-areas/tasks.md`: CRUD de grandes areas para professores, E2E e gates finais
 - [x] Planejar `.specs/features/questions`: cadastro de questoes com alternativas e editor markdown
 - [x] Planejar `.specs/features/subject-field-question-rollup`: contagem e cascade posterior em grandes areas
+- [x] Implementar `.specs/features/subject-field-question-rollup`: contagem de questoes e cascade SubjectField -> Question -> QuestionAlternative
 - [ ] Revisar o roadmap quando a área administrativa ganhar CRUD real
 - [ ] Definir provedor de email para envio real de convites em produção
 

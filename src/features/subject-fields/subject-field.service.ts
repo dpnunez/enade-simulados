@@ -50,6 +50,9 @@ function mapSubjectFieldWriteError(error: unknown): never {
 export async function listSubjectFields() {
   return prisma.subjectField.findMany({
     include: {
+      _count: {
+        select: { questions: true },
+      },
       createdBy: {
         select: { id: true, name: true, email: true },
       },
