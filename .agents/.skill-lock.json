@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "skills": {
+    "codenavi": {
+      "name": "codenavi",
+      "source": "local",
+      "contentHash": "23ac05b7f2d8df8311129d41432eba248bdcf14e9ace3f17c581976f7d888ada",
+      "installedAt": "2026-05-28T15:23:44.432Z",
+      "updatedAt": "2026-05-28T15:23:44.432Z",
+      "agents": [
+        "codex"
+      ],
+      "method": "copy",
+      "global": false
+    }
+  }
+}
