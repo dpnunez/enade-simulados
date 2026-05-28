@@ -1,6 +1,6 @@
 # Code Conventions
 
-**Analyzed:** 2026-05-25
+**Analyzed:** 2026-05-28
 
 ## Naming Conventions
 
@@ -8,6 +8,8 @@
 
 - App Router convention files use `page.tsx`, `layout.tsx`, and `route.ts`.
 - Client component helpers use descriptive kebab names such as `logout-button.tsx`.
+- Route-private component folders use `_components`, e.g. `src/app/app/admin/_components/invite-form.tsx`.
+- Feature files use `[feature].schema.ts`, `[feature].service.ts`, and colocated `[feature].*.test.ts`.
 - Tests use `.test.ts` for unit tests and `.spec.ts` for Playwright E2E.
 - Shared UI primitives use lowercase component names: `button.tsx`, `card.tsx`, `input.tsx`.
 
@@ -15,11 +17,14 @@
 
 - React components use PascalCase: `LoginPage`, `PrivateLayout`, `AdminPage`, `LogoutButton`.
 - Server/auth helpers use camelCase verbs: `getCurrentSession`, `requireAuth`, `requireRole`.
+- Feature services use verb phrases: `createInvitation`, `acceptInvitation`, `listSubjectFields`, `createQuestion`, `updateQuestion`, `deleteQuestion`.
+- Domain errors use `FeatureDomainError` classes with uppercase code unions, e.g. `QuestionDomainError` and `"QUESTION_NOT_FOUND"`.
 - Test helpers use action names: `loginAs`.
 
 **Variables and Constants:**
 
 - Constants use uppercase object names: `ROLES`, `TEST_USERS`, `AUTH_ROUTES`, `PRIVATE_PREFIXES`.
+- Local Prisma error-code maps use descriptive camelCase constants, e.g. `prismaKnownRequestErrorCode`.
 - Local booleans are prefixed semantically: `hasSessionCookie`, `isPrivateRoute`, `isAuthRoute`.
 
 ## Code Organization
@@ -40,6 +45,9 @@ Observed ordering is external packages first, then internal aliases, then relati
 - Form validation schemas use `zod`; when client-side validation is needed, wire schemas into `react-hook-form` with `@hookform/resolvers/zod`.
 - Server-side API handlers own authorization and trusted `zod` validation; `react-hook-form` is a UI/form-state layer, not a security boundary.
 - Route-specific form components should stay close to their route, commonly under `_components`, until they become reusable across multiple surfaces.
+- Feature services parse inputs with Zod at entry and map expected Prisma write failures to domain errors.
+- API route handlers parse JSON defensively where needed, return a `{ success, error }` JSON shape for failures, and keep framework handling thin.
+- Markdown editing is wrapped in `src/components/markdown/markdown-editor.tsx`; route forms should consume the wrapper instead of importing `@mdxeditor/editor` directly.
 
 **UI style:**
 
@@ -53,11 +61,14 @@ Observed ordering is external packages first, then internal aliases, then relati
 - Prisma enum/type imports come from the generated alias `@prisma-generated-client`.
 - Component props use explicit types, usually inline `Readonly<{ children: React.ReactNode }>` for layouts.
 - Better Auth session type is exported as `Session = typeof auth.$Infer.Session`.
+- Derived service result types use `Awaited<ReturnType<typeof fn>>[number]` or similar, e.g. `SubjectFieldListItem` and `QuestionEditable`.
 
 ## Error Handling
 
 - Auth redirect helpers rely on Next.js `redirect()` for control flow.
 - Login UI stores an error string in React state and shows a destructive `Alert`.
+- Domain services throw typed domain errors for expected business conflicts; API routes map those to HTTP status codes and stable error codes.
+- Question and subject-field services map Prisma known request codes such as `P2002`, `P2003`, and `P2025` where those are part of expected domain behavior.
 - Scripts throw `Error` for missing env/config and set `process.exitCode` in top-level catch blocks.
 - Tests mock redirects by throwing `REDIRECT:/path`, allowing assertions on redirect behavior.
 

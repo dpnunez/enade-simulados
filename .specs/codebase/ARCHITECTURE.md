@@ -1,8 +1,8 @@
 # Architecture
 
-**Analyzed:** 2026-05-25
+**Analyzed:** 2026-05-28
 
-**Pattern:** Small modular Next.js monolith with App Router, centralized auth/session helpers, Prisma data access, and local UI components.
+**Pattern:** Modular Next.js monolith with App Router route boundaries, centralized auth/session helpers, Prisma data access, and feature folders for domain behavior.
 
 ## High-Level Structure
 
@@ -17,6 +17,9 @@ flowchart TD
     AppRouter --> UI["src/components/ui"]
     AppRouter --> AuthRoute["src/app/api/auth/[...all]/route.ts"]
     AuthRoute --> BetterAuth
+    AppRouter --> FeatureRoutes["src/app/api domain routes"]
+    FeatureRoutes --> Features["src/features/* services/schemas"]
+    Features --> Prisma
 ```
 
 ## Identified Patterns
@@ -42,6 +45,20 @@ flowchart TD
 **Implementation:** `getCurrentSession()` calls `auth.api.getSession` with `next/headers`; `requireAuth()` redirects to `/login`; `requireRole(role)` redirects unauthorized users to `/app`.
 **Example:** `src/app/app/admin/page.tsx` calls `requireRole("ADMIN")`.
 
+### API-Level Role Checks
+
+**Location:** `src/app/api/**/route.ts` and `src/infra/auth/authorization.ts`
+**Purpose:** Protect mutation and JSON read boundaries independently from page visibility.
+**Implementation:** Route handlers call `auth.api.getSession({ headers })` and then `hasRole()` before validation or mutation. Admin routes protect invitations; teacher routes protect subject fields and questions.
+**Example:** `src/app/api/questions/route.ts` rejects non-teachers with `{ success: false, error: "UNAUTHORIZED" }`.
+
+### Feature Service + Schema Modules
+
+**Location:** `src/features`
+**Purpose:** Keep domain rules and validation outside App Router files.
+**Implementation:** Each feature has a `*.schema.ts` with Zod validation and a `*.service.ts` with Prisma mutations/query helpers and domain errors.
+**Example:** `src/features/questions/question.service.ts` validates input, checks subject-field existence, writes question alternatives in a transaction, and maps Prisma errors to `QuestionDomainError`.
+
 ### Better Auth Route Handler
 
 **Location:** `src/app/api/auth/[...all]/route.ts`
@@ -62,6 +79,13 @@ flowchart TD
 **Purpose:** Reusable UI primitives aligned with shadcn conventions.
 **Implementation:** Components use `React.forwardRef`, `cn`, Radix primitives where applicable, and `class-variance-authority` for variants.
 **Example:** `src/components/ui/button.tsx` exports `Button` and `buttonVariants`.
+
+### Dynamic Markdown Editor Wrapper
+
+**Location:** `src/components/markdown/markdown-editor.tsx`
+**Purpose:** Provide browser-only rich Markdown editing without server-rendering MDXEditor.
+**Implementation:** Uses `next/dynamic` with `ssr: false`, imports `@mdxeditor/editor/style.css`, and exposes a controlled `MarkdownEditor` wrapper with a `resetKey` sync hook.
+**Example:** Question forms consume this editor for Markdown statement and alternative fields.
 
 ## Data Flow
 
@@ -108,19 +132,41 @@ sequenceDiagram
 
 `playwright.config.ts` runs `src/tests/e2e/global-setup.ts`, which loads `.env.test`, runs `pnpm e2e:prepare`, creates the test database if missing, deploys migrations, and seeds deterministic users. The web server builds and starts Next on port `3001`.
 
+### Invitation Flow
+
+```mermaid
+sequenceDiagram
+    actor Admin
+    participant API as src/app/api/invitations/route.ts
+    participant Service as src/features/invitations/invitation.service.ts
+    participant Email as invitation-email.adapter.ts
+    participant DB as Prisma/PostgreSQL
+
+    Admin->>API: POST email + role
+    API->>API: require ADMIN + zod validation
+    API->>Service: createInvitation()
+    Service->>DB: reject existing user/pending invite, store token hash
+    API->>Email: sendInvitationEmail(token link)
+    API-->>Admin: invitation without raw token
+```
+
+### Teacher Content Flow
+
+Teachers manage subject fields and questions through `/app/professor/**` pages backed by `/api/subject-fields/**` and `/api/questions/**`. UI forms use `react-hook-form` plus Zod schemas from `src/features`; API routes re-run trusted validation, enforce `TEACHER`, and call service functions that own Prisma writes.
+
 ## Code Organization
 
-**Approach:** Layered by framework area plus product feature folders. Current domain is mostly authentication; future features are expected to add focused folders under `src/features`.
+**Approach:** Layered by framework area plus product feature folders. Auth and infrastructure remain centralized; product behavior lives in `src/features` with route/page adapters in `src/app`.
 
 **Structure:**
 
 - `src/app`: App Router pages, layouts, and route handlers
 - `src/infra/auth`: Better Auth config, client, session helpers, role constants, unit tests
 - `src/components/ui`: shadcn-style primitives
-- `src/features`: product capability code shared across routes without implying strict module isolation
+- `src/features`: invitation, subject-field, and question schemas/services/tests
 - `src/infra/db`: Prisma client infrastructure
 - `src/tests`: setup and E2E test suite
 - `scripts`: seed and E2E database/server orchestration
 - `prisma`: schema and migrations
 
-**Feature boundaries:** Auth and database helpers are imported through TypeScript aliases (`@auth/*`, `@infra/*`, `@prisma-generated-client`, `@/*`). UI primitives are local and imported from `@/components/ui/*`. Feature folders under `src/features` group product capabilities while allowing direct imports when the dependency is explicit and useful.
+**Feature boundaries:** Auth and database helpers are imported through TypeScript aliases (`@auth/*`, `@infra/*`, `@prisma-generated-client`, `@/*`). UI primitives are local and imported from `@/components/ui/*`. Feature folders under `src/features` expose schemas, services, domain errors, and colocated unit tests; App Router files act as thin UI/API adapters.

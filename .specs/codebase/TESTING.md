@@ -1,6 +1,6 @@
 # Testing Infrastructure
 
-**Analyzed:** 2026-05-25
+**Analyzed:** 2026-05-28
 
 ## Test Frameworks
 
@@ -12,7 +12,7 @@
 
 **Location:**
 
-- Unit tests can be colocated with source, e.g. `src/infra/auth/session.test.ts`.
+- Unit tests can be colocated with source, e.g. `src/infra/auth/session.test.ts` and `src/features/questions/question.service.test.ts`.
 - E2E tests live in `src/tests/e2e`.
 - Shared setup lives in `src/tests/setup` and `src/tests/e2e/global-setup.ts`.
 - E2E helpers and fixtures live in `src/tests/e2e/helpers` and `src/tests/e2e/fixtures`.
@@ -31,16 +31,18 @@
 
 `src/infra/auth/session.test.ts` uses `vi.hoisted` to define mocks before importing the module under test. It mocks `next/headers`, `next/navigation`, and `@auth/server`, then asserts `getCurrentSession`, `requireAuth`, and `requireRole`.
 
+Feature service tests mock Prisma and assert domain behavior for invitations, subject fields, and questions. Schema tests cover Zod normalization and validation contracts near their feature modules.
+
 ### Integration-Light Tests
 
-No separate integration test directory is present. Current "integration-light" coverage is unit-level with mocked boundaries. Database-backed integration tests are not yet implemented.
+No separate integration test directory is present. Current "integration-light" coverage is unit-level with mocked boundaries plus Playwright for real database flows. Database-backed non-browser integration tests are not yet implemented.
 
 ### E2E Tests
 
 **Approach:** Real browser against built Next server and real PostgreSQL test database.
 **Location:** `src/tests/e2e`
 
-Playwright tests use deterministic seed users from `src/tests/e2e/fixtures/users.ts`. `loginAs` drives the login page with semantic locators. Existing specs cover successful login and admin route denial for a student.
+Playwright tests use deterministic seed users from `src/tests/e2e/fixtures/users.ts`. `loginAs` drives the login page with semantic locators. Existing specs cover login, admin authorization, invitations, and subject-field management.
 
 ## Test Execution
 
@@ -70,6 +72,7 @@ Playwright tests use deterministic seed users from `src/tests/e2e/fixtures/users
 | --- | --- | --- | --- |
 | Pure helpers and validation | unit | `src/**/*.test.ts` | `pnpm test:unit` |
 | Auth/session helpers | unit | `src/infra/auth/*.test.ts` | `pnpm test:unit` |
+| Feature services and schemas | unit with mocked Prisma/adapters | `src/features/**/*.test.ts` | `pnpm test:unit` |
 | API Route Handlers and data mutations | unit/integration-light, plus E2E if user-visible | colocated `*.test.ts`; E2E in `src/tests/e2e` | `pnpm test:unit`, `pnpm test:e2e` |
 | App Router pages/layouts with visible behavior | e2e for critical flows | `src/tests/e2e/*.spec.ts` | `pnpm test:e2e` |
 | Prisma schema/migrations | build plus E2E DB setup | `prisma/**`, `scripts/e2e/**` | `pnpm build`, `pnpm test:e2e` |

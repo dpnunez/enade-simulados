@@ -1,14 +1,14 @@
 # Codebase Concerns
 
-**Analyzed:** 2026-05-25
+**Analyzed:** 2026-05-28
 
-## P1: Public Signup Is Disabled but No Production User Provisioning Exists Yet
+## P1: Invitation Email Delivery Is Not Production-Ready
 
-**Evidence:** `src/infra/auth/server.ts` sets `emailAndPassword.disableSignUp: true`; `scripts/seed-users.ts` creates deterministic users for local/test usage.
+**Evidence:** `src/features/invitations/invitation-email.adapter.ts` provides the adapter boundary, and docs/config mention console/test-oriented delivery. No SMTP or external email dependency is installed.
 
-**Risk:** Outside seed scripts, there is currently no product flow for creating real teacher/student users.
+**Risk:** Admin invitation creation can exist in product code before real email delivery is available for production users.
 
-**Fix Approach:** Implement the planned invitation feature as the only user provisioning path. Keep public signup disabled.
+**Fix Approach:** Wire a concrete SMTP/provider adapter behind the existing invitation email boundary and test both success and provider failure behavior.
 
 ## P1: E2E Test Database Is Prepared but Not Reset Between Runs
 
@@ -18,13 +18,13 @@
 
 **Fix Approach:** Add deterministic cleanup for non-seed data in `prepare-test-db.ts`, or recreate the test database/schema before each Playwright run.
 
-## P1: Authorization Relies on Page-Level `requireRole`; No Mutation Pattern Exists Yet
+## P1: Question Browser Flow Lacks E2E Coverage
 
-**Evidence:** `src/app/app/admin/page.tsx` calls `requireRole("ADMIN")`. There are no domain mutations yet.
+**Evidence:** Unit tests exist for `src/features/questions`, and question routes/pages exist under `src/app/app/professor/questoes`; no `src/tests/e2e/questions.spec.ts` was observed.
 
-**Risk:** New mutations could accidentally rely only on UI visibility or proxy checks. HTTP endpoints and other server-side mutation boundaries can be invoked directly, so each mutation must authorize internally.
+**Risk:** Markdown editor behavior, alternative validation, create/edit navigation, and route-level teacher authorization could regress without browser coverage.
 
-**Fix Approach:** For every API handler/controller that mutates data, resolve the current session and enforce the required role before touching data. Add unit tests for unauthorized mutation attempts.
+**Fix Approach:** Add a focused Playwright spec for creating and editing a question through `/app/professor/questoes` once the flow is stable enough for deterministic selectors.
 
 ## P2: Proxy Cookie Check Is Only an Optimistic Gate
 
@@ -34,21 +34,13 @@
 
 **Fix Approach:** Keep all sensitive pages and mutations protected by server-side session checks. Document this pattern in feature tasks.
 
-## P2: No Email Integration Yet
+## P2: Domain Model Still Has Major Product Areas Missing
 
-**Evidence:** No email dependency, SMTP config, or mailer module exists. `.env.example` only includes database and Better Auth variables.
+**Evidence:** `prisma/schema.prisma` now has invitations, subject fields, questions, and alternatives. README/planned product scope still includes simulations, attempts, answers, metrics, and broader student flows.
 
-**Risk:** Invitation delivery cannot be production-ready without choosing and configuring a provider.
+**Risk:** Future features may pressure existing question structures if attempt/answer modeling needs additional invariants or reporting dimensions.
 
-**Fix Approach:** Add an email adapter boundary first, with deterministic dev/test behavior, then wire SMTP or provider credentials when available.
-
-## P2: Domain Model Is Still Auth-Only
-
-**Evidence:** `prisma/schema.prisma` only contains Better Auth models plus `User.role`; README lists matérias, questões, simulados, attempts, answers, and metrics as planned but not implemented.
-
-**Risk:** Future features will introduce most of the core domain at once unless scoped carefully.
-
-**Fix Approach:** Continue using spec-driven slices. Add schema and tests per feature, starting with the smallest useful vertical slice.
+**Fix Approach:** Continue spec-driven vertical slices. Model attempts/answers with migrations and tests before adding dashboard/reporting UI.
 
 ## P3: Generated Prisma Client Path Requires Discipline
 
