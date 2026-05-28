@@ -6,10 +6,10 @@ Depois que questoes existirem no dominio, a listagem de grandes areas deve mostr
 
 ## Goals
 
-- [ ] Mostrar a quantidade de questoes em cada grande area na listagem de grandes areas.
-- [ ] Alterar a relacao `Question.subjectFieldId` para cascade quando uma grande area for removida.
-- [ ] Garantir que alternativas sejam removidas junto com suas questoes.
-- [ ] Cobrir o comportamento com testes depois da implementacao principal de questoes.
+- [x] Mostrar a quantidade de questoes em cada grande area na listagem de grandes areas.
+- [x] Alterar a relacao `Question.subjectFieldId` para cascade quando uma grande area for removida.
+- [x] Garantir que alternativas sejam removidas junto com suas questoes.
+- [x] Cobrir o comportamento com testes depois da implementacao principal de questoes.
 
 ## Out of Scope
 
@@ -56,16 +56,16 @@ Depois que questoes existirem no dominio, a listagem de grandes areas deve mostr
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| SFR-01 | P1: Professor Ve Quantidade de Questoes por Grande Area | Design | Pending |
-| SFR-02 | P1: Professor Deleta Grande Area com Cascade | Design | Pending |
+| SFR-01 | P1: Professor Ve Quantidade de Questoes por Grande Area | Implemented | Done |
+| SFR-02 | P1: Professor Deleta Grande Area com Cascade | Implemented | Done |
 
-**Coverage:** 2 total, 2 mapped to draft tasks, 0 unmapped.
+**Coverage:** 2 total, 2 implemented, 0 unmapped.
 
 ---
 
 ## Success Criteria
 
-- [ ] Grandes areas list shows a question count.
-- [ ] Deleting a grande area deletes related questions.
-- [ ] Deleting related questions deletes related alternatives.
-- [ ] E2E verifies count and cascade behavior.
+- [x] Grandes areas list shows a question count.
+- [x] Deleting a grande area deletes related questions.
+- [x] Deleting related questions deletes related alternatives.
+- [x] E2E verifies count and cascade behavior.

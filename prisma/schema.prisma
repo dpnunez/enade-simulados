@@ -132,7 +132,7 @@ model Question {
   source                   QuestionSource?
   year                     Int?
   subjectFieldId           String
-  subjectField             SubjectField          @relation(fields: [subjectFieldId], references: [id], onDelete: Restrict)
+  subjectField             SubjectField          @relation(fields: [subjectFieldId], references: [id], onDelete: Cascade)
   correctAnswerExplanation String?
   createdById              String
   createdBy                User                  @relation(fields: [createdById], references: [id], onDelete: Restrict)

@@ -1,7 +1,7 @@
 # Subject Field Question Rollup Tasks
 
 **Design**: `.specs/features/subject-field-question-rollup/design.md`
-**Status**: Draft
+**Status**: Done
 
 ---
 
@@ -25,10 +25,10 @@ T1 -> T2 -> T3 -> T4
 
 **Done when**:
 
-- [ ] `Question.subjectFieldId` uses `onDelete: Cascade`.
-- [ ] Migration is checked in.
-- [ ] Prisma client generation succeeds.
-- [ ] Gate check passes: `pnpm build`.
+- [x] `Question.subjectFieldId` uses `onDelete: Cascade`.
+- [x] Migration is checked in.
+- [x] Prisma client generation succeeds.
+- [x] Gate check passes: `pnpm build`.
 
 **Tests**: build; E2E in T3
 **Gate**: build
@@ -45,10 +45,10 @@ T1 -> T2 -> T3 -> T4
 
 **Done when**:
 
-- [ ] `listSubjectFields` includes `_count.questions`.
-- [ ] Each subject-field card displays the number of questions.
-- [ ] Zero questions is displayed clearly.
-- [ ] Gate check passes: `pnpm build`.
+- [x] `listSubjectFields` includes `_count.questions`.
+- [x] Each subject-field card displays the number of questions.
+- [x] Zero questions is displayed clearly.
+- [x] Gate check passes: `pnpm build`.
 
 **Tests**: build; E2E in T3
 **Gate**: build
@@ -65,11 +65,11 @@ T1 -> T2 -> T3 -> T4
 
 **Done when**:
 
-- [ ] Test creates a deterministic subject field with questions and alternatives.
-- [ ] Test verifies the grandes areas page shows the expected question count.
-- [ ] Test deletes the subject field through the UI.
-- [ ] Test verifies related questions and alternatives are deleted.
-- [ ] Gate check passes: `pnpm test:e2e`.
+- [x] Test creates a deterministic subject field with questions and alternatives.
+- [x] Test verifies the grandes areas page shows the expected question count.
+- [x] Test deletes the subject field through the UI.
+- [x] Test verifies related questions and alternatives are deleted.
+- [x] Gate check passes: `pnpm test:e2e`.
 
 **Tests**: e2e
 **Gate**: e2e
@@ -86,10 +86,10 @@ T1 -> T2 -> T3 -> T4
 
 **Done when**:
 
-- [ ] `pnpm test:unit` passes.
-- [ ] `pnpm test:e2e` passes.
-- [ ] `pnpm build` passes.
-- [ ] Requirement traceability statuses are updated.
+- [x] `pnpm test:unit` passes.
+- [x] `pnpm test:e2e` passes.
+- [x] `pnpm build` passes.
+- [x] Requirement traceability statuses are updated.
 
 **Tests**: full/build
 **Gate**: full

@@ -37,6 +37,9 @@ describe("subject-field.service", () => {
     expect(result).toEqual([{ id: "sf_1" }]);
     expect(mocks.prisma.subjectField.findMany).toHaveBeenCalledWith({
       include: {
+        _count: {
+          select: { questions: true },
+        },
         createdBy: {
           select: { id: true, name: true, email: true },
         },
