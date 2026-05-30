@@ -1,6 +1,8 @@
 import knex from "knex";
 import { randomUUID } from "node:crypto";
 
+import { createQuestionContentHash } from "@/features/questions/question-content-hash";
+
 export const SUBJECT_FIELD_E2E_TITLE_PREFIX = "E2E Grande Area";
 
 export function buildSubjectFieldTitle(label: string) {
@@ -43,6 +45,9 @@ export async function createSubjectFieldWithQuestions(label: string, questionCou
       .insert({
         id: buildE2eId("question"),
         descriptionMarkdown: `E2E Questao Rollup ${label} ${index + 1}`,
+        contentHash: createQuestionContentHash(
+          `E2E Questao Rollup ${label} ${index + 1}`,
+        ),
         difficulty: "MEDIUM",
         source: "MANUAL",
         year: 2024,

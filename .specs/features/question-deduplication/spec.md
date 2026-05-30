@@ -6,12 +6,12 @@ Professores podem cadastrar a mesma questao mais de uma vez quando o enunciado m
 
 ## Goals
 
-- [ ] Impedir criacao de duas questoes com o mesmo conteudo canonicalizado.
-- [ ] Impedir edicao de uma questao para um conteudo que ja pertence a outra questao.
-- [ ] Manter `Question.id` estavel e independente do conteudo da questao.
-- [ ] Usar SHA-256 como assinatura deterministica de deduplicacao.
-- [ ] Garantir protecao no banco via indice unico para suportar concorrencia.
-- [ ] Exibir erro claro para professores quando uma questao duplicada for detectada.
+- [x] Impedir criacao de duas questoes com o mesmo conteudo canonicalizado.
+- [x] Impedir edicao de uma questao para um conteudo que ja pertence a outra questao.
+- [x] Manter `Question.id` estavel e independente do conteudo da questao.
+- [x] Usar SHA-256 como assinatura deterministica de deduplicacao.
+- [x] Garantir protecao no banco via indice unico para suportar concorrencia.
+- [x] Exibir erro claro para professores quando uma questao duplicada for detectada.
 
 ## Out of Scope
 
@@ -93,22 +93,22 @@ Professores podem cadastrar a mesma questao mais de uma vez quando o enunciado m
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| QDUP-01 | P1: Professor Nao Cria Questao Duplicada MVP | Design | Pending |
-| QDUP-02 | P1: Professor Nao Cria Questao Duplicada MVP | Design | Pending |
-| QDUP-03 | P1: Professor Nao Edita Questao Para Conteudo Duplicado | Design | Pending |
-| QDUP-04 | P2: Sistema Migra Dados Existentes Com Seguranca | Design | Pending |
-| QDUP-05 | Edge Cases: canonicalizacao, constraint e concorrencia | Design | Pending |
+| QDUP-01 | P1: Professor Nao Cria Questao Duplicada MVP | Complete | Complete |
+| QDUP-02 | P1: Professor Nao Cria Questao Duplicada MVP | Complete | Complete |
+| QDUP-03 | P1: Professor Nao Edita Questao Para Conteudo Duplicado | Complete | Complete |
+| QDUP-04 | P2: Sistema Migra Dados Existentes Com Seguranca | Complete | Complete |
+| QDUP-05 | Edge Cases: canonicalizacao, constraint e concorrencia | Complete | Complete |
 
-**Coverage:** 5 total, 5 mapped to draft tasks, 0 unmapped.
+**Coverage:** 5 total, 5 mapped to completed tasks, 0 unmapped.
 
 ---
 
 ## Success Criteria
 
-- [ ] `Question` has a persisted unique `contentHash` derived from normalized `descriptionMarkdown`.
-- [ ] `Question.id` remains a generated stable identifier and does not depend on content.
-- [ ] Create and update flows compute the same hash for equivalent markdown.
-- [ ] Duplicate create/update requests return `QUESTION_DUPLICATE_CONTENT`.
-- [ ] The question form displays a Portuguese duplicate-content message and preserves input.
-- [ ] Unit tests cover hash normalization and service duplicate mapping.
-- [ ] E2E coverage verifies duplicate prevention through the browser flow.
+- [x] `Question` has a persisted unique `contentHash` derived from normalized `descriptionMarkdown`.
+- [x] `Question.id` remains a generated stable identifier and does not depend on content.
+- [x] Create and update flows compute the same hash for equivalent markdown.
+- [x] Duplicate create/update requests return `QUESTION_DUPLICATE_CONTENT`.
+- [x] The question form displays a Portuguese duplicate-content message and preserves input.
+- [x] Unit tests cover hash normalization and service duplicate mapping.
+- [x] E2E coverage verifies duplicate prevention through the browser flow.

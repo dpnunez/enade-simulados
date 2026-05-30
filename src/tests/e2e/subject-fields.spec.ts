@@ -67,6 +67,7 @@ test.describe('"grande area" management', () => {
 
     await page.getByRole("button", { name: "Deletar" }).click();
     await page.getByRole("button", { name: "Confirmar delecao" }).click();
+    await expect(page.getByRole("heading", { name: updatedTitle })).toHaveCount(0);
 
     await page.reload();
     await expect(page.getByRole("heading", { name: updatedTitle })).toHaveCount(0);

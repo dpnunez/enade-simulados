@@ -7,10 +7,12 @@ import {
   type ParsedQuestionInput,
   type QuestionInput,
 } from "./question.schema";
+import { createQuestionContentHash } from "./question-content-hash";
 
 export type QuestionErrorCode =
   | "QUESTION_NOT_FOUND"
-  | "QUESTION_SUBJECT_FIELD_NOT_FOUND";
+  | "QUESTION_SUBJECT_FIELD_NOT_FOUND"
+  | "QUESTION_DUPLICATE_CONTENT";
 
 export class QuestionDomainError extends Error {
   constructor(public readonly code: QuestionErrorCode) {
@@ -30,6 +32,7 @@ const questionInclude = {
 const prismaKnownRequestErrorCode = {
   requiredRecordNotFound: "P2025",
   foreignKeyConstraintFailed: "P2003",
+  uniqueConstraintFailed: "P2002",
 } as const;
 
 function getPrismaErrorCode(error: unknown) {
@@ -42,6 +45,10 @@ function getPrismaErrorCode(error: unknown) {
 
 function mapQuestionWriteError(error: unknown): never {
   const prismaErrorCode = getPrismaErrorCode(error);
+
+  if (prismaErrorCode === prismaKnownRequestErrorCode.uniqueConstraintFailed) {
+    throw new QuestionDomainError("QUESTION_DUPLICATE_CONTENT");
+  }
 
   if (prismaErrorCode === prismaKnownRequestErrorCode.requiredRecordNotFound) {
     throw new QuestionDomainError("QUESTION_NOT_FOUND");
@@ -76,6 +83,7 @@ function alternativeCreateData(parsed: ParsedQuestionInput) {
 function questionData(parsed: ParsedQuestionInput) {
   return {
     descriptionMarkdown: parsed.descriptionMarkdown,
+    contentHash: createQuestionContentHash(parsed.descriptionMarkdown),
     difficulty: parsed.difficulty,
     source: parsed.source,
     year: parsed.year,

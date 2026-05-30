@@ -1,7 +1,7 @@
 # Question Deduplication Tasks
 
 **Design**: `.specs/features/question-deduplication/design.md`
-**Status**: Draft
+**Status**: Complete
 
 ---
 
@@ -72,13 +72,13 @@ T5 -> T6 -> T7
 
 **Done when**:
 
-- [ ] `normalizeQuestionMarkdownForHash` trims whitespace.
-- [ ] `normalizeQuestionMarkdownForHash` normalizes CRLF/CR line endings.
-- [ ] `normalizeQuestionMarkdownForHash` collapses repeated whitespace to one ASCII space.
-- [ ] `createQuestionContentHash` returns a lowercase SHA-256 hex digest.
-- [ ] Unit tests prove equivalent whitespace variants produce the same hash.
-- [ ] Unit tests prove meaningfully different text produces a different hash.
-- [ ] Gate check passes: `pnpm test:unit`.
+- [x] `normalizeQuestionMarkdownForHash` trims whitespace.
+- [x] `normalizeQuestionMarkdownForHash` normalizes CRLF/CR line endings.
+- [x] `normalizeQuestionMarkdownForHash` collapses repeated whitespace to one ASCII space.
+- [x] `createQuestionContentHash` returns a lowercase SHA-256 hex digest.
+- [x] Unit tests prove equivalent whitespace variants produce the same hash.
+- [x] Unit tests prove meaningfully different text produces a different hash.
+- [x] Gate check passes: `pnpm test:unit`.
 
 **Tests**: unit
 **Gate**: quick
@@ -100,12 +100,12 @@ T5 -> T6 -> T7
 
 **Done when**:
 
-- [ ] `Question` has `contentHash String @unique`.
-- [ ] Migration backfills `contentHash` for existing questions using the same canonicalization rules as the helper.
-- [ ] Migration fails explicitly if duplicate hashes already exist before unique index creation.
-- [ ] Unique index exists for `Question.contentHash`.
-- [ ] Prisma client generation succeeds with `pnpm prisma:generate`.
-- [ ] Gate check passes: `pnpm build`.
+- [x] `Question` has `contentHash String @unique`.
+- [x] Migration backfills `contentHash` for existing questions using the same canonicalization rules as the helper.
+- [x] Migration fails explicitly if duplicate hashes already exist before unique index creation.
+- [x] Unique index exists for `Question.contentHash`.
+- [x] Prisma client generation succeeds with `pnpm prisma:generate`.
+- [x] Gate check passes: `pnpm build`.
 
 **Tests**: build; E2E DB setup in T6
 **Gate**: build
@@ -127,13 +127,13 @@ T5 -> T6 -> T7
 
 **Done when**:
 
-- [ ] `questionData` includes `contentHash: createQuestionContentHash(parsed.descriptionMarkdown)`.
-- [ ] `QuestionErrorCode` includes `QUESTION_DUPLICATE_CONTENT`.
-- [ ] Prisma `P2002` for `contentHash` maps to `QUESTION_DUPLICATE_CONTENT`.
-- [ ] Create duplicate test asserts no second question is accepted.
-- [ ] Update duplicate test asserts the original question remains unchanged.
-- [ ] Update unchanged self-content test remains allowed.
-- [ ] Gate check passes: `pnpm test:unit`.
+- [x] `questionData` includes `contentHash: createQuestionContentHash(parsed.descriptionMarkdown)`.
+- [x] `QuestionErrorCode` includes `QUESTION_DUPLICATE_CONTENT`.
+- [x] Prisma `P2002` for `contentHash` maps to `QUESTION_DUPLICATE_CONTENT`.
+- [x] Create duplicate test asserts no second question is accepted.
+- [x] Update duplicate test asserts the original question remains unchanged.
+- [x] Update unchanged self-content test remains allowed.
+- [x] Gate check passes: `pnpm test:unit`.
 
 **Tests**: unit/integration-light
 **Gate**: quick
@@ -155,10 +155,10 @@ T5 -> T6 -> T7
 
 **Done when**:
 
-- [ ] `QUESTION_DUPLICATE_CONTENT` returns HTTP `409`.
-- [ ] Response body preserves the existing form-friendly JSON shape.
-- [ ] Other existing question domain errors keep their current behavior.
-- [ ] Gate check passes: `pnpm build`.
+- [x] `QUESTION_DUPLICATE_CONTENT` returns HTTP `409`.
+- [x] Response body preserves the existing form-friendly JSON shape.
+- [x] Other existing question domain errors keep their current behavior.
+- [x] Gate check passes: `pnpm build`.
 
 **Tests**: build; E2E in T6
 **Gate**: build
@@ -180,11 +180,11 @@ T5 -> T6 -> T7
 
 **Done when**:
 
-- [ ] Create duplicate response shows a clear message such as `Ja existe uma questao com este enunciado.`
-- [ ] Update duplicate response shows the same message.
-- [ ] Form values remain in place after duplicate submission.
-- [ ] Existing validation and success states still work.
-- [ ] Gate check passes: `pnpm build`.
+- [x] Create duplicate response shows a clear message such as `Ja existe uma questao com este enunciado.`
+- [x] Update duplicate response shows the same message.
+- [x] Form values remain in place after duplicate submission.
+- [x] Existing validation and success states still work.
+- [x] Gate check passes: `pnpm build`.
 
 **Tests**: build; E2E in T6
 **Gate**: build
@@ -206,11 +206,11 @@ T5 -> T6 -> T7
 
 **Done when**:
 
-- [ ] Test data uses deterministic marker text and cleanup to avoid leakage.
-- [ ] E2E creates one question and verifies duplicate create is rejected.
-- [ ] E2E verifies duplicate submission preserves visible form input.
-- [ ] E2E creates/uses a second question and verifies duplicate update is rejected.
-- [ ] Gate check passes: `pnpm test:e2e`.
+- [x] Test data uses deterministic marker text and cleanup to avoid leakage.
+- [x] E2E creates one question and verifies duplicate create is rejected.
+- [x] E2E verifies duplicate submission preserves visible form input.
+- [x] E2E creates/uses a second question and verifies duplicate update is rejected.
+- [x] Gate check passes: `pnpm test:e2e`.
 
 **Tests**: e2e
 **Gate**: e2e
@@ -232,11 +232,11 @@ T5 -> T6 -> T7
 
 **Done when**:
 
-- [ ] `pnpm test:unit` passes.
-- [ ] `pnpm build` passes.
-- [ ] `pnpm test:e2e` passes.
-- [ ] Requirement traceability remains accurate.
-- [ ] Tasks are marked complete only after verification.
+- [x] `pnpm test:unit` passes.
+- [x] `pnpm build` passes.
+- [x] `pnpm test:e2e` passes.
+- [x] Requirement traceability remains accurate.
+- [x] Tasks are marked complete only after verification.
 
 **Tests**: unit + build + e2e
 **Gate**: full

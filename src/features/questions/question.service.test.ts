@@ -106,6 +106,7 @@ describe("question.service", () => {
     expect(mocks.prisma.question.create).toHaveBeenCalledWith({
       data: {
         descriptionMarkdown: "Enunciado da questao",
+        contentHash: expect.stringMatching(/^[a-f0-9]{64}$/),
         difficulty: "MEDIUM",
         source: "MANUAL",
         year: 2024,
@@ -143,6 +144,21 @@ describe("question.service", () => {
     expect(mocks.prisma.question.create).not.toHaveBeenCalled();
   });
 
+  it("maps duplicate content create conflicts", async () => {
+    mocks.prisma.subjectField.findUnique.mockResolvedValue({ id: "subject_field_1" });
+    mocks.prisma.question.create.mockRejectedValue(
+      new Prisma.PrismaClientKnownRequestError("Unique constraint failed", {
+        code: "P2002",
+        clientVersion: "test",
+        meta: { target: ["contentHash"] },
+      }),
+    );
+
+    await expect(createQuestion(validInput, "teacher_1")).rejects.toMatchObject({
+      code: "QUESTION_DUPLICATE_CONTENT",
+    } satisfies Partial<QuestionDomainError>);
+  });
+
   it("rejects create with invalid correct count", async () => {
     await expect(
       createQuestion(
@@ -170,6 +186,7 @@ describe("question.service", () => {
       where: { id: "question_1" },
       data: {
         descriptionMarkdown: "Enunciado da questao",
+        contentHash: expect.stringMatching(/^[a-f0-9]{64}$/),
         difficulty: "MEDIUM",
         source: "MANUAL",
         year: 2024,
@@ -206,6 +223,44 @@ describe("question.service", () => {
     ).rejects.toMatchObject({
       code: "QUESTION_NOT_FOUND",
     } satisfies Partial<QuestionDomainError>);
+  });
+
+  it("allows update when keeping the same content", async () => {
+    mocks.prisma.question.findUnique.mockResolvedValue({ id: "question_1" });
+    mocks.prisma.subjectField.findUnique.mockResolvedValue({ id: "subject_field_1" });
+    mocks.prisma.question.update.mockResolvedValue({ id: "question_1" });
+
+    await updateQuestion("question_1", validInput, "teacher_1");
+
+    expect(mocks.prisma.question.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: "question_1" },
+        data: expect.objectContaining({
+          descriptionMarkdown: "Enunciado da questao",
+          contentHash: expect.stringMatching(/^[a-f0-9]{64}$/),
+        }),
+      }),
+    );
+  });
+
+  it("maps duplicate content update conflicts before replacing alternatives", async () => {
+    mocks.prisma.question.findUnique.mockResolvedValue({ id: "question_1" });
+    mocks.prisma.subjectField.findUnique.mockResolvedValue({ id: "subject_field_1" });
+    mocks.prisma.question.update.mockRejectedValue(
+      new Prisma.PrismaClientKnownRequestError("Unique constraint failed", {
+        code: "P2002",
+        clientVersion: "test",
+        meta: { target: ["contentHash"] },
+      }),
+    );
+
+    await expect(
+      updateQuestion("question_1", validInput, "teacher_1"),
+    ).rejects.toMatchObject({
+      code: "QUESTION_DUPLICATE_CONTENT",
+    } satisfies Partial<QuestionDomainError>);
+    expect(mocks.prisma.questionAlternative.deleteMany).not.toHaveBeenCalled();
+    expect(mocks.prisma.questionAlternative.createMany).not.toHaveBeenCalled();
   });
 
   it("rolls back invalid update before replacing alternatives", async () => {

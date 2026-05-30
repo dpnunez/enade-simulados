@@ -1,7 +1,7 @@
 # Question Deduplication Design
 
 **Spec**: `.specs/features/question-deduplication/spec.md`
-**Status**: Draft
+**Status**: Complete
 
 ---
 
