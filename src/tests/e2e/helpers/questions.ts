@@ -1,7 +1,7 @@
 import knex from "knex";
 import { randomUUID } from "node:crypto";
 
-import { createQuestionContentHash } from "@/features/questions/question-content-hash";
+import { createQuestionDescriptionHash } from "@/features/questions/question-description-hash";
 import {
   buildSubjectFieldTitle,
   SUBJECT_FIELD_E2E_TITLE_PREFIX,
@@ -85,7 +85,7 @@ export async function createQuestionE2eData(label: string) {
     .insert({
       id: buildE2eId("question"),
       descriptionMarkdown,
-      contentHash: createQuestionContentHash(descriptionMarkdown),
+      descriptionHash: createQuestionDescriptionHash(descriptionMarkdown),
       difficulty: "MEDIUM",
       source: "MANUAL",
       year: 2024,
@@ -134,7 +134,7 @@ export async function countQuestionsByEquivalentDescription(descriptionMarkdown:
   });
 
   const rows = await db("Question")
-    .where({ contentHash: createQuestionContentHash(descriptionMarkdown) })
+    .where({ descriptionHash: createQuestionDescriptionHash(descriptionMarkdown) })
     .count<{ count: string }[]>("*");
 
   await db.destroy();

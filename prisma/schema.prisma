@@ -128,7 +128,7 @@ model SubjectField {
 model Question {
   id                       String                @id @default(cuid())
   descriptionMarkdown      String
-  contentHash              String                @unique
+  descriptionHash              String                @unique
   difficulty               QuestionDifficulty
   source                   QuestionSource?
   year                     Int?

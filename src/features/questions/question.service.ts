@@ -7,7 +7,7 @@ import {
   type ParsedQuestionInput,
   type QuestionInput,
 } from "./question.schema";
-import { createQuestionContentHash } from "./question-content-hash";
+import { createQuestionDescriptionHash } from "./question-description-hash";
 
 export type QuestionErrorCode =
   | "QUESTION_NOT_FOUND"
@@ -83,7 +83,7 @@ function alternativeCreateData(parsed: ParsedQuestionInput) {
 function questionData(parsed: ParsedQuestionInput) {
   return {
     descriptionMarkdown: parsed.descriptionMarkdown,
-    contentHash: createQuestionContentHash(parsed.descriptionMarkdown),
+    descriptionHash: createQuestionDescriptionHash(parsed.descriptionMarkdown),
     difficulty: parsed.difficulty,
     source: parsed.source,
     year: parsed.year,

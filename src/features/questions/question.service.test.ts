@@ -106,7 +106,7 @@ describe("question.service", () => {
     expect(mocks.prisma.question.create).toHaveBeenCalledWith({
       data: {
         descriptionMarkdown: "Enunciado da questao",
-        contentHash: expect.stringMatching(/^[a-f0-9]{64}$/),
+        descriptionHash: expect.stringMatching(/^[a-f0-9]{64}$/),
         difficulty: "MEDIUM",
         source: "MANUAL",
         year: 2024,
@@ -150,7 +150,7 @@ describe("question.service", () => {
       new Prisma.PrismaClientKnownRequestError("Unique constraint failed", {
         code: "P2002",
         clientVersion: "test",
-        meta: { target: ["contentHash"] },
+        meta: { target: ["descriptionHash"] },
       }),
     );
 
@@ -186,7 +186,7 @@ describe("question.service", () => {
       where: { id: "question_1" },
       data: {
         descriptionMarkdown: "Enunciado da questao",
-        contentHash: expect.stringMatching(/^[a-f0-9]{64}$/),
+        descriptionHash: expect.stringMatching(/^[a-f0-9]{64}$/),
         difficulty: "MEDIUM",
         source: "MANUAL",
         year: 2024,
@@ -237,7 +237,7 @@ describe("question.service", () => {
         where: { id: "question_1" },
         data: expect.objectContaining({
           descriptionMarkdown: "Enunciado da questao",
-          contentHash: expect.stringMatching(/^[a-f0-9]{64}$/),
+          descriptionHash: expect.stringMatching(/^[a-f0-9]{64}$/),
         }),
       }),
     );
@@ -250,7 +250,7 @@ describe("question.service", () => {
       new Prisma.PrismaClientKnownRequestError("Unique constraint failed", {
         code: "P2002",
         clientVersion: "test",
-        meta: { target: ["contentHash"] },
+        meta: { target: ["descriptionHash"] },
       }),
     );
 

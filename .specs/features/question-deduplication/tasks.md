@@ -60,7 +60,7 @@ T5 -> T6 -> T7
 ### T1: Create Question Content Hash Helper
 
 **What**: Implement canonicalization and SHA-256 hashing for question markdown.
-**Where**: `src/features/questions/question-content-hash.ts`, `src/features/questions/question-content-hash.test.ts`
+**Where**: `src/features/questions/question-description-hash.ts`, `src/features/questions/question-description-hash.test.ts`
 **Depends on**: None
 **Reuses**: Parsed `descriptionMarkdown` from `src/features/questions/question.schema.ts`.
 **Requirement**: QDUP-01, QDUP-03, QDUP-05
@@ -75,7 +75,7 @@ T5 -> T6 -> T7
 - [x] `normalizeQuestionMarkdownForHash` trims whitespace.
 - [x] `normalizeQuestionMarkdownForHash` normalizes CRLF/CR line endings.
 - [x] `normalizeQuestionMarkdownForHash` collapses repeated whitespace to one ASCII space.
-- [x] `createQuestionContentHash` returns a lowercase SHA-256 hex digest.
+- [x] `createQuestionDescriptionHash` returns a lowercase SHA-256 hex digest.
 - [x] Unit tests prove equivalent whitespace variants produce the same hash.
 - [x] Unit tests prove meaningfully different text produces a different hash.
 - [x] Gate check passes: `pnpm test:unit`.
@@ -87,7 +87,7 @@ T5 -> T6 -> T7
 
 ### T2: Add Question Content Hash Column
 
-**What**: Add `Question.contentHash`, backfill existing rows, create a unique index, and regenerate Prisma client.
+**What**: Add `Question.descriptionHash`, backfill existing rows, create a unique index, and regenerate Prisma client.
 **Where**: `prisma/schema.prisma`, `prisma/migrations/*`, `src/generated/prisma/*`
 **Depends on**: T1
 **Reuses**: Existing Prisma schema and migration workflow.
@@ -100,10 +100,10 @@ T5 -> T6 -> T7
 
 **Done when**:
 
-- [x] `Question` has `contentHash String @unique`.
-- [x] Migration backfills `contentHash` for existing questions using the same canonicalization rules as the helper.
+- [x] `Question` has `descriptionHash String @unique`.
+- [x] Migration backfills `descriptionHash` for existing questions using the same canonicalization rules as the helper.
 - [x] Migration fails explicitly if duplicate hashes already exist before unique index creation.
-- [x] Unique index exists for `Question.contentHash`.
+- [x] Unique index exists for `Question.descriptionHash`.
 - [x] Prisma client generation succeeds with `pnpm prisma:generate`.
 - [x] Gate check passes: `pnpm build`.
 
@@ -114,7 +114,7 @@ T5 -> T6 -> T7
 
 ### T3: Enforce Hash in Question Service
 
-**What**: Persist `contentHash` on create/update and map unique constraint conflicts to a duplicate-content domain error.
+**What**: Persist `descriptionHash` on create/update and map unique constraint conflicts to a duplicate-content domain error.
 **Where**: `src/features/questions/question.service.ts`, `src/features/questions/question.service.test.ts`
 **Depends on**: T2
 **Reuses**: Existing `questionData`, `mapQuestionWriteError`, Prisma error-code mapping, and service tests.
@@ -127,9 +127,9 @@ T5 -> T6 -> T7
 
 **Done when**:
 
-- [x] `questionData` includes `contentHash: createQuestionContentHash(parsed.descriptionMarkdown)`.
+- [x] `questionData` includes `descriptionHash: createQuestionDescriptionHash(parsed.descriptionMarkdown)`.
 - [x] `QuestionErrorCode` includes `QUESTION_DUPLICATE_CONTENT`.
-- [x] Prisma `P2002` for `contentHash` maps to `QUESTION_DUPLICATE_CONTENT`.
+- [x] Prisma `P2002` for `descriptionHash` maps to `QUESTION_DUPLICATE_CONTENT`.
 - [x] Create duplicate test asserts no second question is accepted.
 - [x] Update duplicate test asserts the original question remains unchanged.
 - [x] Update unchanged self-content test remains allowed.

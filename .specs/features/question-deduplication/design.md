@@ -18,17 +18,17 @@
 
 ## Architecture Overview
 
-Question deduplication is a domain invariant enforced in two places: the service computes a canonical SHA-256 hash for accepted question input, and the database enforces uniqueness with a unique index on `Question.contentHash`. The UI remains thin: it submits the same form payload and renders a domain-specific duplicate message when the API returns `QUESTION_DUPLICATE_CONTENT`.
+Question deduplication is a domain invariant enforced in two places: the service computes a canonical SHA-256 hash for accepted question input, and the database enforces uniqueness with a unique index on `Question.descriptionHash`. The UI remains thin: it submits the same form payload and renders a domain-specific duplicate message when the API returns `QUESTION_DUPLICATE_CONTENT`.
 
 ```mermaid
 flowchart TD
     Form["QuestionForm"] --> Api["/api/questions routes"]
     Api --> Schema["questionInputSchema"]
     Schema --> Service["question.service.ts"]
-    Service --> Hash["question-content-hash.ts"]
+    Service --> Hash["question-description-hash.ts"]
     Hash --> Service
     Service --> Prisma["Prisma Question writes"]
-    Prisma --> Unique["UNIQUE Question.contentHash"]
+    Prisma --> Unique["UNIQUE Question.descriptionHash"]
     Unique --> PrismaError["P2002 on duplicate"]
     PrismaError --> DomainError["QUESTION_DUPLICATE_CONTENT"]
     DomainError --> Api
@@ -55,7 +55,7 @@ flowchart TD
 
 | System | Integration Method |
 | --- | --- |
-| Prisma/PostgreSQL | Add `Question.contentHash String @unique` and migration/backfill. |
+| Prisma/PostgreSQL | Add `Question.descriptionHash String @unique` and migration/backfill. |
 | Node crypto | Use built-in SHA-256 hashing; no new runtime dependency required. |
 | Question create/update service | Compute hash from parsed/canonical markdown and persist on every write. |
 | API routes | Preserve existing JSON response shape and expose stable duplicate error code. |
@@ -69,10 +69,10 @@ flowchart TD
 ### Question Content Hash Helper
 
 - **Purpose**: Produce deterministic canonical text and SHA-256 hashes for question deduplication.
-- **Location**: `src/features/questions/question-content-hash.ts`
+- **Location**: `src/features/questions/question-description-hash.ts`
 - **Interfaces**:
   - `normalizeQuestionMarkdownForHash(markdown: string): string`
-  - `createQuestionContentHash(descriptionMarkdown: string): string`
+  - `createQuestionDescriptionHash(descriptionMarkdown: string): string`
 - **Dependencies**: Node built-in `crypto`.
 - **Reuses**: Parsed markdown produced by `questionInputSchema`.
 
@@ -89,7 +89,7 @@ This intentionally does not remove accents, punctuation, markdown syntax, or cha
 - **Purpose**: Persist the deduplication signature and enforce uniqueness under concurrency.
 - **Location**: `prisma/schema.prisma`, `prisma/migrations/*`
 - **Interfaces**:
-  - `contentHash String @unique`
+  - `descriptionHash String @unique`
 - **Dependencies**: Existing `Question` model.
 - **Reuses**: Prisma migration and generated-client workflow.
 
@@ -132,7 +132,7 @@ This intentionally does not remove accents, punctuation, markdown syntax, or cha
 interface Question {
   id: string
   descriptionMarkdown: string
-  contentHash: string
+  descriptionHash: string
   difficulty: "EASY" | "MEDIUM" | "HARD"
   source: "ENADE" | "MANUAL" | "ADAPTED" | "OTHER" | null
   year: number | null
@@ -164,7 +164,7 @@ interface Question {
 | Decision | Choice | Rationale |
 | --- | --- | --- |
 | Primary identity | Keep `Question.id` as generated `cuid()` | Edits must not change entity identity or break relations. |
-| Deduplication field | Add `Question.contentHash String @unique` | Simple invariant, database-enforced under concurrency. |
+| Deduplication field | Add `Question.descriptionHash String @unique` | Simple invariant, database-enforced under concurrency. |
 | Hash algorithm | SHA-256 | Deterministic, built into Node, negligible collision risk for this domain. |
 | Hash input | Canonicalized `descriptionMarkdown` only | Matches the requested simple alternative and avoids broader product decisions. |
 | Canonicalization | Trim, normalize line endings, collapse whitespace | Catches formatting-only duplicates without risking aggressive false positives. |

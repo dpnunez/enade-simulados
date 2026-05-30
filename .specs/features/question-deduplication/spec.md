@@ -73,7 +73,7 @@ Professores podem cadastrar a mesma questao mais de uma vez quando o enunciado m
 2. WHEN existing duplicate hashes are found during migration planning or backfill THEN system SHALL fail explicitly or require manual cleanup before adding the unique index.
 3. WHEN Prisma client is regenerated THEN TypeScript code SHALL use the new field consistently.
 
-**Independent Test**: Run Prisma migration/generation on the current database and verify `pnpm build` succeeds with `Question.contentHash` available.
+**Independent Test**: Run Prisma migration/generation on the current database and verify `pnpm build` succeeds with `Question.descriptionHash` available.
 
 ---
 
@@ -105,7 +105,7 @@ Professores podem cadastrar a mesma questao mais de uma vez quando o enunciado m
 
 ## Success Criteria
 
-- [x] `Question` has a persisted unique `contentHash` derived from normalized `descriptionMarkdown`.
+- [x] `Question` has a persisted unique `descriptionHash` derived from normalized `descriptionMarkdown`.
 - [x] `Question.id` remains a generated stable identifier and does not depend on content.
 - [x] Create and update flows compute the same hash for equivalent markdown.
 - [x] Duplicate create/update requests return `QUESTION_DUPLICATE_CONTENT`.

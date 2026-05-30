@@ -7,7 +7,7 @@ export function normalizeQuestionMarkdownForHash(markdown: string) {
     .replace(/\s+/g, " ");
 }
 
-export function createQuestionContentHash(descriptionMarkdown: string) {
+export function createQuestionDescriptionHash(descriptionMarkdown: string) {
   return createHash("sha256")
     .update(normalizeQuestionMarkdownForHash(descriptionMarkdown), "utf8")
     .digest("hex");

@@ -1,11 +1,11 @@
 -- Add nullable first so existing questions can be backfilled before the
 -- uniqueness constraint is enforced.
-ALTER TABLE "Question" ADD COLUMN "contentHash" TEXT;
+ALTER TABLE "Question" ADD COLUMN "descriptionHash" TEXT;
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 UPDATE "Question"
-SET "contentHash" = encode(
+SET "descriptionHash" = encode(
   digest(
     regexp_replace(
       trim(
@@ -25,13 +25,13 @@ BEGIN
   IF EXISTS (
     SELECT 1
     FROM "Question"
-    GROUP BY "contentHash"
+    GROUP BY "descriptionHash"
     HAVING COUNT(*) > 1
   ) THEN
-    RAISE EXCEPTION 'Duplicate question content hashes found. Clean duplicate questions before applying question deduplication migration.';
+    RAISE EXCEPTION 'Duplicate question description hashes found. Clean duplicate questions before applying question deduplication migration.';
   END IF;
 END $$;
 
-ALTER TABLE "Question" ALTER COLUMN "contentHash" SET NOT NULL;
+ALTER TABLE "Question" ALTER COLUMN "descriptionHash" SET NOT NULL;
 
-CREATE UNIQUE INDEX "Question_contentHash_key" ON "Question"("contentHash");
+CREATE UNIQUE INDEX "Question_descriptionHash_key" ON "Question"("descriptionHash");
