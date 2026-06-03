@@ -1,7 +1,7 @@
 # User Name as Nick Tasks
 
 **Design**: `.specs/features/user-nicknames/design.md`
-**Status**: Planned
+**Status**: Completed
 
 ---
 
@@ -32,7 +32,7 @@ T1 -> T2 -> T3 -> T4 -> T5
 
 ### T1: Add Unique Constraint for User Name
 
-**Status**: Planned
+**Status**: Completed
 
 **What**: Make `User.name` unique with deterministic cleanup/backfill for existing data.
 **Where**: `prisma/schema.prisma`, `prisma/migrations/*`, seed scripts if needed.
@@ -42,10 +42,10 @@ T1 -> T2 -> T3 -> T4 -> T5
 
 **Done when**:
 
-- [ ] `User.name` is marked `@unique`.
-- [ ] Existing users have deterministic unique names before the constraint is added.
-- [ ] Seed users have deterministic unique valid names.
-- [ ] Prisma client generation succeeds.
+- [x] `User.name` is marked `@unique`.
+- [x] Existing users have deterministic unique names before the constraint is added.
+- [x] Seed users have deterministic unique valid names.
+- [x] Prisma client generation succeeds.
 
 **Tests**: build/schema
 **Gate**: `pnpm prisma:generate`, `pnpm build`
@@ -54,7 +54,7 @@ T1 -> T2 -> T3 -> T4 -> T5
 
 ### T2: Extend Invitation Acceptance Schema
 
-**Status**: Planned
+**Status**: Completed
 
 **What**: Add name/nick validation to `acceptInvitationSchema`.
 **Where**: `src/features/invitations/invitation.schema.ts`, `src/features/invitations/invitation.schema.test.ts`
@@ -64,11 +64,11 @@ T1 -> T2 -> T3 -> T4 -> T5
 
 **Done when**:
 
-- [ ] Schema requires `name`.
-- [ ] Schema trims `name`.
-- [ ] Schema normalizes `name` for predictable uniqueness.
-- [ ] Schema rejects blank and invalid name/nick values.
-- [ ] Tests cover valid, trimmed, blank, and invalid names.
+- [x] Schema requires `name`.
+- [x] Schema trims `name`.
+- [x] Schema trims `name` while preserving casing and spaces.
+- [x] Schema rejects blank and invalid name/nick values.
+- [x] Tests cover valid, trimmed, blank, and invalid names.
 
 **Tests**: unit
 **Gate**: `pnpm test:unit`
@@ -77,7 +77,7 @@ T1 -> T2 -> T3 -> T4 -> T5
 
 ### T3: Update Invitation Service Acceptance
 
-**Status**: Planned
+**Status**: Completed
 
 **What**: Persist submitted unique name/nick during invite acceptance and remove email-derived fallback.
 **Where**: `src/features/invitations/invitation.service.ts`, `src/features/invitations/invitation.service.test.ts`
@@ -87,12 +87,12 @@ T1 -> T2 -> T3 -> T4 -> T5
 
 **Done when**:
 
-- [ ] `acceptInvitation` creates user with submitted `name`.
-- [ ] `acceptInvitation` no longer derives `name` from invitation email.
-- [ ] Duplicate `name` returns `NAME_ALREADY_REGISTERED`.
-- [ ] Tests cover successful creation payload and custom name preservation.
-- [ ] Tests prove invite for `student@example.com` can create `name: "maria_silva"`.
-- [ ] Tests cover duplicate name rejection and pending invitation preservation.
+- [x] `acceptInvitation` creates user with submitted `name`.
+- [x] `acceptInvitation` no longer derives `name` from invitation email.
+- [x] Duplicate `name` returns `NAME_ALREADY_REGISTERED`.
+- [x] Tests cover successful creation payload and custom name preservation.
+- [x] Tests prove invite for `student@example.com` can create a custom nick that is not derived from email.
+- [x] Tests cover duplicate name rejection and pending invitation preservation.
 
 **Tests**: unit/integration
 **Gate**: `pnpm test:unit`
@@ -101,7 +101,7 @@ T1 -> T2 -> T3 -> T4 -> T5
 
 ### T4: Update API, Form, and Identity UI
 
-**Status**: Planned
+**Status**: Completed
 
 **What**: Collect name/nick in the public invitation form and display it as primary identity.
 **Where**: `src/app/api/invitations/accept/route.ts`, `src/app/convites/[token]/_components/accept-invite-form.tsx`, `src/app/app/layout.tsx`, `src/app/app/admin/page.tsx`
@@ -111,13 +111,13 @@ T1 -> T2 -> T3 -> T4 -> T5
 
 **Done when**:
 
-- [ ] Form includes name/nick input.
-- [ ] Client validation uses the shared schema.
-- [ ] API validates name server-side.
-- [ ] Duplicate name error is user-facing and specific.
-- [ ] Existing email/role locked fields continue working.
-- [ ] Private layout shows `name` as primary identity with email as secondary metadata.
-- [ ] Admin user list shows name/nick alongside email and role.
+- [x] Form includes name/nick input.
+- [x] Client validation uses the shared schema.
+- [x] API validates name server-side.
+- [x] Duplicate name error is user-facing and specific.
+- [x] Existing email/role locked fields continue working.
+- [x] Private layout shows `name` as primary identity with email as secondary metadata.
+- [x] Admin user list shows name/nick alongside email and role.
 
 **Tests**: unit plus E2E in T5
 **Gate**: `pnpm test:unit`, `pnpm build`
@@ -126,7 +126,7 @@ T1 -> T2 -> T3 -> T4 -> T5
 
 ### T5: Update E2E Invitation Coverage
 
-**Status**: Planned
+**Status**: Completed
 
 **What**: Cover the invitation lifecycle with submitted name/nick.
 **Where**: `src/tests/e2e/invitations.spec.ts`, relevant E2E helpers/fixtures.
@@ -136,10 +136,10 @@ T1 -> T2 -> T3 -> T4 -> T5
 
 **Done when**:
 
-- [ ] Invite acceptance test fills custom name/nick.
-- [ ] Test verifies the new user can log in.
-- [ ] Test verifies submitted name/nick appears in the private area.
-- [ ] Optional duplicate name case is covered if it stays deterministic and low maintenance.
+- [x] Invite acceptance test fills custom name/nick.
+- [x] Test verifies the new user can log in.
+- [x] Test verifies submitted name/nick appears in the private area.
+- [x] Optional duplicate name case assessed; duplicate rejection is covered in unit tests to keep E2E deterministic and low maintenance.
 
 **Tests**: e2e
 **Gate**: `pnpm test:e2e`, then `pnpm build`

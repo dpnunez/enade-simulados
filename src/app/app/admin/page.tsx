@@ -13,7 +13,7 @@ export default async function AdminPage() {
   const [users, invitations] = await Promise.all([
     prisma.user.findMany({
       orderBy: { createdAt: "desc" },
-      select: { id: true, email: true, role: true, createdAt: true },
+      select: { id: true, name: true, email: true, role: true, createdAt: true },
     }),
     listPendingInvitations(),
   ]);
@@ -50,9 +50,9 @@ export default async function AdminPage() {
             <div className="space-y-3">
               {users.map((user) => (
                 <div key={user.id} className="rounded-md border p-3 text-sm">
-                  <p className="font-medium">{user.email}</p>
+                  <p className="font-medium">{user.name || user.email}</p>
                   <p className="text-muted-foreground">
-                    {user.role} • {new Date(user.createdAt).toLocaleDateString("pt-BR")}
+                    {user.email} • {user.role} • {new Date(user.createdAt).toLocaleDateString("pt-BR")}
                   </p>
                 </div>
               ))}

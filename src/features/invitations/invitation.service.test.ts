@@ -1,6 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
+  knownRequestError: class PrismaClientKnownRequestError extends Error {
+    code: string;
+
+    constructor(message: string, options: { code: string }) {
+      super(message);
+      this.code = options.code;
+    }
+  },
   prisma: {
     user: {
       findUnique: vi.fn(),
@@ -21,6 +29,16 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock("@infra/db/prisma", () => ({ prisma: mocks.prisma }));
+vi.mock("@prisma-generated-client", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@prisma-generated-client")>();
+  return {
+    ...actual,
+    Prisma: {
+      ...actual.Prisma,
+      PrismaClientKnownRequestError: mocks.knownRequestError,
+    },
+  };
+});
 vi.mock("./invitation-token.service", () => ({
   generateInvitationToken: mocks.generateInvitationToken,
   hashInvitationToken: mocks.hashInvitationToken,
@@ -104,10 +122,10 @@ describe("invitation.service", () => {
     );
   });
 
-  it("accepts invitation with transaction and creates credential account", async () => {
+  it("accepts invitation with transaction and creates credential account using submitted nick", async () => {
     mocks.prisma.invitation.findUnique.mockResolvedValue({
       id: "inv_1",
-      email: "invitee@test.com",
+      email: "student@example.com",
       role: Role.STUDENT,
       status: InvitationStatus.PENDING,
     });
@@ -122,21 +140,73 @@ describe("invitation.service", () => {
       async (cb: (ctx: typeof tx) => Promise<unknown>) => cb(tx),
     );
 
-    await acceptInvitation({ token: "raw-token", password: "password123" });
+    await acceptInvitation({
+      token: "raw-token",
+      name: "Maria Silva",
+      password: "password123",
+    });
 
     expect(tx.user.create).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({
-          email: "invitee@test.com",
+          name: "Maria Silva",
+          email: "student@example.com",
           accounts: {
             create: expect.objectContaining({
               providerId: "credential",
-              accountId: "invitee@test.com",
+              accountId: "student@example.com",
             }),
           },
         }),
       }),
     );
     expect(tx.invitation.update).toHaveBeenCalled();
+  });
+
+  it("rejects duplicate submitted nick before creating the user", async () => {
+    mocks.prisma.invitation.findUnique.mockResolvedValue({
+      id: "inv_1",
+      email: "invitee@test.com",
+      role: Role.STUDENT,
+      status: InvitationStatus.PENDING,
+    });
+    mocks.prisma.user.findUnique
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce({ id: "u_existing" });
+
+    await expect(
+      acceptInvitation({
+        token: "raw-token",
+        name: "maria_silva",
+        password: "password123",
+      }),
+    ).rejects.toMatchObject({
+      code: "NAME_ALREADY_REGISTERED",
+    } satisfies Partial<InvitationDomainError>);
+
+    expect(mocks.prisma.$transaction).not.toHaveBeenCalled();
+  });
+
+  it("maps database name uniqueness races to domain error", async () => {
+    mocks.prisma.invitation.findUnique.mockResolvedValue({
+      id: "inv_1",
+      email: "invitee@test.com",
+      role: Role.STUDENT,
+      status: InvitationStatus.PENDING,
+    });
+    mocks.prisma.user.findUnique.mockResolvedValue(null);
+    mocks.prisma.$transaction.mockRejectedValue(
+      new mocks.knownRequestError("Unique constraint failed", { code: "P2002" }),
+    );
+
+    await expect(
+      acceptInvitation({
+        token: "raw-token",
+        name: "maria_silva",
+        password: "password123",
+      }),
+    ).rejects.toMatchObject({
+      code: "NAME_ALREADY_REGISTERED",
+    } satisfies Partial<InvitationDomainError>);
   });
 });

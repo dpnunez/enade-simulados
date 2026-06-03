@@ -1,6 +1,6 @@
 import { hashPassword } from "better-auth/crypto";
 
-import { InvitationStatus, Role } from "@prisma-generated-client";
+import { InvitationStatus, Prisma, Role } from "@prisma-generated-client";
 import { prisma } from "@infra/db/prisma";
 
 import {
@@ -18,6 +18,7 @@ import {
 
 export type InvitationErrorCode =
   | "EMAIL_ALREADY_REGISTERED"
+  | "NAME_ALREADY_REGISTERED"
   | "PENDING_INVITATION_EXISTS"
   | "INVITATION_NOT_FOUND"
   | "INVITATION_NOT_PENDING";
@@ -27,6 +28,26 @@ export class InvitationDomainError extends Error {
     super(code);
     this.name = "InvitationDomainError";
   }
+}
+
+const prismaKnownRequestErrorCode = {
+  uniqueConstraintFailed: "P2002",
+} as const;
+
+function getPrismaErrorCode(error: unknown) {
+  if (!(error instanceof Prisma.PrismaClientKnownRequestError)) {
+    return null;
+  }
+
+  return error.code;
+}
+
+function mapInvitationWriteError(error: unknown): never {
+  if (getPrismaErrorCode(error) === prismaKnownRequestErrorCode.uniqueConstraintFailed) {
+    throw new InvitationDomainError("NAME_ALREADY_REGISTERED");
+  }
+
+  throw error;
 }
 
 export async function createInvitation(input: CreateInvitationInput) {
@@ -95,30 +116,37 @@ export async function acceptInvitation(input: AcceptInvitationInput) {
   const existingUser = await prisma.user.findUnique({ where: { email: invitation.email } });
   if (existingUser) throw new InvitationDomainError("EMAIL_ALREADY_REGISTERED");
 
+  const existingName = await prisma.user.findUnique({ where: { name: parsed.name } });
+  if (existingName) throw new InvitationDomainError("NAME_ALREADY_REGISTERED");
+
   const passwordHash = await hashPassword(parsed.password);
 
-  return prisma.$transaction(async (tx) => {
-    const user = await tx.user.create({
-      data: {
-        name: invitation.email.split("@")[0] ?? invitation.email,
-        email: invitation.email,
-        emailVerified: true,
-        role: invitation.role as Role,
-        accounts: {
-          create: {
-            providerId: "credential",
-            accountId: invitation.email,
-            password: passwordHash,
+  try {
+    return await prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({
+        data: {
+          name: parsed.name,
+          email: invitation.email,
+          emailVerified: true,
+          role: invitation.role as Role,
+          accounts: {
+            create: {
+              providerId: "credential",
+              accountId: invitation.email,
+              password: passwordHash,
+            },
           },
         },
-      },
-    });
+      });
 
-    await tx.invitation.update({
-      where: { id: invitation.id },
-      data: { status: InvitationStatus.ACCEPTED, acceptedAt: new Date() },
-    });
+      await tx.invitation.update({
+        where: { id: invitation.id },
+        data: { status: InvitationStatus.ACCEPTED, acceptedAt: new Date() },
+      });
 
-    return { user };
-  });
+      return { user };
+    });
+  } catch (error) {
+    mapInvitationWriteError(error);
+  }
 }

@@ -12,6 +12,7 @@ export default async function PrivateLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const session = await requireAuth();
+  const primaryIdentity = session.user.name?.trim() || session.user.email;
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-6 py-8">
@@ -22,10 +23,11 @@ export default async function PrivateLayout({
               <ShieldCheck className="h-3.5 w-3.5" />
               Sessão ativa
             </Badge>
-            <CardTitle className="text-2xl">{session.user.email}</CardTitle>
+            <CardTitle className="text-2xl">{primaryIdentity}</CardTitle>
             <CardDescription className="flex flex-wrap items-center gap-2">
               <UserRound className="h-4 w-4" />
-              Role atual:
+              <span>{session.user.email}</span>
+              <span>Role atual:</span>
               <Badge variant="outline">{session.user.role}</Badge>
             </CardDescription>
           </div>

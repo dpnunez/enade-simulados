@@ -56,15 +56,15 @@ Migration considerations:
 Extend `acceptInvitationSchema` in `src/features/invitations/invitation.schema.ts`:
 
 - `token`: existing non-empty string.
-- `name`: trimmed nick, required.
+- `name`: trimmed nick, required, preserving internal spaces and casing.
 - `password`: existing password rule.
 
 Recommended name/nick rule:
 
-- Trim whitespace.
-- Normalize to lowercase before storage so uniqueness is case-insensitive in practice.
+- Trim leading/trailing whitespace.
+- Preserve submitted casing and internal spaces for display-name-style nicks.
 - Length: 3 to 30 characters.
-- Decide during implementation whether spaces are allowed. If the value is truly a nick, prefer allowing `a-z`, `A-Z`, `0-9`, `_`, `.`, and `-`.
+- Allow letters, numbers, spaces, `_`, `.`, and `-`.
 
 The API route and service remain authoritative. Client-side `react-hook-form` uses the same schema via `zodResolver`.
 
@@ -77,7 +77,7 @@ Update `acceptInvitation(input)` in `src/features/invitations/invitation.service
 1. Parse `acceptInvitationSchema`.
 2. Resolve pending invitation.
 3. Check existing email as today.
-4. Check existing `User.name` after normalization.
+4. Check existing `User.name` after trimming.
 5. Hash password.
 6. In the transaction, create `User` with:
    - `name: parsed.name`
@@ -132,7 +132,7 @@ Unit/integration:
 
 - `src/features/invitations/invitation.schema.test.ts`
   - accepts valid name/nick and trims it.
-  - normalizes name/nick for storage.
+  - trims name/nick while preserving casing and spaces.
   - rejects blank or too-short name/nick.
 - `src/features/invitations/invitation.service.test.ts`
   - creates user with submitted `name`.
@@ -152,7 +152,7 @@ Build/type:
 
 ---
 
-## Open Decisions
+## Decisions
 
-- Should name/nick allow spaces? Current recommendation for nick is no spaces.
-- Should name/nick preserve casing? Current plan stores lowercase to make uniqueness predictable.
+- Name/nick allows spaces.
+- Name/nick preserves casing.
