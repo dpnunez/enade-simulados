@@ -24,6 +24,7 @@ async function parseJson(request: Request) {
 
 function statusForDomainError(error: QuestionDomainError) {
   if (error.code === "QUESTION_NOT_FOUND") return 404;
+  if (error.code === "QUESTION_DUPLICATE_CONTENT") return 409;
   return 409;
 }
 

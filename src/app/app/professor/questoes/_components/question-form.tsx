@@ -79,6 +79,9 @@ function messageForError(error: string) {
   if (error === "QUESTION_NOT_FOUND") {
     return "Esta questao nao foi encontrada. Volte para a lista e tente novamente.";
   }
+  if (error === "QUESTION_DUPLICATE_CONTENT") {
+    return "Ja existe uma questao com este enunciado.";
+  }
   if (error === "VALIDATION_ERROR") {
     return "Revise os dados da questao e tente novamente.";
   }
