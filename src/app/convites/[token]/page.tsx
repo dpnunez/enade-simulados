@@ -5,10 +5,9 @@ import { AcceptInviteForm } from "./_components/accept-invite-form";
 
 export default async function InviteTokenPage({ params }: PageProps<"/convites/[token]">) {
   const { token } = await params;
+  const invitation = await getInvitationOrNull(token);
 
-  try {
-    const invitation = await resolveInvitationToken(token);
-
+  if (invitation) {
     return (
       <main className="mx-auto flex w-full max-w-lg flex-1 items-center px-6 py-12">
         <Card className="w-full">
@@ -21,22 +20,27 @@ export default async function InviteTokenPage({ params }: PageProps<"/convites/[
         </Card>
       </main>
     );
-  } catch (error) {
-    if (error instanceof InvitationDomainError) {
-      return (
-        <main className="mx-auto flex w-full max-w-lg flex-1 items-center px-6 py-12">
-          <Card className="w-full">
-            <CardHeader>
-              <CardTitle>Convite inválido</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">Este convite não está mais disponível.</p>
-            </CardContent>
-          </Card>
-        </main>
-      );
-    }
+  }
 
+  return (
+    <main className="mx-auto flex w-full max-w-lg flex-1 items-center px-6 py-12">
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>Convite inválido</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">Este convite não está mais disponível.</p>
+        </CardContent>
+      </Card>
+    </main>
+  );
+}
+
+async function getInvitationOrNull(token: string) {
+  try {
+    return await resolveInvitationToken(token);
+  } catch (error) {
+    if (error instanceof InvitationDomainError) return null;
     throw error;
   }
 }

@@ -64,19 +64,66 @@ describe("invitation.schema", () => {
   });
 
   describe("acceptInvitationSchema", () => {
-    it("accepts a token and strong enough password", () => {
-      expect(
-        acceptInvitationSchema.safeParse({
-          token: "raw-token",
-          password: "password123",
-        }).success,
-      ).toBe(true);
+    it("trims a valid nick while preserving casing and spaces", () => {
+      const result = acceptInvitationSchema.safeParse({
+        token: "raw-token",
+        name: "  Maria Silva  ",
+        password: "password123",
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.data).toEqual({
+        token: "raw-token",
+        name: "Maria Silva",
+        password: "password123",
+      });
     });
 
     it("rejects missing tokens", () => {
       expect(
         acceptInvitationSchema.safeParse({
           token: "",
+          name: "maria_silva",
+          password: "password123",
+        }).success,
+      ).toBe(false);
+    });
+
+    it("rejects missing nick", () => {
+      expect(
+        acceptInvitationSchema.safeParse({
+          token: "raw-token",
+          name: "   ",
+          password: "password123",
+        }).success,
+      ).toBe(false);
+    });
+
+    it("accepts spaces inside the nick", () => {
+      expect(
+        acceptInvitationSchema.safeParse({
+          token: "raw-token",
+          name: "Hide on Bush",
+          password: "password123",
+        }).success,
+      ).toBe(true);
+    });
+
+    it("rejects invalid nick characters", () => {
+      expect(
+        acceptInvitationSchema.safeParse({
+          token: "raw-token",
+          name: "maria@summoner",
+          password: "password123",
+        }).success,
+      ).toBe(false);
+    });
+
+    it("rejects too-short nicks", () => {
+      expect(
+        acceptInvitationSchema.safeParse({
+          token: "raw-token",
+          name: "ma",
           password: "password123",
         }).success,
       ).toBe(false);
@@ -86,6 +133,7 @@ describe("invitation.schema", () => {
       expect(
         acceptInvitationSchema.safeParse({
           token: "raw-token",
+          name: "maria_silva",
           password: "short",
         }).success,
       ).toBe(false);

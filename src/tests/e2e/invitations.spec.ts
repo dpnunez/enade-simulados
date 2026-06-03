@@ -25,10 +25,12 @@ test.describe("user invitations", () => {
     await page.waitForResponse("/api/invitations");
 
     const token = await getInvitationTokenFromFile();
+    const nick = "Maria Silva";
 
     await page.context().clearCookies();
     await page.goto(`/convites/${token}`);
 
+    await page.getByLabel("Nick").fill(nick);
     await page.getByLabel("Senha").fill("password123");
     await page.getByTestId("accept-invite-button").click();
 
@@ -43,6 +45,9 @@ test.describe("user invitations", () => {
     const res = await page.waitForResponse("/api/auth/sign-in/email");
 
     expect(res.ok()).toBe(true);
+    await page.waitForURL(/\/app$/, { timeout: 10_000 });
+    await expect(page.getByRole("heading", { name: nick })).toBeVisible();
+    await expect(page.getByText(inviteEmail)).toBeVisible();
   });
 
   test("admin cancela convite e tentativa de cadastro falha", async ({
