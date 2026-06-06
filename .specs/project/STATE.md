@@ -1,6 +1,6 @@
 # State
 
-**Last Updated:** 2026-05-28T12:54:53-03:00
+**Last Updated:** 2026-06-04T00:00:00-03:00
 
 ---
 
@@ -97,6 +97,13 @@
 **Trade-off:** Deletar uma grande area remove questoes e alternativas relacionadas sem confirmacao extra especifica para esse impacto.
 **Impact:** Testes e rotinas de limpeza que removem grandes areas devem considerar que questoes vinculadas e alternativas tambem serao removidas pelo banco.
 
+### AD-014: Upload de imagens markdown via abstracao de storage (2026-06-04)
+
+**Decision:** Planejar upload de imagens do `MarkdownEditor` usando um handler generico no componente, uma rota autenticada da aplicacao e um adapter Supabase Storage separado em infra.
+**Reason:** O usuario pediu Supabase Storage como provider, mas explicitamente exigiu que o componente nao soubesse nada sobre Supabase.
+**Trade-off:** O fluxo ganha camadas extras de contrato/adapter, mas preserva testabilidade e permite trocar provider sem alterar o editor.
+**Impact:** `MarkdownEditor` deve receber uma funcao de upload provider-agnostica; credenciais Supabase ficam apenas no servidor; testes devem mockar o contrato de storage.
+
 ## Active Blockers
 
 Nenhum blocker ativo registrado no momento.
@@ -121,7 +128,8 @@ Nenhum blocker ativo registrado no momento.
 ## Deferred Ideas
 
 - [ ] Mapear formalmente o codebase em `.specs/codebase` antes de iniciar features maiores — Captured during: project initialization
-- [ ] Definir estratégia de armazenamento de imagens para questões e anexos — Captured during: project initialization
+- [x] Definir estratégia de armazenamento de imagens para questões e anexos — Planned in `.specs/features/markdown-image-upload`
+- [ ] Definir limpeza de imagens orfas apos falha no salvamento ou remocao de referencias markdown — Deferred from markdown image upload planning
 - [ ] Confirmar critérios de sucesso mensuráveis para o MVP com stakeholders do curso — Captured during: project initialization
 
 ## Todos
@@ -133,6 +141,7 @@ Nenhum blocker ativo registrado no momento.
 - [x] Planejar `.specs/features/questions`: cadastro de questoes com alternativas e editor markdown
 - [x] Planejar `.specs/features/subject-field-question-rollup`: contagem e cascade posterior em grandes areas
 - [x] Implementar `.specs/features/subject-field-question-rollup`: contagem de questoes e cascade SubjectField -> Question -> QuestionAlternative
+- [x] Planejar `.specs/features/markdown-image-upload`: upload de imagens no editor markdown com Supabase Storage abstraido
 - [ ] Revisar o roadmap quando a área administrativa ganhar CRUD real
 - [ ] Definir provedor de email para envio real de convites em produção
 

@@ -100,4 +100,20 @@ No production email provider dependency is implemented yet. Invitation delivery 
 
 ## File Storage
 
-No upload/storage integration observed yet. README mentions image support as a future product need, but no implementation exists.
+**Service:** Supabase Storage
+**Purpose:** Persistent storage for markdown question images uploaded from the teacher question editor.
+**Implementation:**
+
+- Feature storage port: `src/features/uploads/object-storage.ts`
+- Upload service: `src/features/uploads/markdown-image.service.ts`
+- Supabase adapter: `src/infra/storage/supabase-storage.adapter.ts`
+- Upload route: `src/app/api/uploads/markdown-images/route.ts`
+
+**Configuration:**
+
+- `SUPABASE_URL`: Supabase project URL used server-side by the storage client.
+- `SUPABASE_SECRET_KEY`: server-only secret key used by the API route/adapter. Never expose as `NEXT_PUBLIC_`.
+- `SUPABASE_STORAGE_BUCKET`: existing bucket used for markdown images.
+- `SUPABASE_STORAGE_PUBLIC_URL`: public base URL for persistent markdown image URLs.
+
+**Authentication:** Application users authenticate through Better Auth. Upload authorization is enforced by the local API route before the server-side Supabase adapter stores files.
