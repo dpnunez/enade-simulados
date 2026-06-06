@@ -100,21 +100,21 @@ Professores precisam inserir imagens no enunciado markdown de questoes sem sair 
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| MIMG-01 | P1: Professor Insere Imagem No Markdown MVP | Design | Pending |
-| MIMG-02 | P1: Professor Insere Imagem No Markdown MVP | Design | Pending |
-| MIMG-03 | P1: Upload E Autorizado E Validado No Servidor | Design | Pending |
-| MIMG-04 | P1: Storage Provider Fica Abstraido | Design | Pending |
-| MIMG-05 | Edge Cases: chaves, falhas, config e orfaos | Design | Pending |
+| MIMG-01 | P1: Professor Insere Imagem No Markdown MVP | Execute | Partial: editor/form wired; E2E pending |
+| MIMG-02 | P1: Professor Insere Imagem No Markdown MVP | Execute | Partial: API/helper wired; E2E pending |
+| MIMG-03 | P1: Upload E Autorizado E Validado No Servidor | Execute | Implemented with unit/integration-light coverage |
+| MIMG-04 | P1: Storage Provider Fica Abstraido | Execute | Implemented |
+| MIMG-05 | Edge Cases: chaves, falhas, config e orfaos | Execute | Implemented except orphan cleanup remains out of scope |
 
-**Coverage:** 5 total, 5 mapped to draft tasks, 0 unmapped.
+**Coverage:** 5 total, 5 mapped to tasks, 0 unmapped. Browser E2E remains pending for the main teacher upload flow.
 
 ---
 
 ## Success Criteria
 
-- [ ] `MarkdownEditor` exposes image upload without importing Supabase.
+- [x] `MarkdownEditor` exposes image upload without importing Supabase.
 - [ ] `teacher@enade.local` can upload a valid raster image and see markdown image syntax inserted.
-- [ ] Upload route rejects anonymous, non-teacher, invalid MIME and oversized files.
-- [ ] Supabase credentials stay server-side.
-- [ ] Storage implementation can be swapped in tests through an adapter contract.
+- [x] Upload route rejects anonymous, non-teacher, invalid MIME and oversized files.
+- [x] Supabase credentials stay server-side via `SUPABASE_SECRET_KEY`.
+- [x] Storage implementation can be swapped in tests through an adapter contract.
 - [ ] Unit tests cover validation/service/adapter boundaries and E2E covers the main browser flow.

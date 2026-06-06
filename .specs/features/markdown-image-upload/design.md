@@ -1,7 +1,7 @@
 # Markdown Image Upload Design
 
 **Spec**: `.specs/features/markdown-image-upload/spec.md`
-**Status**: Draft
+**Status**: Implemented pending E2E/final gates
 
 ---
 
@@ -71,7 +71,7 @@ Note: `mermaid-studio` is not installed in this session, so this uses inline Mer
 | MDXEditor | Add `editor.imagePlugin({ imageUploadHandler })` and `editor.InsertImage` to toolbar only when upload is configured. |
 | App Router API | Add `POST /api/uploads/markdown-images` reading `request.formData()`. |
 | Better Auth | Require authenticated `TEACHER` before validation/upload. |
-| Supabase Storage | Add `@supabase/supabase-js`, server-only client factory, bucket/path config env vars, and adapter. |
+| Supabase Storage | Add `@supabase/supabase-js`, server-only client factory, bucket/path config env vars, and adapter. Required envs: `SUPABASE_URL`, `SUPABASE_SECRET_KEY`, `SUPABASE_STORAGE_BUCKET`, `SUPABASE_STORAGE_PUBLIC_URL`. |
 | Question markdown | Store returned URL in existing `Question.descriptionMarkdown`; no schema change needed. |
 
 ---
@@ -147,7 +147,7 @@ Note: `mermaid-studio` is not installed in this session, so this uses inline Mer
 - **Interfaces**:
   - `createSupabaseStorageClient()`
   - `supabaseMarkdownImageStorage: ObjectStorageAdapter`
-- **Dependencies**: `@supabase/supabase-js`, server env vars.
+- **Dependencies**: `@supabase/supabase-js`, server env vars: `SUPABASE_URL`, `SUPABASE_SECRET_KEY`, `SUPABASE_STORAGE_BUCKET`, `SUPABASE_STORAGE_PUBLIC_URL`.
 - **Reuses**: Existing infra folder convention.
 
 ### Upload Route Handler
@@ -210,6 +210,6 @@ interface ObjectStorageAdapter {
 | Storage boundary | Feature-owned `ObjectStorageAdapter` port, infra Supabase adapter | Keeps domain/test contract stable if provider changes. |
 | Upload endpoint | App route `/api/uploads/markdown-images` with `multipart/form-data` | Fits browser `File` upload and Next 16 Request APIs. |
 | File types | PNG, JPEG, WebP, GIF; reject SVG | Covers common raster needs while reducing XSS/CSP risk. |
-| Size limit | Default 6MB max, configurable downward/upward by env | Aligns with Supabase guidance that standard upload is ideal for files not larger than 6MB. |
+| Size limit | Fixed 6MB max for MVP | Aligns with Supabase guidance that standard upload is ideal for files not larger than 6MB. |
 | Object keys | Unique generated key under a configured prefix; `upsert: false` | Avoids overwrites and stale CDN propagation. |
 | URL inserted | Persistent URL from storage adapter | Allows markdown to remain renderable after save/reload. |

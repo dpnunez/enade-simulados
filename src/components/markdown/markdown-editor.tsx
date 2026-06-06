@@ -1,6 +1,10 @@
 "use client";
 
-import type { MDXEditorMethods, MDXEditorProps } from "@mdxeditor/editor";
+import type {
+  ImageUploadHandler,
+  MDXEditorMethods,
+  MDXEditorProps,
+} from "@mdxeditor/editor";
 import "@mdxeditor/editor/style.css";
 import dynamic from "next/dynamic";
 import { forwardRef, useEffect, useRef } from "react";
@@ -10,6 +14,7 @@ import { cn } from "@/lib/utils";
 type MarkdownEditorProps = {
   value: string;
   onChange: (value: string) => void;
+  imageUploadHandler?: ImageUploadHandler;
   onBlur?: () => void;
   resetKey?: string | number;
   ariaLabel?: string;
@@ -18,6 +23,7 @@ type MarkdownEditorProps = {
 
 type LoadedEditorProps = Pick<MDXEditorProps, "markdown" | "onChange"> & {
   onBlur?: () => void;
+  imageUploadHandler?: ImageUploadHandler;
   ariaLabel?: string;
   className?: string;
 };
@@ -26,7 +32,17 @@ const LoadedMarkdownEditor = dynamic(
   () =>
     import("@mdxeditor/editor").then((editor) => {
       const Editor = forwardRef<MDXEditorMethods, LoadedEditorProps>(
-        ({ markdown, onChange, onBlur, ariaLabel, className }, ref) => (
+        (
+          {
+            markdown,
+            onChange,
+            onBlur,
+            imageUploadHandler,
+            ariaLabel,
+            className,
+          },
+          ref,
+        ) => (
           <editor.MDXEditor
             ref={ref}
             markdown={markdown}
@@ -43,6 +59,9 @@ const LoadedMarkdownEditor = dynamic(
               editor.listsPlugin(),
               editor.quotePlugin(),
               editor.thematicBreakPlugin(),
+              ...(imageUploadHandler
+                ? [editor.imagePlugin({ imageUploadHandler })]
+                : []),
               editor.markdownShortcutPlugin(),
               editor.toolbarPlugin({
                 toolbarContents: () => (
@@ -54,6 +73,7 @@ const LoadedMarkdownEditor = dynamic(
                     <editor.Separator />
                     <editor.ListsToggle />
                     <editor.InsertThematicBreak />
+                    {imageUploadHandler ? <editor.InsertImage /> : null}
                   </>
                 ),
               }),
@@ -75,6 +95,7 @@ const LoadedMarkdownEditor = dynamic(
 export function MarkdownEditor({
   value,
   onChange,
+  imageUploadHandler,
   onBlur,
   resetKey,
   ariaLabel,
@@ -96,6 +117,7 @@ export function MarkdownEditor({
         }
       }}
       onBlur={onBlur}
+      imageUploadHandler={imageUploadHandler}
       ariaLabel={ariaLabel}
       className={className}
     />

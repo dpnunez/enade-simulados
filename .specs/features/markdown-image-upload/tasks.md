@@ -1,7 +1,7 @@
 # Markdown Image Upload Tasks
 
 **Design**: `.specs/features/markdown-image-upload/design.md`
-**Status**: Draft
+**Status**: Implemented pending E2E/final gates
 
 ---
 
@@ -54,10 +54,10 @@ T7 ── T8
 
 **Done when**:
 
-- [ ] `@supabase/supabase-js` is installed.
-- [ ] Required env vars are documented: project URL, service role or storage key, bucket, public base URL/prefix.
-- [ ] No Supabase env var is exposed with `NEXT_PUBLIC_` unless intentionally public and safe.
-- [ ] Integration docs mention Supabase Storage as file storage provider.
+- [x] `@supabase/supabase-js` is installed.
+- [x] Required env vars are documented: project URL, secret key, bucket, public base URL/prefix.
+- [x] No Supabase env var is exposed with `NEXT_PUBLIC_` unless intentionally public and safe.
+- [x] Integration docs mention Supabase Storage as file storage provider.
 
 **Tests**: build
 **Gate**: `pnpm build`
@@ -79,12 +79,12 @@ T7 ── T8
 
 **Done when**:
 
-- [ ] Allowed types include `image/png`, `image/jpeg`, `image/webp`, `image/gif`.
-- [ ] SVG and arbitrary MIME types are rejected.
-- [ ] File size max is enforced, defaulting to 6MB unless config overrides.
-- [ ] Object keys are unique, path-safe, extension-aware, and do not trust raw filenames.
-- [ ] Unit tests cover valid file, invalid MIME, oversized file, unsafe filename, and uniqueness shape.
-- [ ] Gate check passes: `pnpm test:unit`.
+- [x] Allowed types include `image/png`, `image/jpeg`, `image/webp`, `image/gif`.
+- [x] SVG and arbitrary MIME types are rejected.
+- [x] File size max is enforced, defaulting to 6MB.
+- [x] Object keys are unique, path-safe, extension-aware, and do not trust raw filenames.
+- [x] Unit tests cover valid file, invalid MIME, oversized file, unsafe filename, and uniqueness shape.
+- [x] Gate check passes for focused unit tests and `pnpm build`.
 
 **Tests**: unit
 **Gate**: quick
@@ -106,12 +106,12 @@ T7 ── T8
 
 **Done when**:
 
-- [ ] Service accepts a generic storage adapter.
-- [ ] Service validates file metadata before calling storage.
-- [ ] Service returns `{ url, key, contentType, size }`.
-- [ ] Storage failures are mapped to stable domain errors.
-- [ ] Tests use a fake adapter and do not import Supabase.
-- [ ] Gate check passes: `pnpm test:unit`.
+- [x] Service accepts a generic storage adapter.
+- [x] Service validates file metadata before calling storage.
+- [x] Service returns `{ url, key, contentType, size }`.
+- [x] Storage failures are mapped to stable domain errors.
+- [x] Tests use a fake adapter and do not import Supabase.
+- [x] Gate check passes for focused unit tests and `pnpm build`.
 
 **Tests**: unit
 **Gate**: quick
@@ -133,12 +133,12 @@ T7 ── T8
 
 **Done when**:
 
-- [ ] Adapter reads server-only env config and fails clearly when missing.
-- [ ] Adapter uploads using configured bucket/key/content type/cache control.
-- [ ] Adapter uses `upsert: false`.
-- [ ] Adapter returns a persistent URL from Supabase/public URL configuration.
-- [ ] Provider errors are mapped without leaking raw internals to clients.
-- [ ] Gate check passes: `pnpm test:unit` and `pnpm build`.
+- [x] Adapter reads server-only env config and fails clearly when missing.
+- [x] Adapter uploads using configured bucket/key/content type/cache control.
+- [x] Adapter uses `upsert: false`.
+- [x] Adapter returns a persistent URL from Supabase/public URL configuration.
+- [x] Provider errors are mapped without leaking raw internals to clients.
+- [x] Gate check passes for focused unit tests.
 
 **Tests**: unit with mocked Supabase client, build
 **Gate**: quick + build
@@ -160,12 +160,12 @@ T7 ── T8
 
 **Done when**:
 
-- [ ] Route reads `await request.formData()` and extracts field `file`.
-- [ ] Route requires authenticated `TEACHER`.
-- [ ] Route returns stable `{ success, image }` or `{ success: false, error }`.
-- [ ] Route never exposes Supabase credentials or raw provider errors.
-- [ ] Unit/integration-light tests cover unauthorized, invalid file, service error, and success.
-- [ ] Gate check passes: `pnpm test:unit`.
+- [x] Route reads `await request.formData()` and extracts field `file`.
+- [x] Route requires authenticated `TEACHER`.
+- [x] Route returns stable `{ success, image }` or `{ success: false, error }`.
+- [x] Route never exposes Supabase credentials or raw provider errors.
+- [x] Unit/integration-light tests cover unauthorized, invalid file, service error, and success.
+- [x] Gate check passes for focused unit tests.
 
 **Tests**: unit/integration-light
 **Gate**: quick
@@ -187,12 +187,12 @@ T7 ── T8
 
 **Done when**:
 
-- [ ] `MarkdownEditorProps` accepts `imageUploadHandler?: (file: File) => Promise<string>`.
-- [ ] MDXEditor includes `imagePlugin({ imageUploadHandler })` when handler exists.
-- [ ] Toolbar includes `InsertImage` only when upload is configured.
-- [ ] The component does not import Supabase or upload route constants from infra.
-- [ ] Existing editor behavior remains unchanged when no handler is passed.
-- [ ] Gate check passes: `pnpm test:unit` and `pnpm build`.
+- [x] `MarkdownEditorProps` accepts `imageUploadHandler?: (file: File) => Promise<string>`.
+- [x] MDXEditor includes `imagePlugin({ imageUploadHandler })` when handler exists.
+- [x] Toolbar includes `InsertImage` only when upload is configured.
+- [x] The component does not import Supabase or upload route constants from infra.
+- [x] Existing editor behavior remains unchanged when no handler is passed.
+- [x] `pnpm build` passes.
 
 **Tests**: unit/component if feasible; otherwise build
 **Gate**: quick + build
@@ -214,9 +214,9 @@ T7 ── T8
 
 **Done when**:
 
-- [ ] Question description editor receives `uploadQuestionMarkdownImage`.
-- [ ] Upload helper posts `FormData` to `/api/uploads/markdown-images`.
-- [ ] Helper throws user-facing errors for failed upload responses.
+- [x] Question description editor receives `uploadQuestionMarkdownImage`.
+- [x] Upload helper posts `FormData` to `/api/uploads/markdown-images`.
+- [x] Helper throws user-facing errors for failed upload responses.
 - [ ] E2E covers valid teacher image upload and persistence after save/reload.
 - [ ] E2E covers at least one rejected upload path if reliable without real Supabase dependency.
 - [ ] Gate check passes: `pnpm test:e2e`.
@@ -242,9 +242,9 @@ T7 ── T8
 **Done when**:
 
 - [ ] `pnpm test` passes.
-- [ ] `pnpm build` passes.
-- [ ] Requirement traceability statuses are updated.
-- [ ] Tasks are marked done with verification results.
+- [x] `pnpm build` passes.
+- [x] Requirement traceability statuses are updated.
+- [x] Tasks are marked done/partial with verification results.
 - [ ] State records final decisions and any deferred cleanup work.
 
 **Tests**: full + build

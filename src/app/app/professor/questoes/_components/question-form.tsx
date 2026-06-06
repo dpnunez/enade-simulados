@@ -17,6 +17,7 @@ import {
 } from "@/features/questions/question.schema";
 import type { QuestionEditable } from "@/features/questions/question.service";
 import { cn } from "@/lib/utils";
+import { uploadQuestionMarkdownImage } from "./question-image-upload";
 
 export type QuestionSubjectFieldOption = {
   id: string;
@@ -244,6 +245,7 @@ export function QuestionForm({
                 descriptionDraftRef.current = value;
               }}
               onBlur={syncDescriptionDraft}
+              imageUploadHandler={uploadQuestionMarkdownImage}
               resetKey={descriptionResetKey}
               ariaLabel="Enunciado da questao"
               className={cn(
