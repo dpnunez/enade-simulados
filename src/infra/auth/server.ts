@@ -3,6 +3,7 @@ import { betterAuth } from "better-auth";
 import { nextCookies } from "better-auth/next-js";
 
 import { prisma } from "@infra/db/prisma";
+import { env } from "@infra/env";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -13,7 +14,7 @@ export const auth = betterAuth({
     disableSignUp: true,
   },
   rateLimit: {
-    enabled: process.env.BETTER_AUTH_RATE_LIMIT_DISABLED !== "true",
+    enabled: !env.BETTER_AUTH_RATE_LIMIT_DISABLED,
   },
   user: {
     additionalFields: {

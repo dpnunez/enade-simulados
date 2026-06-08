@@ -33,4 +33,5 @@ export const env = createEnv({
   },
   experimental__runtimeEnv: {},
   emptyStringAsUndefined: true,
+  isServer: typeof window === "undefined" || process.env.NODE_ENV === "test",
 });
