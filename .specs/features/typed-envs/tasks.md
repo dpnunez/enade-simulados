@@ -1,9 +1,11 @@
 # Tasks: Typed Envs with t3-env
 
-**Status:** Planned
+**Status:** Implemented
 **Created:** 2026-06-07
 
 ## T1 - Add dependency and env module
+
+**Status:** Complete
 
 **Requirement:** TE-001, TE-002
 **Where:** `package.json`, `pnpm-lock.yaml`, `src/infra/env.ts`
@@ -28,6 +30,8 @@
 
 ## T2 - Validate env during Next build
 
+**Status:** Complete
+
 **Requirement:** TE-003
 **Where:** `next.config.ts`
 **Depends on:** T1
@@ -47,6 +51,8 @@
 - `pnpm build`
 
 ## T3 - Migrate runtime app env reads
+
+**Status:** Complete
 
 **Requirement:** TE-004
 **Where:**
@@ -75,6 +81,8 @@
 
 ## T4 - Keep tests stable around module-level env parsing
 
+**Status:** Complete
+
 **Requirement:** TE-006
 **Where:**
 
@@ -99,6 +107,8 @@
 - `pnpm test:unit`
 
 ## T5 - Decide what remains outside typed env
+
+**Status:** Complete
 
 **Requirement:** TE-005
 **Where:**
@@ -126,6 +136,8 @@
 
 ## T6 - Update env documentation
 
+**Status:** Complete
+
 **Requirement:** TE-007
 **Where:** `.env.example`
 **Depends on:** T1
@@ -144,6 +156,8 @@
 - Manual compare between `src/infra/env.ts` schema and `.env.example`.
 
 ## T7 - Final gates
+
+**Status:** Complete
 
 **Requirement:** TE-001 through TE-007
 **Depends on:** T1-T6

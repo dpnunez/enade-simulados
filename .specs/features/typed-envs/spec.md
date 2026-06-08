@@ -1,6 +1,6 @@
 # Typed Envs with t3-env
 
-**Status:** Planned
+**Status:** Implemented
 **Created:** 2026-06-07
 **Scope:** Medium
 
