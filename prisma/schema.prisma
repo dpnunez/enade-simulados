@@ -225,9 +225,9 @@ model SimulationAnswer {
   attemptQuestion       SimulationAttemptQuestion @relation(fields: [attemptQuestionId], references: [id], onDelete: Cascade)
   selectedAlternativeId String?
   selectedAlternative   QuestionAlternative?      @relation("SimulationAnswerSelectedAlternative", fields: [selectedAlternativeId], references: [id], onDelete: Restrict)
-  correctAlternativeId  String
-  correctAlternative    QuestionAlternative       @relation("SimulationAnswerCorrectAlternative", fields: [correctAlternativeId], references: [id], onDelete: Restrict)
-  isCorrect             Boolean
+  correctAlternativeId  String?
+  correctAlternative    QuestionAlternative?      @relation("SimulationAnswerCorrectAlternative", fields: [correctAlternativeId], references: [id], onDelete: Restrict)
+  isCorrect             Boolean?
   answeredAt            DateTime                  @default(now())
 
   @@index([selectedAlternativeId])
