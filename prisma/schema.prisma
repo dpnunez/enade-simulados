@@ -37,19 +37,25 @@ enum QuestionSource {
   OTHER
 }
 
+enum SimulationAttemptStatus {
+  IN_PROGRESS
+  COMPLETED
+}
+
 model User {
-  id            String    @id @default(cuid())
-  name          String    @unique
-  email         String    @unique
-  emailVerified Boolean   @default(false)
-  image         String?
-  role          Role      @default(STUDENT)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  sessions      Session[]
-  accounts      Account[]
-  subjectFields SubjectField[]
-  questions     Question[]
+  id                 String              @id @default(cuid())
+  name               String              @unique
+  email              String              @unique
+  emailVerified      Boolean             @default(false)
+  image              String?
+  role               Role                @default(STUDENT)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  sessions           Session[]
+  accounts           Account[]
+  subjectFields      SubjectField[]
+  questions          Question[]
+  simulationAttempts SimulationAttempt[]
 }
 
 model Session {
@@ -110,36 +116,39 @@ model Invitation {
 }
 
 model SubjectField {
-  id              String   @id @default(cuid())
-  title           String
-  titleNormalized String   @unique
-  description     String
-  colorHex        String
-  createdById     String
-  createdBy       User     @relation(fields: [createdById], references: [id], onDelete: Restrict)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  questions       Question[]
+  id                         String                          @id @default(cuid())
+  title                      String
+  titleNormalized            String                          @unique
+  description                String
+  colorHex                   String
+  createdById                String
+  createdBy                  User                            @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  createdAt                  DateTime                        @default(now())
+  updatedAt                  DateTime                        @updatedAt
+  questions                  Question[]
+  simulationAttemptFilters   SimulationAttemptSubjectField[]
+  simulationAttemptQuestions SimulationAttemptQuestion[]
 
   @@index([createdById])
   @@index([updatedAt])
 }
 
 model Question {
-  id                       String                @id @default(cuid())
-  descriptionMarkdown      String
-  descriptionHash              String                @unique
-  difficulty               QuestionDifficulty
-  source                   QuestionSource?
-  year                     Int?
-  subjectFieldId           String
-  subjectField             SubjectField          @relation(fields: [subjectFieldId], references: [id], onDelete: Cascade)
-  correctAnswerExplanation String?
-  createdById              String
-  createdBy                User                  @relation(fields: [createdById], references: [id], onDelete: Restrict)
-  createdAt                DateTime              @default(now())
-  updatedAt                DateTime              @updatedAt
-  alternatives             QuestionAlternative[]
+  id                         String                      @id @default(cuid())
+  descriptionMarkdown        String
+  descriptionHash            String                      @unique
+  difficulty                 QuestionDifficulty
+  source                     QuestionSource?
+  year                       Int?
+  subjectFieldId             String
+  subjectField               SubjectField                @relation(fields: [subjectFieldId], references: [id], onDelete: Cascade)
+  correctAnswerExplanation   String?
+  createdById                String
+  createdBy                  User                        @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  createdAt                  DateTime                    @default(now())
+  updatedAt                  DateTime                    @updatedAt
+  alternatives               QuestionAlternative[]
+  simulationAttemptQuestions SimulationAttemptQuestion[]
 
   @@index([subjectFieldId])
   @@index([createdById])
@@ -147,15 +156,80 @@ model Question {
 }
 
 model QuestionAlternative {
-  id              String   @id @default(cuid())
-  questionId      String
-  question        Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  contentMarkdown String
-  position        Int
-  isCorrect       Boolean  @default(false)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id                        String             @id @default(cuid())
+  questionId                String
+  question                  Question           @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  contentMarkdown           String
+  position                  Int
+  isCorrect                 Boolean            @default(false)
+  createdAt                 DateTime           @default(now())
+  updatedAt                 DateTime           @updatedAt
+  selectedSimulationAnswers SimulationAnswer[] @relation("SimulationAnswerSelectedAlternative")
+  correctSimulationAnswers  SimulationAnswer[] @relation("SimulationAnswerCorrectAlternative")
 
   @@unique([questionId, position])
   @@index([questionId])
+}
+
+model SimulationAttempt {
+  id                     String                          @id @default(cuid())
+  studentId              String
+  student                User                            @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  status                 SimulationAttemptStatus         @default(IN_PROGRESS)
+  requestedQuestionCount Int
+  totalQuestions         Int
+  answeredCount          Int                             @default(0)
+  correctCount           Int                             @default(0)
+  wrongCount             Int                             @default(0)
+  scorePercent           Float                           @default(0)
+  completedAt            DateTime?
+  createdAt              DateTime                        @default(now())
+  updatedAt              DateTime                        @updatedAt
+  subjectFields          SimulationAttemptSubjectField[]
+  questions              SimulationAttemptQuestion[]
+
+  @@index([studentId, createdAt])
+  @@index([status, updatedAt])
+}
+
+model SimulationAttemptSubjectField {
+  attemptId      String
+  attempt        SimulationAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  subjectFieldId String
+  subjectField   SubjectField      @relation(fields: [subjectFieldId], references: [id], onDelete: Restrict)
+
+  @@id([attemptId, subjectFieldId])
+  @@index([subjectFieldId])
+}
+
+model SimulationAttemptQuestion {
+  id             String             @id @default(cuid())
+  attemptId      String
+  attempt        SimulationAttempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  questionId     String
+  question       Question           @relation(fields: [questionId], references: [id], onDelete: Restrict)
+  position       Int
+  difficulty     QuestionDifficulty
+  subjectFieldId String
+  subjectField   SubjectField       @relation(fields: [subjectFieldId], references: [id], onDelete: Restrict)
+  answer         SimulationAnswer?
+
+  @@unique([attemptId, questionId])
+  @@unique([attemptId, position])
+  @@index([questionId])
+}
+
+model SimulationAnswer {
+  id                    String                    @id @default(cuid())
+  attemptQuestionId     String                    @unique
+  attemptQuestion       SimulationAttemptQuestion @relation(fields: [attemptQuestionId], references: [id], onDelete: Cascade)
+  selectedAlternativeId String?
+  selectedAlternative   QuestionAlternative?      @relation("SimulationAnswerSelectedAlternative", fields: [selectedAlternativeId], references: [id], onDelete: Restrict)
+  correctAlternativeId  String
+  correctAlternative    QuestionAlternative       @relation("SimulationAnswerCorrectAlternative", fields: [correctAlternativeId], references: [id], onDelete: Restrict)
+  isCorrect             Boolean
+  answeredAt            DateTime                  @default(now())
+
+  @@index([selectedAlternativeId])
+  @@index([correctAlternativeId])
 }
