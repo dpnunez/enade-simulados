@@ -1,6 +1,6 @@
 # State
 
-**Last Updated:** 2026-06-09T16:45:00-03:00
+**Last Updated:** 2026-06-09T17:10:00-03:00
 
 ---
 
@@ -152,6 +152,7 @@ Nenhum blocker ativo registrado no momento.
 - [x] Planejar `.specs/features/typed-envs`: envs tipadas com `@t3-oss/env-nextjs`
 - [x] Planejar `.specs/features/student-simulated-exams`: geracao, resposta, historico e pontuacao agregada de simulados do estudante
 - [x] Implementar `.specs/features/student-simulated-exams`: persistencia, APIs, UI de estudante, historico, correcao e cobertura E2E
+- [ ] Implementar `.specs/features/simulation-answer-drafts`: salvar respostas de simulado em andamento sem finalizar/corrigir
 - [ ] Revisar o roadmap quando a área administrativa ganhar CRUD real
 - [ ] Definir provedor de email para envio real de convites em produção
 
