@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, Circle, CircleAlert } from "lucide-react";
+import { CheckCircle2, Circle, CircleAlert, Save } from "lucide-react";
 
 import { Alert, AlertDescription, AlertIcon, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -32,14 +32,35 @@ type SimulationAttemptViewProps =
       attempt: SimulationAttemptReviewDetail;
     };
 
-function messageForError(error: string) {
+function messageForError(error: string, action: "finalize" | "save") {
   if (error === "SIMULATION_ATTEMPT_ALREADY_COMPLETED") {
     return "Este simulado ja foi finalizado.";
   }
   if (error === "SIMULATION_INVALID_ANSWER") {
     return "Uma alternativa selecionada nao pertence a questao.";
   }
-  return "Nao foi possivel finalizar o simulado.";
+  return action === "save"
+    ? "Nao foi possivel salvar as respostas."
+    : "Nao foi possivel finalizar o simulado.";
+}
+
+function selectedAnswersFromAttempt(
+  attempt: SimulationAttemptInProgressDetail | SimulationAttemptReviewDetail,
+) {
+  return Object.fromEntries(
+    attempt.questions
+      .filter((question) => question.selectedAlternativeId)
+      .map((question) => [question.id, question.selectedAlternativeId as string]),
+  );
+}
+
+function serializeAnswers(selectedByQuestion: Record<string, string>) {
+  return Object.entries(selectedByQuestion).map(
+    ([attemptQuestionId, selectedAlternativeId]) => ({
+      attemptQuestionId,
+      selectedAlternativeId,
+    }),
+  );
 }
 
 export function SimulationAttemptView({
@@ -48,45 +69,103 @@ export function SimulationAttemptView({
 }: SimulationAttemptViewProps) {
   const router = useRouter();
   const [activeIndex, setActiveIndex] = useState(0);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<{
+    title: string;
+    message: string;
+  } | null>(null);
+  const [saveMessage, setSaveMessage] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isFinalizing, setIsFinalizing] = useState(false);
   const [selectedByQuestion, setSelectedByQuestion] = useState<
     Record<string, string>
-  >(() =>
-    Object.fromEntries(
-      attempt.questions
-        .filter((question) => question.selectedAlternativeId)
-        .map((question) => [question.id, question.selectedAlternativeId as string]),
-    ),
+  >(() => selectedAnswersFromAttempt(attempt));
+  const [savedByQuestion, setSavedByQuestion] = useState<Record<string, string>>(
+    () => selectedAnswersFromAttempt(attempt),
   );
   const activeQuestion = attempt.questions[activeIndex];
   const answeredCount = useMemo(
     () => Object.keys(selectedByQuestion).length,
     [selectedByQuestion],
   );
+  const hasUnsavedChanges = useMemo(() => {
+    const selectedEntries = Object.entries(selectedByQuestion);
+    const savedEntries = Object.entries(savedByQuestion);
+
+    if (selectedEntries.length !== savedEntries.length) return true;
+
+    return selectedEntries.some(
+      ([questionId, selectedAlternativeId]) =>
+        savedByQuestion[questionId] !== selectedAlternativeId,
+    );
+  }, [savedByQuestion, selectedByQuestion]);
 
   async function finalizeAttempt() {
     setError(null);
+    setSaveMessage(null);
+    setIsFinalizing(true);
 
-    const response = await fetch(`/api/student/simulated-exams/${attempt.id}`, {
-      method: "PATCH",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        answers: Object.entries(selectedByQuestion).map(
-          ([attemptQuestionId, selectedAlternativeId]) => ({
-            attemptQuestionId,
-            selectedAlternativeId,
-          }),
-        ),
-      }),
-    });
-    const payload = await response.json();
+    try {
+      const response = await fetch(`/api/student/simulated-exams/${attempt.id}`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          answers: serializeAnswers(selectedByQuestion),
+        }),
+      });
+      const payload = await response.json();
 
-    if (!response.ok || !payload.success) {
-      setError(messageForError(payload.error));
-      return;
+      if (!response.ok || !payload.success) {
+        setError({
+          title: "Falha ao finalizar",
+          message: messageForError(payload.error, "finalize"),
+        });
+        return;
+      }
+
+      router.refresh();
+    } finally {
+      setIsFinalizing(false);
     }
+  }
 
-    router.refresh();
+  async function saveAnswers() {
+    setError(null);
+    setSaveMessage(null);
+    setIsSaving(true);
+
+    try {
+      const response = await fetch(
+        `/api/student/simulated-exams/${attempt.id}/answers`,
+        {
+          method: "PUT",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            answers: serializeAnswers(selectedByQuestion),
+          }),
+        },
+      );
+      const payload = await response.json();
+
+      if (!response.ok || !payload.success) {
+        setError({
+          title: "Falha ao salvar",
+          message: messageForError(payload.error, "save"),
+        });
+        return;
+      }
+
+      setSavedByQuestion(selectedAnswersFromAttempt(payload.attempt));
+      setSaveMessage("Respostas salvas.");
+      router.refresh();
+    } catch {
+      setError({
+        title: "Falha ao salvar",
+        message: messageForError("UNKNOWN", "save"),
+      });
+      return;
+    } finally {
+      setIsSaving(false);
+    }
   }
 
   return (
@@ -122,8 +201,21 @@ export function SimulationAttemptView({
           <Alert variant="destructive" role="alert">
             <AlertIcon />
             <div>
-              <AlertTitle>Falha ao finalizar</AlertTitle>
-              <AlertDescription>{error}</AlertDescription>
+              <AlertTitle>{error.title}</AlertTitle>
+              <AlertDescription>{error.message}</AlertDescription>
+            </div>
+          </Alert>
+        ) : null}
+        {mode === "in-progress" && saveMessage ? (
+          <Alert>
+            <AlertIcon />
+            <div>
+              <AlertTitle>{saveMessage}</AlertTitle>
+              <AlertDescription>
+                {hasUnsavedChanges
+                  ? "Ha alteracoes ainda nao salvas."
+                  : "Voce pode continuar depois sem finalizar."}
+              </AlertDescription>
             </div>
           </Alert>
         ) : null}
@@ -219,6 +311,7 @@ export function SimulationAttemptView({
                     disabled={mode === "completed"}
                     onChange={() => {
                       if (mode === "completed") return;
+                      setSaveMessage(null);
                       setSelectedByQuestion((current) => ({
                         ...current,
                         [activeQuestion.id]: alternative.id,
@@ -269,9 +362,31 @@ export function SimulationAttemptView({
           </div>
 
           {mode === "in-progress" ? (
-            <Button type="button" onClick={finalizeAttempt}>
-              Finalizar e corrigir
-            </Button>
+            <div className="flex flex-col items-start gap-2 sm:items-end">
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  disabled={isSaving}
+                  onClick={saveAnswers}
+                >
+                  <Save aria-hidden="true" />
+                  {isSaving ? "Salvando..." : "Salvar respostas"}
+                </Button>
+                <Button
+                  type="button"
+                  disabled={isFinalizing}
+                  onClick={finalizeAttempt}
+                >
+                  {isFinalizing ? "Finalizando..." : "Finalizar e corrigir"}
+                </Button>
+              </div>
+              {hasUnsavedChanges ? (
+                <p className="text-xs text-muted-foreground">
+                  Ha alteracoes ainda nao salvas.
+                </p>
+              ) : null}
+            </div>
           ) : null}
         </div>
       </CardContent>
