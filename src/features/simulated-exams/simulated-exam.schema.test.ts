@@ -4,6 +4,7 @@ import { z } from "zod";
 import {
   simulationAttemptIdSchema,
   simulationGenerationInputSchema,
+  simulationSaveAnswersInputSchema,
   simulationSubmitInputSchema,
 } from "./simulated-exam.schema";
 
@@ -74,6 +75,26 @@ describe("simulated-exam.schema", () => {
     });
   });
 
+  it("accepts valid draft save input and trims ids", () => {
+    const parsed = simulationSaveAnswersInputSchema.parse({
+      answers: [
+        {
+          attemptQuestionId: " attempt_question_1 ",
+          selectedAlternativeId: " alternative_1 ",
+        },
+      ],
+    });
+
+    expect(parsed).toEqual({
+      answers: [
+        {
+          attemptQuestionId: "attempt_question_1",
+          selectedAlternativeId: "alternative_1",
+        },
+      ],
+    });
+  });
+
   it("rejects malformed ids", () => {
     expect(() => simulationAttemptIdSchema.parse(" ")).toThrow(z.ZodError);
 
@@ -87,12 +108,27 @@ describe("simulated-exam.schema", () => {
         ],
       }),
     ).toThrow(z.ZodError);
+
+    expect(() =>
+      simulationSaveAnswersInputSchema.parse({
+        answers: [
+          {
+            attemptQuestionId: "attempt_question_1",
+            selectedAlternativeId: "",
+          },
+        ],
+      }),
+    ).toThrow(z.ZodError);
   });
 
   it("accepts empty answers", () => {
     const parsed = simulationSubmitInputSchema.parse({ answers: [] });
 
     expect(parsed).toEqual({ answers: [] });
+
+    expect(simulationSaveAnswersInputSchema.parse({ answers: [] })).toEqual({
+      answers: [],
+    });
   });
 
   it("rejects duplicate answers for the same attempt question", () => {
@@ -110,5 +146,35 @@ describe("simulated-exam.schema", () => {
         ],
       }),
     ).toThrow(z.ZodError);
+
+    expect(() =>
+      simulationSaveAnswersInputSchema.parse({
+        answers: [
+          {
+            attemptQuestionId: "attempt_question_1",
+            selectedAlternativeId: "alternative_1",
+          },
+          {
+            attemptQuestionId: " attempt_question_1 ",
+            selectedAlternativeId: "alternative_2",
+          },
+        ],
+      }),
+    ).toThrow(z.ZodError);
+  });
+
+  it("keeps submit schema using the shared answer payload shape", () => {
+    const input = {
+      answers: [
+        {
+          attemptQuestionId: " attempt_question_1 ",
+          selectedAlternativeId: " alternative_1 ",
+        },
+      ],
+    };
+
+    expect(simulationSubmitInputSchema.parse(input)).toEqual(
+      simulationSaveAnswersInputSchema.parse(input),
+    );
   });
 });

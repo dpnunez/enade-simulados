@@ -40,7 +40,7 @@ const simulationAnswerInputSchema = z.object({
   selectedAlternativeId: idSchema,
 });
 
-export const simulationSubmitInputSchema = z
+const simulationAnswerListInputSchema = z
   .object({
     answers: z.array(simulationAnswerInputSchema).max(maxQuestionsPerSimulation),
   })
@@ -61,6 +61,10 @@ export const simulationSubmitInputSchema = z
     });
   });
 
+export const simulationSaveAnswersInputSchema = simulationAnswerListInputSchema;
+
+export const simulationSubmitInputSchema = simulationAnswerListInputSchema;
+
 export type SimulationGenerationInput = z.input<
   typeof simulationGenerationInputSchema
 >;
@@ -70,4 +74,10 @@ export type ParsedSimulationGenerationInput = z.output<
 export type SimulationSubmitInput = z.input<typeof simulationSubmitInputSchema>;
 export type ParsedSimulationSubmitInput = z.output<
   typeof simulationSubmitInputSchema
+>;
+export type SimulationSaveAnswersInput = z.input<
+  typeof simulationSaveAnswersInputSchema
+>;
+export type ParsedSimulationSaveAnswersInput = z.output<
+  typeof simulationSaveAnswersInputSchema
 >;
