@@ -38,6 +38,7 @@ import {
   getInProgressSimulationAttemptForStudent,
   listEligibleSubjectFields,
   listSimulationAttemptsForStudent,
+  saveSimulationAttemptAnswers,
   submitSimulationAttempt,
 } from "./simulated-exam.service";
 
@@ -249,6 +250,162 @@ describe("simulated-exam.service", () => {
     } satisfies Partial<SimulationDomainError>);
   });
 
+  it("saves draft answers without correction fields and returns safe in-progress detail", async () => {
+    const savedAttempt = inProgressAttempt();
+    savedAttempt.answeredCount = 2;
+    savedAttempt.questions[0].answer = {
+      selectedAlternativeId: "alternative_1",
+    };
+
+    mocks.prisma.simulationAttempt.findFirst
+      .mockResolvedValueOnce({
+        id: "attempt_1",
+        status: "IN_PROGRESS",
+        questions: [
+          {
+            id: "attempt_question_1",
+            answer: null,
+            question: {
+              alternatives: [{ id: "alternative_1" }],
+            },
+          },
+          {
+            id: "attempt_question_2",
+            answer: { selectedAlternativeId: "alternative_2" },
+            question: {
+              alternatives: [{ id: "alternative_2" }],
+            },
+          },
+        ],
+      })
+      .mockResolvedValueOnce(savedAttempt);
+    mocks.prisma.simulationAnswer.upsert.mockResolvedValue({});
+    mocks.prisma.simulationAttempt.update.mockResolvedValue({});
+
+    const detail = await saveSimulationAttemptAnswers(
+      "attempt_1",
+      {
+        answers: [
+          {
+            attemptQuestionId: "attempt_question_1",
+            selectedAlternativeId: "alternative_1",
+          },
+        ],
+      },
+      "student_1",
+    );
+
+    expect(mocks.prisma.simulationAnswer.upsert).toHaveBeenCalledWith({
+      where: { attemptQuestionId: "attempt_question_1" },
+      create: {
+        attemptQuestionId: "attempt_question_1",
+        selectedAlternativeId: "alternative_1",
+        correctAlternativeId: null,
+        isCorrect: null,
+      },
+      update: {
+        selectedAlternativeId: "alternative_1",
+        correctAlternativeId: null,
+        isCorrect: null,
+        answeredAt: expect.any(Date),
+      },
+    });
+    expect(mocks.prisma.simulationAttempt.update).toHaveBeenCalledWith({
+      where: { id: "attempt_1" },
+      data: { answeredCount: 2 },
+    });
+    expect(detail.answeredCount).toBe(2);
+    const serialized = JSON.stringify(detail);
+    expect(serialized).not.toContain("isCorrect");
+    expect(serialized).not.toContain("correctAlternativeId");
+    expect(serialized).not.toContain("correctAnswerExplanation");
+  });
+
+  it("rejects draft saves for attempts that are missing or not owned by the student", async () => {
+    mocks.prisma.simulationAttempt.findFirst.mockResolvedValue(null);
+
+    await expect(
+      saveSimulationAttemptAnswers(
+        "attempt_1",
+        {
+          answers: [
+            {
+              attemptQuestionId: "attempt_question_1",
+              selectedAlternativeId: "alternative_1",
+            },
+          ],
+        },
+        "student_2",
+      ),
+    ).rejects.toMatchObject({
+      code: "SIMULATION_ATTEMPT_NOT_FOUND",
+    } satisfies Partial<SimulationDomainError>);
+  });
+
+  it("rejects draft saves for completed attempts", async () => {
+    mocks.prisma.simulationAttempt.findFirst.mockResolvedValue({
+      id: "attempt_1",
+      status: "COMPLETED",
+      questions: [],
+    });
+
+    await expect(
+      saveSimulationAttemptAnswers("attempt_1", { answers: [] }, "student_1"),
+    ).rejects.toMatchObject({
+      code: "SIMULATION_ATTEMPT_ALREADY_COMPLETED",
+    } satisfies Partial<SimulationDomainError>);
+  });
+
+  it("rejects draft saves with invalid attempt questions or alternatives", async () => {
+    mocks.prisma.simulationAttempt.findFirst.mockResolvedValue({
+      id: "attempt_1",
+      status: "IN_PROGRESS",
+      questions: [
+        {
+          id: "attempt_question_1",
+          answer: null,
+          question: {
+            alternatives: [{ id: "alternative_1" }],
+          },
+        },
+      ],
+    });
+
+    await expect(
+      saveSimulationAttemptAnswers(
+        "attempt_1",
+        {
+          answers: [
+            {
+              attemptQuestionId: "attempt_question_1",
+              selectedAlternativeId: "alternative_outside",
+            },
+          ],
+        },
+        "student_1",
+      ),
+    ).rejects.toMatchObject({
+      code: "SIMULATION_INVALID_ANSWER",
+    } satisfies Partial<SimulationDomainError>);
+
+    await expect(
+      saveSimulationAttemptAnswers(
+        "attempt_1",
+        {
+          answers: [
+            {
+              attemptQuestionId: "attempt_question_outside",
+              selectedAlternativeId: "alternative_1",
+            },
+          ],
+        },
+        "student_1",
+      ),
+    ).rejects.toMatchObject({
+      code: "SIMULATION_INVALID_ANSWER",
+    } satisfies Partial<SimulationDomainError>);
+  });
+
   it("submits answers, finalizes aggregates, and returns completed review", async () => {
     mocks.prisma.simulationAttempt.findFirst
       .mockResolvedValueOnce({
@@ -258,6 +415,7 @@ describe("simulated-exam.service", () => {
         questions: [
           {
             id: "attempt_question_1",
+            answer: null,
             question: {
               alternatives: [
                 { id: "alternative_1", isCorrect: true },
@@ -267,6 +425,7 @@ describe("simulated-exam.service", () => {
           },
           {
             id: "attempt_question_2",
+            answer: null,
             question: {
               alternatives: [
                 { id: "alternative_3", isCorrect: true },
@@ -307,6 +466,82 @@ describe("simulated-exam.service", () => {
         wrongCount: 1,
         scorePercent: 50,
         completedAt: expect.any(Date),
+      }),
+    });
+  });
+
+  it("submits saved draft answers merged with payload answers taking precedence", async () => {
+    mocks.prisma.simulationAttempt.findFirst
+      .mockResolvedValueOnce({
+        id: "attempt_1",
+        status: "IN_PROGRESS",
+        totalQuestions: 2,
+        questions: [
+          {
+            id: "attempt_question_1",
+            answer: { selectedAlternativeId: "alternative_2" },
+            question: {
+              alternatives: [
+                { id: "alternative_1", isCorrect: true },
+                { id: "alternative_2", isCorrect: false },
+              ],
+            },
+          },
+          {
+            id: "attempt_question_2",
+            answer: { selectedAlternativeId: "alternative_4" },
+            question: {
+              alternatives: [
+                { id: "alternative_3", isCorrect: true },
+                { id: "alternative_4", isCorrect: false },
+              ],
+            },
+          },
+        ],
+      })
+      .mockResolvedValueOnce(completedAttempt());
+    mocks.prisma.simulationAnswer.upsert.mockResolvedValue({});
+    mocks.prisma.simulationAttempt.update.mockResolvedValue({});
+
+    await submitSimulationAttempt(
+      "attempt_1",
+      {
+        answers: [
+          {
+            attemptQuestionId: "attempt_question_1",
+            selectedAlternativeId: "alternative_1",
+          },
+        ],
+      },
+      "student_1",
+    );
+
+    expect(mocks.prisma.simulationAnswer.upsert).toHaveBeenCalledTimes(2);
+    expect(mocks.prisma.simulationAnswer.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { attemptQuestionId: "attempt_question_1" },
+        create: expect.objectContaining({
+          selectedAlternativeId: "alternative_1",
+          isCorrect: true,
+        }),
+      }),
+    );
+    expect(mocks.prisma.simulationAnswer.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { attemptQuestionId: "attempt_question_2" },
+        create: expect.objectContaining({
+          selectedAlternativeId: "alternative_4",
+          isCorrect: false,
+        }),
+      }),
+    );
+    expect(mocks.prisma.simulationAttempt.update).toHaveBeenCalledWith({
+      where: { id: "attempt_1" },
+      data: expect.objectContaining({
+        answeredCount: 2,
+        correctCount: 1,
+        wrongCount: 1,
+        scorePercent: 50,
       }),
     });
   });

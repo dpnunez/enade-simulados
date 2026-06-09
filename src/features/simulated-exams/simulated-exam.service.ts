@@ -5,8 +5,10 @@ import { prisma } from "@infra/db/prisma";
 import {
   simulationAttemptIdSchema,
   simulationGenerationInputSchema,
+  simulationSaveAnswersInputSchema,
   simulationSubmitInputSchema,
   type SimulationGenerationInput,
+  type SimulationSaveAnswersInput,
   type SimulationSubmitInput,
 } from "./simulated-exam.schema";
 import {
@@ -299,6 +301,11 @@ export async function submitSimulationAttempt(
         questions: {
           select: {
             id: true,
+            answer: {
+              select: {
+                selectedAlternativeId: true,
+              },
+            },
             question: {
               select: {
                 alternatives: {
@@ -326,14 +333,32 @@ export async function submitSimulationAttempt(
       attempt.questions.map((question) => [question.id, question]),
     );
 
-    const correctedAnswers = parsed.answers.map((answer) => {
-      const attemptQuestion = attemptQuestionsById.get(answer.attemptQuestionId);
+    const selectedByAttemptQuestion = new Map(
+      attempt.questions
+        .filter((question) => question.answer?.selectedAlternativeId)
+        .map((question) => [
+          question.id,
+          question.answer?.selectedAlternativeId ?? null,
+        ]),
+    );
+
+    parsed.answers.forEach((answer) => {
+      selectedByAttemptQuestion.set(
+        answer.attemptQuestionId,
+        answer.selectedAlternativeId,
+      );
+    });
+
+    const correctedAnswers = Array.from(
+      selectedByAttemptQuestion.entries(),
+    ).map(([attemptQuestionId, selectedAlternativeId]) => {
+      const attemptQuestion = attemptQuestionsById.get(attemptQuestionId);
       if (!attemptQuestion) {
         throw new SimulationDomainError("SIMULATION_INVALID_ANSWER");
       }
 
       const selectedAlternative = attemptQuestion.question.alternatives.find(
-        (alternative) => alternative.id === answer.selectedAlternativeId,
+        (alternative) => alternative.id === selectedAlternativeId,
       );
       if (!selectedAlternative) {
         throw new SimulationDomainError("SIMULATION_INVALID_ANSWER");
@@ -347,7 +372,7 @@ export async function submitSimulationAttempt(
       }
 
       return {
-        attemptQuestionId: answer.attemptQuestionId,
+        attemptQuestionId,
         selectedAlternativeId: selectedAlternative.id,
         correctAlternativeId: correctAlternative.id,
         isCorrect: selectedAlternative.id === correctAlternative.id,
@@ -388,6 +413,117 @@ export async function submitSimulationAttempt(
     });
 
     return getCompletedSimulationAttemptForStudent(id, studentId, tx);
+  });
+}
+
+export async function saveSimulationAttemptAnswers(
+  attemptId: string,
+  input: SimulationSaveAnswersInput,
+  studentId: string,
+) {
+  const id = simulationAttemptIdSchema.parse(attemptId);
+  const parsed = simulationSaveAnswersInputSchema.parse(input);
+
+  return prisma.$transaction(async (tx) => {
+    const attempt = await tx.simulationAttempt.findFirst({
+      where: {
+        id,
+        studentId,
+      },
+      select: {
+        id: true,
+        status: true,
+        questions: {
+          select: {
+            id: true,
+            answer: {
+              select: {
+                selectedAlternativeId: true,
+              },
+            },
+            question: {
+              select: {
+                alternatives: {
+                  select: {
+                    id: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!attempt) {
+      throw new SimulationDomainError("SIMULATION_ATTEMPT_NOT_FOUND");
+    }
+
+    if (attempt.status === "COMPLETED") {
+      throw new SimulationDomainError("SIMULATION_ATTEMPT_ALREADY_COMPLETED");
+    }
+
+    const attemptQuestionsById = new Map(
+      attempt.questions.map((question) => [question.id, question]),
+    );
+    const selectedByAttemptQuestion = new Map(
+      attempt.questions
+        .filter((question) => question.answer?.selectedAlternativeId)
+        .map((question) => [
+          question.id,
+          question.answer?.selectedAlternativeId ?? null,
+        ]),
+    );
+
+    parsed.answers.forEach((answer) => {
+      const attemptQuestion = attemptQuestionsById.get(answer.attemptQuestionId);
+      if (!attemptQuestion) {
+        throw new SimulationDomainError("SIMULATION_INVALID_ANSWER");
+      }
+
+      const selectedAlternative = attemptQuestion.question.alternatives.find(
+        (alternative) => alternative.id === answer.selectedAlternativeId,
+      );
+      if (!selectedAlternative) {
+        throw new SimulationDomainError("SIMULATION_INVALID_ANSWER");
+      }
+
+      selectedByAttemptQuestion.set(
+        answer.attemptQuestionId,
+        selectedAlternative.id,
+      );
+    });
+
+    await Promise.all(
+      parsed.answers.map((answer) =>
+        tx.simulationAnswer.upsert({
+          where: {
+            attemptQuestionId: answer.attemptQuestionId,
+          },
+          create: {
+            attemptQuestionId: answer.attemptQuestionId,
+            selectedAlternativeId: answer.selectedAlternativeId,
+            correctAlternativeId: null,
+            isCorrect: null,
+          },
+          update: {
+            selectedAlternativeId: answer.selectedAlternativeId,
+            correctAlternativeId: null,
+            isCorrect: null,
+            answeredAt: new Date(),
+          },
+        }),
+      ),
+    );
+
+    await tx.simulationAttempt.update({
+      where: { id },
+      data: {
+        answeredCount: selectedByAttemptQuestion.size,
+      },
+    });
+
+    return getInProgressSimulationAttemptForStudent(id, studentId, tx);
   });
 }
 
