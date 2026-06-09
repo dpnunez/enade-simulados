@@ -143,6 +143,7 @@ Nenhum blocker ativo registrado no momento.
 - [x] Implementar `.specs/features/subject-field-question-rollup`: contagem de questoes e cascade SubjectField -> Question -> QuestionAlternative
 - [x] Planejar `.specs/features/markdown-image-upload`: upload de imagens no editor markdown com Supabase Storage abstraido
 - [x] Planejar `.specs/features/typed-envs`: envs tipadas com `@t3-oss/env-nextjs`
+- [x] Planejar `.specs/features/student-simulated-exams`: geracao, resposta, historico e pontuacao agregada de simulados do estudante
 - [ ] Revisar o roadmap quando a área administrativa ganhar CRUD real
 - [ ] Definir provedor de email para envio real de convites em produção
 
