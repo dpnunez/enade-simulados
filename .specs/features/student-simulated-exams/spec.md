@@ -6,11 +6,11 @@ Estudantes precisam gerar simulados personalizados a partir das grandes areas di
 
 ## Goals
 
-- [ ] Permitir que um `STUDENT` gere um simulado informando grandes areas e quantidade de questões.
-- [ ] Sortear questões somente das grandes areas selecionadas, com distribuição balanceada de dificuldade quando houver banco suficiente.
-- [ ] Permitir que o estudante responda o simulado e receba correção persistida.
-- [ ] Permitir consulta de simulados antigos com acertos, erros, alternativa escolhida e alternativa correta.
-- [ ] Persistir pontuação agregada da tentativa para ranking futuro, sem tela ou regra de ranking neste escopo.
+- [x] Permitir que um `STUDENT` gere um simulado informando grandes areas e quantidade de questões.
+- [x] Sortear questões somente das grandes areas selecionadas, com distribuição balanceada de dificuldade quando houver banco suficiente.
+- [x] Permitir que o estudante responda o simulado e receba correção persistida.
+- [x] Permitir consulta de simulados antigos com acertos, erros, alternativa escolhida e alternativa correta.
+- [x] Persistir pontuação agregada da tentativa para ranking futuro, sem tela ou regra de ranking neste escopo.
 
 ## Out of Scope
 
@@ -113,20 +113,20 @@ Estudantes precisam gerar simulados personalizados a partir das grandes areas di
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| SIM-01 | Gerar Simulado Personalizado | Design | In Design |
-| SIM-02 | Gerar Simulado Personalizado | Design | In Design |
-| SIM-03 | Gerar Simulado Personalizado | Design | In Design |
-| SIM-04 | Responder e Finalizar Simulado | Design | In Design |
-| SIM-05 | Responder e Finalizar Simulado | Design | In Design |
-| SIM-06 | Consultar Histórico de Simulados | Design | In Design |
-| SIM-07 | Consultar Histórico de Simulados | Design | In Design |
-| SIM-08 | Continuar Tentativa em Andamento | Design | In Design |
-| SIM-09 | Autorização e isolamento por estudante | Design | In Design |
-| SIM-10 | Pontuação agregada para ranking futuro | Design | In Design |
-| SIM-11 | Navegação livre entre questões da tentativa | Design | In Design |
-| SIM-12 | Não vazar resposta correta antes da finalização | Design | In Design |
+| SIM-01 | Gerar Simulado Personalizado | Implementation | Verified |
+| SIM-02 | Gerar Simulado Personalizado | Implementation | Verified |
+| SIM-03 | Gerar Simulado Personalizado | Implementation | Verified |
+| SIM-04 | Responder e Finalizar Simulado | Implementation | Verified |
+| SIM-05 | Responder e Finalizar Simulado | Implementation | Verified |
+| SIM-06 | Consultar Histórico de Simulados | Implementation | Verified |
+| SIM-07 | Consultar Histórico de Simulados | Implementation | Verified |
+| SIM-08 | Continuar Tentativa em Andamento | Implementation | Verified |
+| SIM-09 | Autorização e isolamento por estudante | Implementation | Verified |
+| SIM-10 | Pontuação agregada para ranking futuro | Implementation | Verified |
+| SIM-11 | Navegação livre entre questões da tentativa | Implementation | Verified |
+| SIM-12 | Não vazar resposta correta antes da finalização | Implementation | Verified |
 
-**Coverage:** 12 total, 12 mapped to design, 0 unmapped.
+**Coverage:** 12 total, 12 verified in implementation, 0 unmapped.
 
 ---
 
@@ -142,9 +142,9 @@ Estudantes precisam gerar simulados personalizados a partir das grandes areas di
 
 ## Success Criteria
 
-- [ ] Estudante gera um simulado com filtros válidos em menos de 1 minuto.
-- [ ] Sistema nunca sorteia questão fora das grandes areas selecionadas.
-- [ ] Finalização calcula e persiste acertos, erros e percentual.
-- [ ] Tentativas em andamento nunca expõem resposta correta no HTML, Server Component payload, JSON de API ou responses de network.
-- [ ] Histórico mostra apenas simulados do estudante autenticado.
-- [ ] Testes cobrem sorteio balanceado, autorização, submissão e revisão histórica.
+- [x] Estudante gera um simulado com filtros válidos em menos de 1 minuto.
+- [x] Sistema nunca sorteia questão fora das grandes areas selecionadas.
+- [x] Finalização calcula e persiste acertos, erros e percentual.
+- [x] Tentativas em andamento nunca expõem resposta correta no HTML, Server Component payload, JSON de API ou responses de network.
+- [x] Histórico mostra apenas simulados do estudante autenticado.
+- [x] Testes cobrem sorteio balanceado, autorização, submissão e revisão histórica.

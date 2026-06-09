@@ -1,7 +1,9 @@
 # Student Simulated Exams Tasks
 
 **Design**: `.specs/features/student-simulated-exams/design.md`
-**Status**: Draft
+**Status**: Verified
+
+**Final Verification**: `pnpm test` passed with 118 unit tests and 11 E2E tests; `pnpm build` passed after implementation.
 
 ---
 
@@ -74,13 +76,13 @@ T9 -> T10 -> T11
 
 **Done when**:
 
-- [ ] `SimulationAttemptStatus` enum exists with `IN_PROGRESS` and `COMPLETED`.
-- [ ] `SimulationAttempt`, `SimulationAttemptSubjectField`, `SimulationAttemptQuestion`, and `SimulationAnswer` exist with constraints from design.
-- [ ] `User` has a relation to simulation attempts.
-- [ ] Relations cascade only where historical integrity remains safe.
-- [ ] Migration applies cleanly.
-- [ ] Prisma client generation succeeds.
-- [ ] Gate check passes: `pnpm build`.
+- [x] `SimulationAttemptStatus` enum exists with `IN_PROGRESS` and `COMPLETED`.
+- [x] `SimulationAttempt`, `SimulationAttemptSubjectField`, `SimulationAttemptQuestion`, and `SimulationAnswer` exist with constraints from design.
+- [x] `User` has a relation to simulation attempts.
+- [x] Relations cascade only where historical integrity remains safe.
+- [x] Migration applies cleanly.
+- [x] Prisma client generation succeeds.
+- [x] Gate check passes: `pnpm build`.
 
 **Tests**: build
 **Gate**: build
@@ -102,11 +104,11 @@ T9 -> T10 -> T11
 
 **Done when**:
 
-- [ ] Generation schema validates unique `subjectFieldIds` and `questionCount` range.
-- [ ] Submit schema validates attempt-question ids and selected-alternative ids.
-- [ ] Schemas normalize empty/duplicate values where appropriate.
-- [ ] Unit tests cover valid generation, missing subject fields, duplicate subject fields, invalid question count, valid submit, malformed ids, and empty answers.
-- [ ] Gate check passes: `pnpm test:unit`.
+- [x] Generation schema validates unique `subjectFieldIds` and `questionCount` range.
+- [x] Submit schema validates attempt-question ids and selected-alternative ids.
+- [x] Schemas normalize empty/duplicate values where appropriate.
+- [x] Unit tests cover valid generation, missing subject fields, duplicate subject fields, invalid question count, valid submit, malformed ids, and empty answers.
+- [x] Gate check passes: `pnpm test:unit`.
 
 **Tests**: unit
 **Gate**: quick
@@ -128,13 +130,13 @@ T9 -> T10 -> T11
 
 **Done when**:
 
-- [ ] Selector filters by selected `subjectFieldIds`.
-- [ ] Selector rejects when available count is below requested count.
-- [ ] Quota helper distributes evenly across difficulties when possible.
-- [ ] Quota helper redistributes shortages to available difficulties.
-- [ ] Random selection returns exactly `N` unique questions.
-- [ ] Unit tests cover balanced 3-way distribution, remainder distribution, shortage redistribution, insufficient total, and subject-field filtering.
-- [ ] Gate check passes: `pnpm test:unit`.
+- [x] Selector filters by selected `subjectFieldIds`.
+- [x] Selector rejects when available count is below requested count.
+- [x] Quota helper distributes evenly across difficulties when possible.
+- [x] Quota helper redistributes shortages to available difficulties.
+- [x] Random selection returns exactly `N` unique questions.
+- [x] Unit tests cover balanced 3-way distribution, remainder distribution, shortage redistribution, insufficient total, and subject-field filtering.
+- [x] Gate check passes: `pnpm test:unit`.
 
 **Tests**: unit
 **Gate**: quick
@@ -156,17 +158,17 @@ T9 -> T10 -> T11
 
 **Done when**:
 
-- [ ] `listEligibleSubjectFields` returns only grandes areas with question count > 0.
-- [ ] `createSimulationAttempt` creates attempt, selected subject fields, selected questions, positions, and initial aggregate counts transactionally.
-- [ ] In-progress detail service enforces ownership and returns only safe answer-taking DTO fields.
-- [ ] Completed review detail service enforces ownership and returns correction fields only after finalization.
-- [ ] In-progress DTO excludes `isCorrect`, `correctAlternativeId`, `correctAnswerExplanation`, and any equivalent correct-answer marker.
-- [ ] `submitSimulationAttempt` validates ownership/status, validates alternatives belong to attempt questions, upserts answers, finalizes status, and stores score aggregates.
-- [ ] `submitSimulationAttempt` accepts answers keyed by attempt-question id, independent of display/navigation order.
-- [ ] `listSimulationAttemptsForStudent` returns only that student's attempts ordered newest first.
-- [ ] Domain errors include not enough questions, not found/not owned, already completed, and invalid answer.
-- [ ] Unit tests cover success/failure paths and assert in-progress payloads do not expose correct-answer fields.
-- [ ] Gate check passes: `pnpm test:unit`.
+- [x] `listEligibleSubjectFields` returns only grandes areas with question count > 0.
+- [x] `createSimulationAttempt` creates attempt, selected subject fields, selected questions, positions, and initial aggregate counts transactionally.
+- [x] In-progress detail service enforces ownership and returns only safe answer-taking DTO fields.
+- [x] Completed review detail service enforces ownership and returns correction fields only after finalization.
+- [x] In-progress DTO excludes `isCorrect`, `correctAlternativeId`, `correctAnswerExplanation`, and any equivalent correct-answer marker.
+- [x] `submitSimulationAttempt` validates ownership/status, validates alternatives belong to attempt questions, upserts answers, finalizes status, and stores score aggregates.
+- [x] `submitSimulationAttempt` accepts answers keyed by attempt-question id, independent of display/navigation order.
+- [x] `listSimulationAttemptsForStudent` returns only that student's attempts ordered newest first.
+- [x] Domain errors include not enough questions, not found/not owned, already completed, and invalid answer.
+- [x] Unit tests cover success/failure paths and assert in-progress payloads do not expose correct-answer fields.
+- [x] Gate check passes: `pnpm test:unit`.
 
 **Tests**: unit/integration-light
 **Gate**: quick
@@ -188,13 +190,13 @@ T9 -> T10 -> T11
 
 **Done when**:
 
-- [ ] Relevant Next.js 16 route handler docs are checked before editing.
-- [ ] `POST /api/student/simulated-exams` requires `STUDENT`, validates JSON, calls service, and returns created attempt id.
-- [ ] `PATCH /api/student/simulated-exams/[attemptId]` requires `STUDENT`, validates JSON, calls submit service, and returns corrected attempt summary only after finalization.
-- [ ] No API response for an in-progress attempt includes correct-answer fields.
-- [ ] Unauthorized users receive `401` and mutate no data.
-- [ ] Domain errors map to stable response codes and statuses.
-- [ ] Gate check passes: `pnpm build`.
+- [x] Relevant Next.js 16 route handler docs are checked before editing.
+- [x] `POST /api/student/simulated-exams` requires `STUDENT`, validates JSON, calls service, and returns created attempt id.
+- [x] `PATCH /api/student/simulated-exams/[attemptId]` requires `STUDENT`, validates JSON, calls submit service, and returns corrected attempt summary only after finalization.
+- [x] No API response for an in-progress attempt includes correct-answer fields.
+- [x] Unauthorized users receive `401` and mutate no data.
+- [x] Domain errors map to stable response codes and statuses.
+- [x] Gate check passes: `pnpm build`.
 
 **Tests**: build; E2E in T10
 **Gate**: build
@@ -216,14 +218,14 @@ T9 -> T10 -> T11
 
 **Done when**:
 
-- [ ] Relevant Next.js 16 page/layout docs are checked before editing.
-- [ ] Student nav exposes links to gerar simulado and histórico only for `STUDENT`.
-- [ ] Pages use `requireRole("STUDENT")`.
-- [ ] History page loads attempt summaries.
-- [ ] Generation page loads eligible subject fields.
-- [ ] Attempt page loads only owned attempt details.
-- [ ] Attempt page passes only safe in-progress DTOs to Client Components before finalization.
-- [ ] Gate check passes: `pnpm build`.
+- [x] Relevant Next.js 16 page/layout docs are checked before editing.
+- [x] Student nav exposes links to gerar simulado and histórico only for `STUDENT`.
+- [x] Pages use `requireRole("STUDENT")`.
+- [x] History page loads attempt summaries.
+- [x] Generation page loads eligible subject fields.
+- [x] Attempt page loads only owned attempt details.
+- [x] Attempt page passes only safe in-progress DTOs to Client Components before finalization.
+- [x] Gate check passes: `pnpm build`.
 
 **Tests**: build; E2E in T10
 **Gate**: build
@@ -245,12 +247,12 @@ T9 -> T10 -> T11
 
 **Done when**:
 
-- [ ] Form renders eligible grandes areas as checkbox/toggle controls.
-- [ ] Numeric field validates question count.
-- [ ] Submit calls create API and navigates to the attempt page.
-- [ ] Validation/domain errors render clearly.
-- [ ] Empty eligible subject fields render a useful empty state.
-- [ ] Gate check passes: `pnpm build`.
+- [x] Form renders eligible grandes areas as checkbox/toggle controls.
+- [x] Numeric field validates question count.
+- [x] Submit calls create API and navigates to the attempt page.
+- [x] Validation/domain errors render clearly.
+- [x] Empty eligible subject fields render a useful empty state.
+- [x] Gate check passes: `pnpm build`.
 
 **Tests**: build; E2E in T10
 **Gate**: build
@@ -272,15 +274,15 @@ T9 -> T10 -> T11
 
 **Done when**:
 
-- [ ] In-progress attempts render alternatives as selectable controls.
-- [ ] In-progress attempts show previous/next controls and a question navigator/status list.
-- [ ] Student can jump to any question and answer questions in any order.
-- [ ] In-progress component props do not contain correct-answer fields.
-- [ ] Completed attempts render chosen/correct states without allowing edits.
-- [ ] Submit/finalize calls API and refreshes/navigates to completed review.
-- [ ] Unanswered questions are represented in the UI.
-- [ ] Aggregate score summary is visible after completion.
-- [ ] Gate check passes: `pnpm build`.
+- [x] In-progress attempts render alternatives as selectable controls.
+- [x] In-progress attempts show previous/next controls and a question navigator/status list.
+- [x] Student can jump to any question and answer questions in any order.
+- [x] In-progress component props do not contain correct-answer fields.
+- [x] Completed attempts render chosen/correct states without allowing edits.
+- [x] Submit/finalize calls API and refreshes/navigates to completed review.
+- [x] Unanswered questions are represented in the UI.
+- [x] Aggregate score summary is visible after completion.
+- [x] Gate check passes: `pnpm build`.
 
 **Tests**: build; E2E in T10
 **Gate**: build
@@ -302,10 +304,10 @@ T9 -> T10 -> T11
 
 **Done when**:
 
-- [ ] Helpers can create subject fields/questions for all difficulties deterministically.
-- [ ] Helpers clean attempts, answers, and dependent test records without leaking data across runs.
-- [ ] Helper cleanup respects existing cascade/restrict rules.
-- [ ] Gate check passes: `pnpm test:unit` or targeted type/build gate if helpers are E2E-only.
+- [x] Helpers can create subject fields/questions for all difficulties deterministically.
+- [x] Helpers clean attempts, answers, and dependent test records without leaking data across runs.
+- [x] Helper cleanup respects existing cascade/restrict rules.
+- [x] Gate check passes: `pnpm test:unit` or targeted type/build gate if helpers are E2E-only.
 
 **Tests**: build/type confidence
 **Gate**: build
@@ -327,15 +329,15 @@ T9 -> T10 -> T11
 
 **Done when**:
 
-- [ ] Student can generate a simulado from selected grandes areas.
-- [ ] Generated questions come only from selected grandes areas.
-- [ ] Network responses and page payloads for the in-progress attempt do not include `isCorrect`, `correctAlternativeId`, `correctAnswerExplanation`, or the known correct alternative id.
-- [ ] Student can answer and finish the simulado.
-- [ ] Student can navigate out of sequence, answer a later question first, return to an earlier question, and keep both selections.
-- [ ] Completed review shows one correct and one wrong state in deterministic data.
-- [ ] History lists the completed simulado.
-- [ ] Teacher/admin cannot access student simulation pages or APIs through the tested flow.
-- [ ] Gate check passes: `pnpm test:e2e`.
+- [x] Student can generate a simulado from selected grandes areas.
+- [x] Generated questions come only from selected grandes areas.
+- [x] Network responses and page payloads for the in-progress attempt do not include `isCorrect`, `correctAlternativeId`, `correctAnswerExplanation`, or the known correct alternative id.
+- [x] Student can answer and finish the simulado.
+- [x] Student can navigate out of sequence, answer a later question first, return to an earlier question, and keep both selections.
+- [x] Completed review shows one correct and one wrong state in deterministic data.
+- [x] History lists the completed simulado.
+- [x] Teacher/admin cannot access student simulation pages or APIs through the tested flow.
+- [x] Gate check passes: `pnpm test:e2e`.
 
 **Tests**: e2e
 **Gate**: e2e
@@ -357,11 +359,11 @@ T9 -> T10 -> T11
 
 **Done when**:
 
-- [ ] `pnpm test` passes.
-- [ ] `pnpm build` passes if not already covered by the final test script.
-- [ ] `.specs/project/STATE.md` records accepted modeling decisions.
-- [ ] `.notebook` is updated if implementation discovery would be costly to rediscover.
-- [ ] Requirement traceability statuses are updated from draft planning to verified implementation state.
+- [x] `pnpm test` passes.
+- [x] `pnpm build` passes if not already covered by the final test script.
+- [x] `.specs/project/STATE.md` records accepted modeling decisions.
+- [x] `.notebook` is updated if implementation discovery would be costly to rediscover.
+- [x] Requirement traceability statuses are updated from draft planning to verified implementation state.
 
 **Tests**: full
 **Gate**: full

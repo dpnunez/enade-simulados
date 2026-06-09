@@ -1,6 +1,6 @@
 # State
 
-**Last Updated:** 2026-06-07T00:00:00-03:00
+**Last Updated:** 2026-06-09T16:45:00-03:00
 
 ---
 
@@ -104,6 +104,13 @@
 **Trade-off:** O fluxo ganha camadas extras de contrato/adapter, mas preserva testabilidade e permite trocar provider sem alterar o editor.
 **Impact:** `MarkdownEditor` deve receber uma funcao de upload provider-agnostica; credenciais Supabase ficam apenas no servidor; testes devem mockar o contrato de storage.
 
+### AD-015: Simulados individuais persistem tentativa normalizada (2026-06-09)
+
+**Decision:** Modelar simulados do estudante com `SimulationAttempt`, filtros de grandes areas, questoes selecionadas e uma resposta por questao, mantendo agregados de pontuacao na tentativa.
+**Reason:** A normalizacao preserva historico, isolamento por estudante, revisao questao a questao e prepara ranking futuro sem duplicar enunciados/alternativas.
+**Trade-off:** Questoes e alternativas referenciadas por tentativas passam a bloquear delecao fisica do catalogo ate existir uma estrategia de arquivamento/snapshot.
+**Impact:** Rotinas de limpeza E2E e futuras telas de catalogo precisam remover tentativas relacionadas antes de apagar questoes usadas em simulados.
+
 ## Active Blockers
 
 Nenhum blocker ativo registrado no momento.
@@ -144,6 +151,7 @@ Nenhum blocker ativo registrado no momento.
 - [x] Planejar `.specs/features/markdown-image-upload`: upload de imagens no editor markdown com Supabase Storage abstraido
 - [x] Planejar `.specs/features/typed-envs`: envs tipadas com `@t3-oss/env-nextjs`
 - [x] Planejar `.specs/features/student-simulated-exams`: geracao, resposta, historico e pontuacao agregada de simulados do estudante
+- [x] Implementar `.specs/features/student-simulated-exams`: persistencia, APIs, UI de estudante, historico, correcao e cobertura E2E
 - [ ] Revisar o roadmap quando a área administrativa ganhar CRUD real
 - [ ] Definir provedor de email para envio real de convites em produção
 
