@@ -1,15 +1,20 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import {
-  buildInvitationUrl,
-  sendInvitationEmail,
-} from "./invitation-email.adapter";
-
 const ORIGINAL_ENV = process.env;
+
+async function loadAdapter() {
+  vi.resetModules();
+  return import("./invitation-email.adapter");
+}
 
 describe("invitation-email.adapter", () => {
   beforeEach(() => {
-    process.env = { ...ORIGINAL_ENV };
+    process.env = {
+      ...ORIGINAL_ENV,
+      DATABASE_URL: "postgresql://user:password@localhost:5432/enade_test",
+      BETTER_AUTH_SECRET: "test-secret",
+      BETTER_AUTH_URL: "http://localhost:3000",
+    };
   });
 
   afterEach(() => {
@@ -17,8 +22,9 @@ describe("invitation-email.adapter", () => {
     vi.restoreAllMocks();
   });
 
-  it("builds invitation URL from APP_BASE_URL and token", () => {
+  it("builds invitation URL from APP_BASE_URL and token", async () => {
     process.env.APP_BASE_URL = "https://enade.local";
+    const { buildInvitationUrl } = await loadAdapter();
 
     const url = buildInvitationUrl("token-123");
 
@@ -32,6 +38,8 @@ describe("invitation-email.adapter", () => {
     const infoSpy = vi
       .spyOn(console, "info")
       .mockImplementation(() => undefined);
+
+    const { sendInvitationEmail } = await loadAdapter();
 
     await sendInvitationEmail({
       email: "user@test.com",
@@ -52,7 +60,12 @@ describe("invitation-email.adapter", () => {
 
   it("throws when smtp delivery is configured without required settings", async () => {
     process.env.INVITATION_EMAIL_DELIVERY = "smtp";
-    delete process.env.SMTP_HOST;
+    process.env.SMTP_HOST = "";
+    process.env.SMTP_PORT = "";
+    process.env.SMTP_USER = "";
+    process.env.SMTP_PASSWORD = "";
+
+    const { sendInvitationEmail } = await loadAdapter();
 
     await expect(
       sendInvitationEmail({

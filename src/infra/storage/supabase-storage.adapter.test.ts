@@ -12,20 +12,21 @@ vi.mock("@supabase/supabase-js", () => ({
   createClient: mocks.createClient,
 }));
 
-import {
-  SupabaseStorageUploadError,
-  createSupabaseStorageClient,
-  createSupabaseStorageConfig,
-  createSupabaseStorageAdapter,
-} from "./supabase-storage.adapter";
-
 const originalEnv = process.env;
+
+async function loadAdapter() {
+  vi.resetModules();
+  return import("./supabase-storage.adapter");
+}
 
 describe("supabase-storage.adapter", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     process.env = {
       ...originalEnv,
+      DATABASE_URL: "postgresql://user:password@localhost:5432/enade_test",
+      BETTER_AUTH_SECRET: "test-secret",
+      BETTER_AUTH_URL: "http://localhost:3000",
       SUPABASE_URL: "https://project.supabase.co",
       SUPABASE_SECRET_KEY: "supabase-secret-key",
       SUPABASE_STORAGE_BUCKET: "question-images",
@@ -34,8 +35,9 @@ describe("supabase-storage.adapter", () => {
     };
   });
 
-  it("creates storage config from env values without validating required fields", () => {
+  it("creates storage config from env values without validating required fields", async () => {
     process.env.SUPABASE_SECRET_KEY = "";
+    const { createSupabaseStorageConfig } = await loadAdapter();
 
     expect(createSupabaseStorageConfig()).toEqual({
       url: "https://project.supabase.co",
@@ -45,7 +47,9 @@ describe("supabase-storage.adapter", () => {
     });
   });
 
-  it("creates a server-side Supabase client from env config", () => {
+  it("creates a server-side Supabase client from env config", async () => {
+    const { createSupabaseStorageClient } = await loadAdapter();
+
     createSupabaseStorageClient();
 
     expect(mocks.createClient).toHaveBeenCalledWith(
@@ -61,7 +65,11 @@ describe("supabase-storage.adapter", () => {
   });
 
   it("uploads objects with configured bucket and upsert disabled", async () => {
-    mocks.upload.mockResolvedValue({ data: { path: "markdown-images/a.png" }, error: null });
+    mocks.upload.mockResolvedValue({
+      data: { path: "markdown-images/a.png" },
+      error: null,
+    });
+    const { createSupabaseStorageAdapter } = await loadAdapter();
     const adapter = createSupabaseStorageAdapter();
 
     const result = await adapter.uploadObject({
@@ -94,6 +102,8 @@ describe("supabase-storage.adapter", () => {
       data: null,
       error: new Error("raw provider details"),
     });
+    const { SupabaseStorageUploadError, createSupabaseStorageAdapter } =
+      await loadAdapter();
     const adapter = createSupabaseStorageAdapter();
 
     await expect(

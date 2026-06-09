@@ -4,6 +4,7 @@ import type {
   ObjectStorageAdapter,
   ObjectStorageUploadInput,
 } from "@/features/uploads/object-storage";
+import { env } from "@infra/env";
 
 export type SupabaseStorageConfig = {
   url: string;
@@ -21,10 +22,10 @@ export class SupabaseStorageUploadError extends Error {
 
 export function createSupabaseStorageConfig(): SupabaseStorageConfig {
   return {
-    url: process.env.SUPABASE_URL?.trim() ?? "",
-    secretKey: process.env.SUPABASE_SECRET_KEY?.trim() ?? "",
-    bucket: process.env.SUPABASE_STORAGE_BUCKET?.trim() ?? "",
-    publicUrl: (process.env.SUPABASE_STORAGE_PUBLIC_URL?.trim() ?? "").replace(/\/+$/, ""),
+    url: env.SUPABASE_URL,
+    secretKey: env.SUPABASE_SECRET_KEY,
+    bucket: env.SUPABASE_STORAGE_BUCKET,
+    publicUrl: env.SUPABASE_STORAGE_PUBLIC_URL,
   };
 }
 

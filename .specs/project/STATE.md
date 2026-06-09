@@ -1,6 +1,6 @@
 # State
 
-**Last Updated:** 2026-06-04T00:00:00-03:00
+**Last Updated:** 2026-06-07T00:00:00-03:00
 
 ---
 
@@ -142,6 +142,7 @@ Nenhum blocker ativo registrado no momento.
 - [x] Planejar `.specs/features/subject-field-question-rollup`: contagem e cascade posterior em grandes areas
 - [x] Implementar `.specs/features/subject-field-question-rollup`: contagem de questoes e cascade SubjectField -> Question -> QuestionAlternative
 - [x] Planejar `.specs/features/markdown-image-upload`: upload de imagens no editor markdown com Supabase Storage abstraido
+- [x] Planejar `.specs/features/typed-envs`: envs tipadas com `@t3-oss/env-nextjs`
 - [ ] Revisar o roadmap quando a área administrativa ganhar CRUD real
 - [ ] Definir provedor de email para envio real de convites em produção
 
