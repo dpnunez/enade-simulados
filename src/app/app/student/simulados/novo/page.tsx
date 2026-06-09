@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/card";
 import { listEligibleSubjectFields } from "@/features/simulated-exams/simulated-exam.service";
 
+import { SimulationGenerateForm } from "../_components/simulation-generate-form";
+
 export default async function NovoSimuladoPage() {
   await requireRole("STUDENT");
 
@@ -40,32 +42,7 @@ export default async function NovoSimuladoPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {subjectFields.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              Nenhuma grande area possui questoes disponiveis no momento.
-            </p>
-          ) : (
-            <div className="grid gap-3 sm:grid-cols-2">
-              {subjectFields.map((subjectField) => (
-                <div
-                  key={subjectField.id}
-                  className="rounded-md border p-3 text-sm"
-                >
-                  <div className="flex items-center gap-2 font-medium">
-                    <span
-                      aria-hidden="true"
-                      className="h-3 w-3 rounded-full border"
-                      style={{ backgroundColor: subjectField.colorHex }}
-                    />
-                    {subjectField.title}
-                  </div>
-                  <p className="mt-1 text-muted-foreground">
-                    {subjectField._count.questions} questoes disponiveis
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
+          <SimulationGenerateForm subjectFields={subjectFields} />
         </CardContent>
       </Card>
     </div>
