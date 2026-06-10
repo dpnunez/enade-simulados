@@ -36,6 +36,12 @@
 - Cadastro público permanece desativado; novos usuários entram apenas por convite
 - Admins listam usuários, acompanham convites pendentes e cancelam convites
 
+**Recuperação de senha** - PLANNED
+
+- Usuários solicitam link de redefinição sem expor existência de conta
+- Reset usa token hashado, expiração e revogação de sessões
+- Fluxo first-party compatível com Better Auth e alinhado ao email adapter de convites
+
 ---
 
 ## Milestone 2: Banco acadêmico e operação do professor
