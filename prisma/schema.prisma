@@ -24,6 +24,13 @@ enum InvitationStatus {
   CANCELLED
 }
 
+enum PasswordResetTokenStatus {
+  PENDING
+  USED
+  CANCELLED
+  EXPIRED
+}
+
 enum QuestionDifficulty {
   EASY
   MEDIUM
@@ -43,19 +50,20 @@ enum SimulationAttemptStatus {
 }
 
 model User {
-  id                 String              @id @default(cuid())
-  name               String              @unique
-  email              String              @unique
-  emailVerified      Boolean             @default(false)
-  image              String?
-  role               Role                @default(STUDENT)
-  createdAt          DateTime            @default(now())
-  updatedAt          DateTime            @updatedAt
-  sessions           Session[]
-  accounts           Account[]
-  subjectFields      SubjectField[]
-  questions          Question[]
-  simulationAttempts SimulationAttempt[]
+  id                  String               @id @default(cuid())
+  name                String               @unique
+  email               String               @unique
+  emailVerified       Boolean              @default(false)
+  image               String?
+  role                Role                 @default(STUDENT)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  sessions            Session[]
+  accounts            Account[]
+  passwordResetTokens PasswordResetToken[]
+  subjectFields       SubjectField[]
+  questions           Question[]
+  simulationAttempts  SimulationAttempt[]
 }
 
 model Session {
@@ -113,6 +121,21 @@ model Invitation {
 
   @@index([email, status])
   @@index([status, createdAt])
+}
+
+model PasswordResetToken {
+  id        String                   @id @default(cuid())
+  userId    String
+  user      User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String                   @unique
+  status    PasswordResetTokenStatus @default(PENDING)
+  expiresAt DateTime
+  createdAt DateTime                 @default(now())
+  updatedAt DateTime                 @updatedAt
+  usedAt    DateTime?
+
+  @@index([userId, status])
+  @@index([status, expiresAt])
 }
 
 model SubjectField {
