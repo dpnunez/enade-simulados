@@ -111,6 +111,13 @@
 **Trade-off:** Questoes e alternativas referenciadas por tentativas passam a bloquear delecao fisica do catalogo ate existir uma estrategia de arquivamento/snapshot.
 **Impact:** Rotinas de limpeza E2E e futuras telas de catalogo precisam remover tentativas relacionadas antes de apagar questoes usadas em simulados.
 
+### AD-016: Reset de senha como fluxo first-party compatível com Better Auth (2026-06-09)
+
+**Decision:** Planejar recuperacao de senha como feature propria em `.specs/features/password-reset`, usando tokens hashados, rotas em portugues e atualizacao de senha compativel com Better Auth em vez dos endpoints nativos de reset como contrato principal.
+**Reason:** O produto ja controla criacao de conta por convites first-party com signup publico desativado; reset de senha deve seguir o mesmo dominio de UI, email adapter, testes e mensagens sem enumeracao.
+**Trade-off:** A feature tera mais codigo e testes do que configurar `emailAndPassword.sendResetPassword`, mas evita acoplar UX e token lifecycle a rotas geradas da lib.
+**Impact:** Implementacao deve reutilizar `hashPassword`/tabelas `Account` e `Session`, mas possuir modelo/servico de token proprio.
+
 ## Active Blockers
 
 Nenhum blocker ativo registrado no momento.
@@ -152,7 +159,9 @@ Nenhum blocker ativo registrado no momento.
 - [x] Planejar `.specs/features/typed-envs`: envs tipadas com `@t3-oss/env-nextjs`
 - [x] Planejar `.specs/features/student-simulated-exams`: geracao, resposta, historico e pontuacao agregada de simulados do estudante
 - [x] Implementar `.specs/features/student-simulated-exams`: persistencia, APIs, UI de estudante, historico, correcao e cobertura E2E
+- [x] Planejar `.specs/features/password-reset`: recuperacao de senha first-party compativel com Better Auth
 - [ ] Implementar `.specs/features/simulation-answer-drafts`: salvar respostas de simulado em andamento sem finalizar/corrigir
+- [ ] Implementar `.specs/features/password-reset`: tokens, email adapter, UI publica, APIs e cobertura E2E
 - [ ] Revisar o roadmap quando a área administrativa ganhar CRUD real
 - [ ] Definir provedor de email para envio real de convites em produção
 
