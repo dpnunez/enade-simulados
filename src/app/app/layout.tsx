@@ -46,18 +46,21 @@ export default async function PrivateLayout({
         <CardContent className="space-y-4">
           <Separator />
           <nav className="flex flex-wrap gap-2">
-            <Button asChild variant="outline" size="sm">
-              <Link href="/app">Base privada</Link>
-            </Button>
-            <Button asChild variant="outline" size="sm">
-              <Link href="/app/admin">Admin</Link>
-            </Button>
-            <Button asChild variant="outline" size="sm">
-              <Link href="/app/student">Student</Link>
-            </Button>
-            <Button asChild variant="outline" size="sm">
-              <Link href="/app/teacher">Teacher</Link>
-            </Button>
+            {session.user.role === "ADMIN" ? (
+              <Button asChild variant="outline" size="sm">
+                <Link href="/app/admin">Admin</Link>
+              </Button>
+            ) : null}
+            {session.user.role === "STUDENT" ? (
+              <Button asChild variant="outline" size="sm">
+                <Link href="/app/student">Student</Link>
+              </Button>
+            ) : null}
+            {session.user.role === "TEACHER" ? (
+              <Button asChild variant="outline" size="sm">
+                <Link href="/app/teacher">Teacher</Link>
+              </Button>
+            ) : null}
             {session.user.role === "TEACHER" ? (
               <>
                 <Button asChild variant="outline" size="sm">

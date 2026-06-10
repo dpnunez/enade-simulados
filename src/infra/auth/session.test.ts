@@ -26,7 +26,7 @@ vi.mock("@auth/server", () => ({
   },
 }));
 
-import { getCurrentSession, requireAuth, requireRole } from "./session";
+import { getCurrentSession, getRoleHomePath, requireAuth, requireRole } from "./session";
 
 describe("session helpers", () => {
   const session = {
@@ -42,6 +42,12 @@ describe("session helpers", () => {
     mocks.redirect.mockImplementation((path: string) => {
       throw new Error(`REDIRECT:${path}`);
     });
+  });
+
+  it("getRoleHomePath retorna a área inicial da role", () => {
+    expect(getRoleHomePath("ADMIN")).toBe("/app/admin");
+    expect(getRoleHomePath("STUDENT")).toBe("/app/student");
+    expect(getRoleHomePath("TEACHER")).toBe("/app/teacher");
   });
 
   it("getCurrentSession encaminha os headers para a api de sessão", async () => {
@@ -67,7 +73,7 @@ describe("session helpers", () => {
     await expect(requireAuth()).resolves.toEqual(session);
   });
 
-  it("requireRole redireciona para /app quando a role não bate", async () => {
+  it("requireRole redireciona para a área da role atual quando a role não bate", async () => {
     mocks.getSession.mockResolvedValue({
       user: {
         email: "student@enade.local",
@@ -75,7 +81,7 @@ describe("session helpers", () => {
       },
     });
 
-    await expect(requireRole("ADMIN")).rejects.toThrow("REDIRECT:/app");
+    await expect(requireRole("ADMIN")).rejects.toThrow("REDIRECT:/app/student");
   });
 
   it("requireRole retorna a sessão quando a role é válida", async () => {

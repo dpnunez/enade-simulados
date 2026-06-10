@@ -8,7 +8,7 @@ Entry:
 - Data model: `prisma/schema.prisma`
 
 Public:
-- Home: `src/app/page.tsx` -> links to `/login` and `/app`.
+- Root redirect: `src/app/page.tsx` -> unauthenticated users go to `/login`; authenticated users go to the home path for their role.
 - Login: `src/app/login/page.tsx` -> Better Auth email/password via `src/infra/auth/client.ts`.
 - Forgot/reset password: `src/app/esqueci-senha/page.tsx`, `src/app/redefinir-senha/[token]/page.tsx`.
 - Invite acceptance: `src/app/convites/[token]/page.tsx`.
@@ -16,7 +16,8 @@ Public:
 Protected shell:
 - `src/proxy.ts` redirects `/app/*` without session cookie to `/login`, and `/login` with session cookie to `/app`.
 - `src/app/app/layout.tsx` requires auth, shows session identity, role, logout, and role-specific nav.
-- `src/app/app/page.tsx` requires any authenticated user.
+- `src/app/app/page.tsx` requires auth and redirects to `getRoleHomePath()` from `src/infra/auth/session.ts`.
+- Role home paths: ADMIN -> `/app/admin`, STUDENT -> `/app/student`, TEACHER -> `/app/teacher`.
 
 ADMIN:
 - Page: `src/app/app/admin/page.tsx`.

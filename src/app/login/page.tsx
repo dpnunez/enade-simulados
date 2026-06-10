@@ -109,19 +109,12 @@ export default function LoginPage() {
             </Button>
           </form>
         </CardContent>
-
         <Separator />
 
         <CardFooter className="flex-col items-start gap-4 px-6 py-6">
           <p className="text-sm text-muted-foreground">
             Os usuários disponíveis no seed foram preparados para os testes.
           </p>
-          <Button asChild variant="ghost" className="px-0">
-            <Link href="/">
-              Voltar para a home
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
         </CardFooter>
       </Card>
     </main>
