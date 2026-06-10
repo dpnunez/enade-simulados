@@ -1,6 +1,6 @@
 # State
 
-**Last Updated:** 2026-06-10T10:58:12-03:00
+**Last Updated:** 2026-06-10T13:11:11-03:00
 
 ---
 
@@ -125,6 +125,13 @@
 **Trade-off:** Producao ainda exige configurar um adapter SMTP/provider antes de usar envio real.
 **Impact:** Proximas features de email transacional podem extrair um helper compartilhado quando convites e reset convergirem em um provider real.
 
+### AD-018: Ranking de simulados usa pontuacao ponderada derivada (2026-06-10)
+
+**Decision:** Planejar ranking de estudantes para professores em `.specs/features/teacher-simulation-ranking`, calculando pontos a partir de respostas corretas e dificuldade da questao: facil 1, media/sem dificuldade 2, dificil 3; erros nao descontam pontos.
+**Reason:** O usuario definiu explicitamente a regra de pontuacao e pediu tabela paginada no backend com React Table no frontend.
+**Trade-off:** A primeira versao calcula `weightedScore` por agregacao em consulta, sem persistir nova coluna em `SimulationAttempt`; se a consulta ficar cara, uma migration/backfill pode materializar esse score depois.
+**Impact:** A implementacao deve criar service/API/page de professor, instalar `@tanstack/react-table`, manter autorizacao `TEACHER` server-side e cobrir pesos/paginacao em testes.
+
 ## Active Blockers
 
 Nenhum blocker ativo registrado no momento.
@@ -171,6 +178,7 @@ Nenhum blocker ativo registrado no momento.
 - [x] Planejar `.specs/features/password-reset`: recuperacao de senha first-party compativel com Better Auth
 - [ ] Implementar `.specs/features/simulation-answer-drafts`: salvar respostas de simulado em andamento sem finalizar/corrigir
 - [x] Implementar `.specs/features/password-reset`: tokens, email adapter, UI publica, APIs e cobertura E2E
+- [x] Planejar `.specs/features/teacher-simulation-ranking`: ranking paginado de estudantes para professores com pontuacao ponderada
 - [ ] Revisar o roadmap quando a área administrativa ganhar CRUD real
 - [ ] Definir provedor de email para envio real de convites e reset de senha em produção
 

@@ -103,6 +103,13 @@
 - Registro de tentativas
 - Visão simples de desempenho geral e por disciplina
 
+**Ranking de estudantes para professores** - PLANNED
+
+- Professores visualizam tabela paginada de desempenho dos estudantes
+- Pontuação ponderada por dificuldade: facil 1, media 2, dificil 3
+- Erro não desconta pontos
+- Métricas extras: simulados/formularios feitos, acertos, erros, total de questões e acerto global
+
 ---
 
 ## Future Considerations
@@ -110,4 +117,4 @@
 - Relatórios acadêmicos mais completos
 - Filtros por dificuldade e cobertura por tema
 - Geração inteligente de simulados
-- Gamificação, ranking e trilhas de estudo
+- Gamificação e trilhas de estudo
