@@ -10,6 +10,12 @@ function buildE2eId(prefix: string) {
   return `${prefix}_${randomUUID().replaceAll("-", "")}`;
 }
 
+function questionWeight(difficulty: "EASY" | "MEDIUM" | "HARD") {
+  if (difficulty === "EASY") return 1;
+  if (difficulty === "HARD") return 3;
+  return 2;
+}
+
 async function getUserIdByEmail(db: knex.Knex, email: string) {
   const user = await db("User").where({ email }).first("id");
 
@@ -131,6 +137,11 @@ async function createCompletedAttempt(
 ) {
   const correctCount = input.answers.filter((answer) => answer.isCorrect).length;
   const wrongCount = input.answers.length - correctCount;
+  const weightedScore = input.answers.reduce(
+    (total, answer) =>
+      answer.isCorrect ? total + questionWeight(answer.difficulty) : total,
+    0,
+  );
   const now = new Date();
   const [attempt] = await db("SimulationAttempt")
     .insert({
@@ -143,6 +154,7 @@ async function createCompletedAttempt(
       correctCount,
       wrongCount,
       scorePercent: Math.round((correctCount / input.answers.length) * 10_000) / 100,
+      weightedScore,
       completedAt: now,
       createdAt: now,
       updatedAt: now,

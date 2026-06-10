@@ -54,14 +54,21 @@ flowchart TD
 
 ## Data Model Strategy
 
-### MVP sem nova coluna
+### Score materializado por tentativa
 
-Calcular `weightedScore` a partir das respostas corretas e da dificuldade copiada em `SimulationAttemptQuestion`. Isso evita migration imediata e respeita que ranking e uma leitura derivada.
+Persistir `weightedScore` em `SimulationAttempt` no momento de finalizacao do simulado. O ranking passa a somar essa coluna por estudante, evitando join com `SimulationAttemptQuestion` e `SimulationAnswer` a cada leitura.
 
 Formula por estudante:
 
 ```text
 weightedScore =
+  sum(SimulationAttempt.weightedScore where status = COMPLETED)
+```
+
+Formula por tentativa:
+
+```text
+SimulationAttempt.weightedScore =
   sum(
     case
       when SimulationAnswer.isCorrect = true and SimulationAttemptQuestion.difficulty = EASY then 1
@@ -70,17 +77,17 @@ weightedScore =
       else 0
     end
   )
+```
 
 completedForms = count(distinct SimulationAttempt.id where status = COMPLETED)
 correctAnswers = sum(SimulationAttempt.correctCount)
 wrongAnswers = sum(SimulationAttempt.wrongCount)
 totalQuestions = sum(SimulationAttempt.totalQuestions)
 accuracyPercent = round(correctAnswers / totalQuestions * 100, 2), or 0 when totalQuestions = 0
-```
 
-### Performance follow-up
+### Migration/backfill
 
-Se o ranking ficar caro, adicionar `weightedScore` em `SimulationAttempt` no momento de finalizacao e indexar `SimulationAttempt(status, studentId, completedAt)`. Essa otimizacao nao entra no MVP porque exige migration e backfill; fica como tarefa opcional somente se a consulta real mostrar gargalo.
+A migration `20260610150000_simulation_attempt_weighted_score` adiciona `SimulationAttempt.weightedScore`, recalcula tentativas `COMPLETED` existentes a partir das respostas ja gravadas e adiciona indice `SimulationAttempt(status, studentId)`.
 
 ---
 
@@ -208,7 +215,7 @@ interface SimulationRankingPage {
 
 | Decision | Choice | Rationale |
 | --- | --- | --- |
-| Pontuacao inicial | Derivada por consulta agregada | Evita migration/backfill ate haver necessidade real de materializacao. |
+| Pontuacao inicial | Materializada em `SimulationAttempt.weightedScore` | Evita recalcular peso por resposta em cada leitura do ranking. |
 | Peso de dificuldade ausente | 2 pontos | Segue regra "sem dificuldade: media", mesmo que o schema atual exija enum. |
 | Percentual global | `sum(correctCount) / sum(totalQuestions)` | Mantem consistencia com simulados finalizados e trata nao respondidas como erro. |
 | Backend pagination | Obrigatoria | Pedido explicito; reduz payload e custo no browser. |

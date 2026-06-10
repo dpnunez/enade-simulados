@@ -1,4 +1,4 @@
-import { Prisma, type QuestionDifficulty } from "@prisma-generated-client";
+import { Prisma } from "@prisma-generated-client";
 
 import { prisma } from "@infra/db/prisma";
 
@@ -63,14 +63,6 @@ const directionFragments: Record<
   desc: Prisma.sql`DESC`,
 };
 
-export function calculateQuestionWeight(
-  difficulty: QuestionDifficulty | null | undefined,
-) {
-  if (difficulty === "EASY") return 1;
-  if (difficulty === "HARD") return 3;
-  return 2;
-}
-
 function numberFromDb(value: unknown) {
   if (typeof value === "bigint") return Number(value);
   if (typeof value === "number") return value;
@@ -117,31 +109,13 @@ function rankingBaseSql() {
         COUNT(*) AS "completedForms",
         COALESCE(SUM(attempt."correctCount"), 0) AS "correctAnswers",
         COALESCE(SUM(attempt."wrongCount"), 0) AS "wrongAnswers",
-        COALESCE(SUM(attempt."totalQuestions"), 0) AS "totalQuestions"
+        COALESCE(SUM(attempt."totalQuestions"), 0) AS "totalQuestions",
+        COALESCE(SUM(attempt."weightedScore"), 0) AS "weightedScore"
       FROM "SimulationAttempt" attempt
       WHERE attempt.status = 'COMPLETED'
       GROUP BY attempt."studentId"
     ) attempt_totals
     INNER JOIN "User" student ON student.id = attempt_totals."studentId"
-    LEFT JOIN (
-      SELECT
-        attempt."studentId" AS "studentId",
-        COALESCE(SUM(
-          CASE
-            WHEN answer."isCorrect" = true AND attempt_question.difficulty = 'EASY' THEN 1
-            WHEN answer."isCorrect" = true AND attempt_question.difficulty = 'HARD' THEN 3
-            WHEN answer."isCorrect" = true THEN 2
-            ELSE 0
-          END
-        ), 0) AS "weightedScore"
-      FROM "SimulationAttempt" attempt
-      INNER JOIN "SimulationAttemptQuestion" attempt_question
-        ON attempt_question."attemptId" = attempt.id
-      LEFT JOIN "SimulationAnswer" answer
-        ON answer."attemptQuestionId" = attempt_question.id
-      WHERE attempt.status = 'COMPLETED'
-      GROUP BY attempt."studentId"
-    ) score_totals ON score_totals."studentId" = attempt_totals."studentId"
   `;
 }
 
@@ -157,7 +131,7 @@ export async function listTeacherSimulationRanking(
         student.id AS "studentId",
         student.name AS "studentName",
         student.email AS "studentEmail",
-        COALESCE(score_totals."weightedScore", 0) AS "weightedScore",
+        attempt_totals."weightedScore" AS "weightedScore",
         attempt_totals."completedForms" AS "completedForms",
         attempt_totals."correctAnswers" AS "correctAnswers",
         attempt_totals."wrongAnswers" AS "wrongAnswers",

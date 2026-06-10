@@ -125,12 +125,12 @@
 **Trade-off:** Producao ainda exige configurar um adapter SMTP/provider antes de usar envio real.
 **Impact:** Proximas features de email transacional podem extrair um helper compartilhado quando convites e reset convergirem em um provider real.
 
-### AD-018: Ranking de simulados usa pontuacao ponderada derivada (2026-06-10)
+### AD-018: Ranking de simulados usa pontuacao ponderada materializada (2026-06-10)
 
-**Decision:** Planejar ranking de estudantes para professores em `.specs/features/teacher-simulation-ranking`, calculando pontos a partir de respostas corretas e dificuldade da questao: facil 1, media/sem dificuldade 2, dificil 3; erros nao descontam pontos.
-**Reason:** O usuario definiu explicitamente a regra de pontuacao e pediu tabela paginada no backend com React Table no frontend.
-**Trade-off:** A primeira versao calcula `weightedScore` por agregacao em consulta, sem persistir nova coluna em `SimulationAttempt`; se a consulta ficar cara, uma migration/backfill pode materializar esse score depois.
-**Impact:** A implementacao deve criar service/API/page de professor, instalar `@tanstack/react-table`, manter autorizacao `TEACHER` server-side e cobrir pesos/paginacao em testes.
+**Decision:** Persistir `SimulationAttempt.weightedScore` na finalizacao do simulado e usar essa coluna no ranking de estudantes para professores; pesos: facil 1, media/sem dificuldade 2, dificil 3; erros nao descontam pontos.
+**Reason:** Reduz custo do ranking paginado e evita recalcular pontuacao ponderada por resposta a cada leitura.
+**Trade-off:** A finalizacao do simulado ganha um agregado a mais e dados legados precisam de backfill por migration.
+**Impact:** Ranking soma `weightedScore` por tentativa `COMPLETED`; migrations devem preservar backfill e fixtures/testes que inserem tentativas finalizadas diretamente devem informar o score quando precisarem de pontuacao real.
 
 ## Active Blockers
 

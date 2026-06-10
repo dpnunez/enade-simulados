@@ -8,10 +8,7 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("@infra/db/prisma", () => ({ prisma: mocks.prisma }));
 
-import {
-  calculateQuestionWeight,
-  listTeacherSimulationRanking,
-} from "./simulation-ranking.service";
+import { listTeacherSimulationRanking } from "./simulation-ranking.service";
 
 function sqlText(value: unknown) {
   const sql = value as { sql?: string; text?: string; strings?: string[] };
@@ -22,14 +19,6 @@ function sqlText(value: unknown) {
 describe("simulation-ranking.service", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-  });
-
-  it("calcula pesos por dificuldade com medio como fallback", () => {
-    expect(calculateQuestionWeight("EASY")).toBe(1);
-    expect(calculateQuestionWeight("MEDIUM")).toBe(2);
-    expect(calculateQuestionWeight("HARD")).toBe(3);
-    expect(calculateQuestionWeight(null)).toBe(2);
-    expect(calculateQuestionWeight(undefined)).toBe(2);
   });
 
   it("retorna metadados de paginacao e rank global", async () => {
@@ -76,7 +65,7 @@ describe("simulation-ranking.service", () => {
     });
   });
 
-  it("monta consulta com tentativas finalizadas, pesos e desempates estaveis", async () => {
+  it("monta consulta usando score materializado e desempates estaveis", async () => {
     mocks.prisma.$queryRaw
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce([{ rowCount: 0n }]);
@@ -86,10 +75,9 @@ describe("simulation-ranking.service", () => {
     const queryText = sqlText(mocks.prisma.$queryRaw.mock.calls[0][0]);
 
     expect(queryText).toContain("attempt.status = 'COMPLETED'");
-    expect(queryText).toContain("answer.\"isCorrect\" = true");
-    expect(queryText).toContain("attempt_question.difficulty = 'EASY' THEN 1");
-    expect(queryText).toContain("attempt_question.difficulty = 'HARD' THEN 3");
-    expect(queryText).toContain("ELSE 0");
+    expect(queryText).toContain('SUM(attempt."weightedScore")');
+    expect(queryText).not.toContain('"SimulationAnswer"');
+    expect(queryText).not.toContain('"SimulationAttemptQuestion"');
     expect(queryText).toContain('"weightedScore" DESC');
     expect(queryText).toContain('"accuracyPercent" DESC');
     expect(queryText).toContain('"completedForms" DESC');

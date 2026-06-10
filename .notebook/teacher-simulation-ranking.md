@@ -9,8 +9,9 @@ Entry points:
 Domain flow:
 - `src/features/simulation-ranking/simulation-ranking.schema.ts` valida `page`, `pageSize`, `sort` e `direction`.
 - `src/features/simulation-ranking/simulation-ranking.service.ts:listTeacherSimulationRanking()` agrega apenas `SimulationAttempt.status = COMPLETED`.
-- A pontuacao vem de respostas corretas em `SimulationAnswer.isCorrect`, usando `SimulationAttemptQuestion.difficulty`: `EASY` 1, `MEDIUM`/nulo 2, `HARD` 3.
-- A consulta separa totais de tentativa e score por resposta em subconsultas, evitando duplicar `correctCount`, `wrongCount` e `totalQuestions` pelo join com questoes/respostas.
+- `SimulationAttempt.weightedScore` materializa a pontuacao na finalizacao do simulado.
+- A pontuacao de cada tentativa vem de respostas corretas em `SimulationAnswer.isCorrect`, usando `SimulationAttemptQuestion.difficulty`: `EASY` 1, `MEDIUM`/nulo 2, `HARD` 3.
+- `src/features/simulation-ranking/simulation-ranking.service.ts:listTeacherSimulationRanking()` soma `SimulationAttempt.weightedScore`, evitando join com questoes/respostas no ranking.
 
 Security notes:
 - Page e API exigem `TEACHER`.
@@ -22,5 +23,6 @@ E2E:
 
 Gotcha:
 - O percentual agregado vindo de SQL numeric pode chegar como objeto numerico via Prisma/Postgres; `numberFromDb()` precisa aceitar `toString()`, alem de `number`, `string` e `bigint`.
+- A migration `20260610150000_simulation_attempt_weighted_score` faz backfill de `weightedScore` para tentativas finalizadas existentes.
 
 Updated: 2026-06-10
