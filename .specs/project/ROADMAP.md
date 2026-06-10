@@ -103,7 +103,7 @@
 - Registro de tentativas
 - Visão simples de desempenho geral e por disciplina
 
-**Ranking de estudantes para professores** - PLANNED
+**Ranking de estudantes para professores** - COMPLETE
 
 - Professores visualizam tabela paginada de desempenho dos estudantes
 - Pontuação ponderada por dificuldade: facil 1, media 2, dificil 3

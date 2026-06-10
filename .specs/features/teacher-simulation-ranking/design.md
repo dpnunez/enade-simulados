@@ -1,7 +1,7 @@
 # Teacher Simulation Ranking Design
 
 **Spec**: `.specs/features/teacher-simulation-ranking/spec.md`
-**Status**: Draft
+**Status**: Implemented
 
 ---
 
@@ -217,8 +217,8 @@ interface SimulationRankingPage {
 
 ---
 
-## Open Questions
+## Resolved Questions
 
-- O texto "formularios feitos" deve aparecer literalmente na UI, ou preferimos "simulados feitos" por consistencia com o produto?
-- O ranking deve incluir apenas estudantes com pelo menos um simulado finalizado no MVP, conforme assumido, ou todos os estudantes com zero quando sem atividade?
-- A ordenacao controlada P2 deve entrar na primeira implementacao ou ficar para uma segunda task apos ranking padrao?
+- A UI usa "Formularios" na coluna compacta, mantendo a metrica definida na spec.
+- O MVP inclui apenas estudantes com pelo menos uma tentativa `COMPLETED`.
+- Ordenacao controlada P2 entrou na primeira implementacao para os campos permitidos pelo schema.

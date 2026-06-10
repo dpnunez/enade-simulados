@@ -6,11 +6,11 @@ Professores precisam visualizar quais estudantes tiveram melhor desempenho nos s
 
 ## Goals
 
-- [ ] Permitir que um `TEACHER` visualize ranking paginado de estudantes por pontuacao acumulada em simulados finalizados.
-- [ ] Calcular pontos apenas por acertos, usando pesos por dificuldade: facil = 1, media = 2, dificil = 3, sem dificuldade = media.
-- [ ] Mostrar metricas extras por estudante: quantidade de formularios/simulados feitos, percentual de acerto global, acertos, erros e total de questoes.
-- [ ] Manter paginacao, ordenacao base e agregacao no backend, com `react-table` controlando estado e renderizacao da tabela no frontend.
-- [ ] Garantir que apenas professores acessem a tela e a API.
+- [x] Permitir que um `TEACHER` visualize ranking paginado de estudantes por pontuacao acumulada em simulados finalizados.
+- [x] Calcular pontos apenas por acertos, usando pesos por dificuldade: facil = 1, media = 2, dificil = 3, sem dificuldade = media.
+- [x] Mostrar metricas extras por estudante: quantidade de formularios/simulados feitos, percentual de acerto global, acertos, erros e total de questoes.
+- [x] Manter paginacao, ordenacao base e agregacao no backend, com `react-table` controlando estado e renderizacao da tabela no frontend.
+- [x] Garantir que apenas professores acessem a tela e a API.
 
 ## Out of Scope
 
@@ -113,22 +113,22 @@ Professores precisam visualizar quais estudantes tiveram melhor desempenho nos s
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| RANK-01 | Visualizar Ranking Paginado | Design | Pending |
-| RANK-02 | Visualizar Ranking Paginado | Design | Pending |
-| RANK-03 | Calcular Pontuacao Ponderada | Design | Pending |
-| RANK-04 | Calcular Pontuacao Ponderada | Design | Pending |
-| RANK-05 | Proteger API De Ranking | Design | Pending |
-| RANK-06 | Proteger API De Ranking | Design | Pending |
-| RANK-07 | Ordenacao Controlada | Design | Pending |
-| RANK-08 | Estados vazios e parametros de pagina | Design | Pending |
+| RANK-01 | Visualizar Ranking Paginado | Execute | Done |
+| RANK-02 | Visualizar Ranking Paginado | Execute | Done |
+| RANK-03 | Calcular Pontuacao Ponderada | Execute | Done |
+| RANK-04 | Calcular Pontuacao Ponderada | Execute | Done |
+| RANK-05 | Proteger API De Ranking | Execute | Done |
+| RANK-06 | Proteger API De Ranking | Execute | Done |
+| RANK-07 | Ordenacao Controlada | Execute | Done |
+| RANK-08 | Estados vazios e parametros de pagina | Execute | Done |
 
-**Coverage:** 8 total, 8 mapped to design/tasks, 8 pending.
+**Coverage:** 8 total, 8 implemented and verified.
 
 ---
 
-## Assumed Decisions for Draft
+## Implemented Decisions
 
-| Topic | Draft Decision | Why |
+| Topic | Decision | Why |
 | --- | --- | --- |
 | Unidade exibida como "formularios feitos" | Usar quantidade de `SimulationAttempt` com status `COMPLETED`. | No dominio atual, cada simulado finalizado equivale ao formulario feito pelo estudante. |
 | Base do percentual global | `sum(correctCount) / sum(totalQuestions) * 100`. | Mantem questoes nao respondidas como incorretas, igual ao fluxo atual de finalizacao. |
@@ -138,9 +138,9 @@ Professores precisam visualizar quais estudantes tiveram melhor desempenho nos s
 
 ## Success Criteria
 
-- [ ] Professor acessa ranking em `/app/professor/ranking` e ve tabela paginada.
-- [ ] Ranking ordena estudantes por pontos ponderados desc com desempate estavel.
-- [ ] Backend pagina com `page`, `pageSize`, `rowCount` e nao retorna todos os estudantes.
-- [ ] Frontend usa `@tanstack/react-table` com paginacao manual.
-- [ ] Testes unitarios cobrem pesos, percentuais e parametros de consulta.
-- [ ] E2E cobre acesso do professor, tabela preenchida e bloqueio para estudante.
+- [x] Professor acessa ranking em `/app/professor/ranking` e ve tabela paginada.
+- [x] Ranking ordena estudantes por pontos ponderados desc com desempate estavel.
+- [x] Backend pagina com `page`, `pageSize`, `rowCount` e nao retorna todos os estudantes.
+- [x] Frontend usa `@tanstack/react-table` com paginacao manual.
+- [x] Testes unitarios cobrem pesos, percentuais e parametros de consulta.
+- [x] E2E cobre acesso do professor, tabela preenchida e bloqueio para estudante.

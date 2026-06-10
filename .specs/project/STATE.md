@@ -1,6 +1,6 @@
 # State
 
-**Last Updated:** 2026-06-10T13:11:11-03:00
+**Last Updated:** 2026-06-10T13:43:40-03:00
 
 ---
 
@@ -179,6 +179,7 @@ Nenhum blocker ativo registrado no momento.
 - [ ] Implementar `.specs/features/simulation-answer-drafts`: salvar respostas de simulado em andamento sem finalizar/corrigir
 - [x] Implementar `.specs/features/password-reset`: tokens, email adapter, UI publica, APIs e cobertura E2E
 - [x] Planejar `.specs/features/teacher-simulation-ranking`: ranking paginado de estudantes para professores com pontuacao ponderada
+- [x] Implementar `.specs/features/teacher-simulation-ranking`: service/API/page, React Table, fixtures E2E e gates completos
 - [ ] Revisar o roadmap quando a área administrativa ganhar CRUD real
 - [ ] Definir provedor de email para envio real de convites e reset de senha em produção
 

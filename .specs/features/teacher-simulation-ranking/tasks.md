@@ -1,7 +1,7 @@
 # Teacher Simulation Ranking Tasks
 
 **Design**: `.specs/features/teacher-simulation-ranking/design.md`
-**Status**: Draft
+**Status**: Complete
 
 ---
 
@@ -74,9 +74,9 @@ T8 -> T9 -> T10
 
 **Done when**:
 
-- [ ] Dependency is installed with pnpm and lockfile updated.
-- [ ] Version resolves successfully in the local workspace.
-- [ ] Gate check passes: `pnpm build`.
+- [x] Dependency is installed with pnpm and lockfile updated.
+- [x] Version resolves successfully in the local workspace.
+- [x] Gate check passes: `pnpm build`.
 
 **Tests**: build
 **Gate**: build
@@ -98,12 +98,12 @@ T8 -> T9 -> T10
 
 **Done when**:
 
-- [ ] `page` defaults to 1 and rejects/coerces invalid non-positive values according to schema decision.
-- [ ] `pageSize` defaults to 20 and is bounded between 10 and 100.
-- [ ] Sort fields are restricted to allowed columns.
-- [ ] Direction is restricted to `asc`/`desc`.
-- [ ] Unit tests cover defaults, valid pagination, invalid pagination, valid sort and invalid sort.
-- [ ] Gate check passes: `pnpm test:unit`.
+- [x] `page` defaults to 1 and rejects/coerces invalid non-positive values according to schema decision.
+- [x] `pageSize` defaults to 20 and is bounded between 10 and 100.
+- [x] Sort fields are restricted to allowed columns.
+- [x] Direction is restricted to `asc`/`desc`.
+- [x] Unit tests cover defaults, valid pagination, invalid pagination, valid sort and invalid sort.
+- [x] Gate check passes: `pnpm test:unit`.
 
 **Tests**: unit
 **Gate**: quick
@@ -125,15 +125,15 @@ T8 -> T9 -> T10
 
 **Done when**:
 
-- [ ] `calculateQuestionWeight` returns 1 for `EASY`, 2 for `MEDIUM`, 3 for `HARD`, and 2 for null/undefined.
-- [ ] Service filters only `SimulationAttempt.status = COMPLETED`.
-- [ ] Service sums points only when `SimulationAnswer.isCorrect = true`.
-- [ ] Errors/null correction fields add 0 and never subtract.
-- [ ] Service returns `rows`, `rowCount`, `page`, `pageSize`, and `pageCount`.
-- [ ] Row `rank` reflects global position based on backend page offset.
-- [ ] Default ordering is points desc, acerto desc, formularios desc, nome/email asc.
-- [ ] Unit tests cover scoring weights, no error penalty, global percent denominator, pagination metadata and stable ordering.
-- [ ] Gate check passes: `pnpm test:unit`.
+- [x] `calculateQuestionWeight` returns 1 for `EASY`, 2 for `MEDIUM`, 3 for `HARD`, and 2 for null/undefined.
+- [x] Service filters only `SimulationAttempt.status = COMPLETED`.
+- [x] Service sums points only when `SimulationAnswer.isCorrect = true`.
+- [x] Errors/null correction fields add 0 and never subtract.
+- [x] Service returns `rows`, `rowCount`, `page`, `pageSize`, and `pageCount`.
+- [x] Row `rank` reflects global position based on backend page offset.
+- [x] Default ordering is points desc, acerto desc, formularios desc, nome/email asc.
+- [x] Unit tests cover scoring weights, no error penalty, global percent denominator, pagination metadata and stable ordering.
+- [x] Gate check passes: `pnpm test:unit`.
 
 **Tests**: unit/integration-light
 **Gate**: quick
@@ -155,13 +155,13 @@ T8 -> T9 -> T10
 
 **Done when**:
 
-- [ ] Relevant Next.js 16 route handler docs are checked before editing.
-- [ ] Handler requires `TEACHER`.
-- [ ] Handler validates query params through ranking schema.
-- [ ] Handler returns table DTO as JSON on success.
-- [ ] Unauthorized users do not execute ranking query.
-- [ ] Invalid query returns stable error JSON.
-- [ ] Gate check passes: `pnpm build`.
+- [x] Relevant Next.js 16 route handler docs are checked before editing.
+- [x] Handler requires `TEACHER`.
+- [x] Handler validates query params through ranking schema.
+- [x] Handler returns table DTO as JSON on success.
+- [x] Unauthorized users do not execute ranking query.
+- [x] Invalid query returns stable error JSON.
+- [x] Gate check passes: `pnpm build`.
 
 **Tests**: build; E2E in T9
 **Gate**: build
@@ -183,9 +183,9 @@ T8 -> T9 -> T10
 
 **Done when**:
 
-- [ ] Exports `Table`, `TableHeader`, `TableBody`, `TableFooter`, `TableHead`, `TableRow`, `TableCell`, `TableCaption` or equivalent shadcn-compatible primitives.
-- [ ] Styling follows existing UI primitive conventions.
-- [ ] Gate check passes: `pnpm build`.
+- [x] Exports `Table`, `TableHeader`, `TableBody`, `TableFooter`, `TableHead`, `TableRow`, `TableCell`, `TableCaption` or equivalent shadcn-compatible primitives.
+- [x] Styling follows existing UI primitive conventions.
+- [x] Gate check passes: `pnpm build`.
 
 **Tests**: build
 **Gate**: build
@@ -207,14 +207,14 @@ T8 -> T9 -> T10
 
 **Done when**:
 
-- [ ] Component declares `"use client"`.
-- [ ] Uses `useReactTable` with `manualPagination: true`.
-- [ ] Provides backend `rowCount` to the table.
-- [ ] Controls `pagination` state and refetches on page/pageSize change.
-- [ ] Renders columns for rank, student, weighted score, completed forms, correct, wrong, total questions and accuracy.
-- [ ] Handles loading, empty and error states.
-- [ ] Sorting UI is included only for approved columns if P2 is implemented now; otherwise headers remain static.
-- [ ] Gate check passes: `pnpm build`.
+- [x] Component declares `"use client"`.
+- [x] Uses `useReactTable` with `manualPagination: true`.
+- [x] Provides backend `rowCount` to the table.
+- [x] Controls `pagination` state and refetches on page/pageSize change.
+- [x] Renders columns for rank, student, weighted score, completed forms, correct, wrong, total questions and accuracy.
+- [x] Handles loading, empty and error states.
+- [x] Sorting UI is included only for approved columns if P2 is implemented now; otherwise headers remain static.
+- [x] Gate check passes: `pnpm build`.
 
 **Tests**: build; E2E in T9
 **Gate**: build
@@ -236,11 +236,11 @@ T8 -> T9 -> T10
 
 **Done when**:
 
-- [ ] Page requires `TEACHER` server-side.
-- [ ] Page renders title/description and `RankingTable`.
-- [ ] Teacher nav shows a ranking link with icon.
-- [ ] Non-teacher nav does not show the link.
-- [ ] Gate check passes: `pnpm build`.
+- [x] Page requires `TEACHER` server-side.
+- [x] Page renders title/description and `RankingTable`.
+- [x] Teacher nav shows a ranking link with icon.
+- [x] Non-teacher nav does not show the link.
+- [x] Gate check passes: `pnpm build`.
 
 **Tests**: build; E2E in T9
 **Gate**: build
@@ -262,10 +262,10 @@ T8 -> T9 -> T10
 
 **Done when**:
 
-- [ ] Helper creates at least two students or uses existing deterministic users safely.
-- [ ] Helper creates completed attempts with known EASY/MEDIUM/HARD correct and incorrect answers.
-- [ ] Cleanup removes attempts before question/subject-field catalog rows.
-- [ ] Gate check passes: `pnpm test:e2e` when used by T9.
+- [x] Helper creates at least two students or uses existing deterministic users safely.
+- [x] Helper creates completed attempts with known EASY/MEDIUM/HARD correct and incorrect answers.
+- [x] Cleanup removes attempts before question/subject-field catalog rows.
+- [x] Gate check passes: `pnpm test:e2e` when used by T9.
 
 **Tests**: e2e
 **Gate**: e2e
@@ -287,12 +287,12 @@ T8 -> T9 -> T10
 
 **Done when**:
 
-- [ ] Teacher can open ranking page and see expected students/metrics.
-- [ ] Higher weighted score appears before lower weighted score.
-- [ ] Incorrect answers do not reduce points.
-- [ ] Page controls trigger backend pagination and preserve visible row count.
-- [ ] Student cannot access ranking page/API.
-- [ ] Gate check passes: `pnpm test:e2e`.
+- [x] Teacher can open ranking page and see expected students/metrics.
+- [x] Higher weighted score appears before lower weighted score.
+- [x] Incorrect answers do not reduce points.
+- [x] Page controls trigger backend pagination and preserve visible row count.
+- [x] Student cannot access ranking page/API.
+- [x] Gate check passes: `pnpm test:e2e`.
 
 **Tests**: e2e
 **Gate**: e2e
@@ -314,11 +314,11 @@ T8 -> T9 -> T10
 
 **Done when**:
 
-- [ ] `pnpm test:unit` passes.
-- [ ] `pnpm test:e2e` passes.
-- [ ] `pnpm build` passes.
-- [ ] Requirement traceability statuses are updated.
-- [ ] STATE/ROADMAP reflect implementation outcome.
+- [x] `pnpm test:unit` passes.
+- [x] `pnpm test:e2e` passes.
+- [x] `pnpm build` passes.
+- [x] Requirement traceability statuses are updated.
+- [x] STATE/ROADMAP reflect implementation outcome.
 
 **Tests**: full/build
 **Gate**: full
