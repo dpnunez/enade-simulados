@@ -18,6 +18,8 @@ describe("password-reset-email.adapter", () => {
       DATABASE_URL: "postgresql://user:password@localhost:5432/enade_test",
       BETTER_AUTH_SECRET: "test-secret",
       BETTER_AUTH_URL: "http://localhost:3000",
+      PASSWORD_RESET_EMAIL_DELIVERY: "console",
+      PASSWORD_RESET_EMAIL_FROM: "Equipe <noreply@enade.local>",
     };
   });
 
@@ -40,10 +42,17 @@ describe("password-reset-email.adapter", () => {
     expect(url).toBe("https://enade.local/redefinir-senha/token-123");
   });
 
-  it("uses console delivery with reset URL payload", async () => {
-    process.env.PASSWORD_RESET_EMAIL_DELIVERY = "console";
-    process.env.PASSWORD_RESET_EMAIL_FROM = "Equipe <noreply@enade.local>";
+  it("requires reset email delivery envs", async () => {
+    delete process.env.PASSWORD_RESET_EMAIL_DELIVERY;
+    const errorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
 
+    await expect(loadAdapter()).rejects.toThrow();
+    expect(errorSpy).toHaveBeenCalled();
+  });
+
+  it("uses console delivery with reset URL payload", async () => {
     const infoSpy = vi
       .spyOn(console, "info")
       .mockImplementation(() => undefined);
