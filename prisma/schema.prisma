@@ -205,6 +205,7 @@ model SimulationAttempt {
   correctCount           Int                             @default(0)
   wrongCount             Int                             @default(0)
   scorePercent           Float                           @default(0)
+  weightedScore          Int                             @default(0)
   completedAt            DateTime?
   createdAt              DateTime                        @default(now())
   updatedAt              DateTime                        @updatedAt
@@ -213,6 +214,7 @@ model SimulationAttempt {
 
   @@index([studentId, createdAt])
   @@index([status, updatedAt])
+  @@index([status, studentId])
 }
 
 model SimulationAttemptSubjectField {

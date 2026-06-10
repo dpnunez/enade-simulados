@@ -2,6 +2,7 @@ import Link from "next/link";
 import {
   BookOpenCheck,
   ClipboardList,
+  Trophy,
   History,
   PenLine,
   ShieldCheck,
@@ -69,6 +70,12 @@ export default async function PrivateLayout({
                   <Link href="/app/professor/questoes">
                     <ClipboardList aria-hidden="true" />
                     Questoes
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" size="sm">
+                  <Link href="/app/professor/ranking">
+                    <Trophy aria-hidden="true" />
+                    Ranking
                   </Link>
                 </Button>
               </>

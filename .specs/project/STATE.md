@@ -1,6 +1,6 @@
 # State
 
-**Last Updated:** 2026-06-10T10:58:12-03:00
+**Last Updated:** 2026-06-10T13:43:40-03:00
 
 ---
 
@@ -125,6 +125,13 @@
 **Trade-off:** Producao ainda exige configurar um adapter SMTP/provider antes de usar envio real.
 **Impact:** Proximas features de email transacional podem extrair um helper compartilhado quando convites e reset convergirem em um provider real.
 
+### AD-018: Ranking de simulados usa pontuacao ponderada materializada (2026-06-10)
+
+**Decision:** Persistir `SimulationAttempt.weightedScore` na finalizacao do simulado e usar essa coluna no ranking de estudantes para professores; pesos: facil 1, media/sem dificuldade 2, dificil 3; erros nao descontam pontos.
+**Reason:** Reduz custo do ranking paginado e evita recalcular pontuacao ponderada por resposta a cada leitura.
+**Trade-off:** A finalizacao do simulado ganha um agregado a mais e dados legados precisam de backfill por migration.
+**Impact:** Ranking soma `weightedScore` por tentativa `COMPLETED`; migrations devem preservar backfill e fixtures/testes que inserem tentativas finalizadas diretamente devem informar o score quando precisarem de pontuacao real.
+
 ## Active Blockers
 
 Nenhum blocker ativo registrado no momento.
@@ -171,6 +178,8 @@ Nenhum blocker ativo registrado no momento.
 - [x] Planejar `.specs/features/password-reset`: recuperacao de senha first-party compativel com Better Auth
 - [ ] Implementar `.specs/features/simulation-answer-drafts`: salvar respostas de simulado em andamento sem finalizar/corrigir
 - [x] Implementar `.specs/features/password-reset`: tokens, email adapter, UI publica, APIs e cobertura E2E
+- [x] Planejar `.specs/features/teacher-simulation-ranking`: ranking paginado de estudantes para professores com pontuacao ponderada
+- [x] Implementar `.specs/features/teacher-simulation-ranking`: service/API/page, React Table, fixtures E2E e gates completos
 - [ ] Revisar o roadmap quando a área administrativa ganhar CRUD real
 - [ ] Definir provedor de email para envio real de convites e reset de senha em produção
 

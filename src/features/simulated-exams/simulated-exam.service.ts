@@ -1,4 +1,4 @@
-import type { Prisma } from "@prisma-generated-client";
+import type { Prisma, QuestionDifficulty } from "@prisma-generated-client";
 
 import { prisma } from "@infra/db/prisma";
 
@@ -57,6 +57,12 @@ function mapSelectionError(error: unknown): never {
 function scorePercent(correctCount: number, totalQuestions: number) {
   if (totalQuestions === 0) return 0;
   return Math.round((correctCount / totalQuestions) * 10_000) / 100;
+}
+
+function questionWeight(difficulty: QuestionDifficulty | null | undefined) {
+  if (difficulty === "EASY") return 1;
+  if (difficulty === "HARD") return 3;
+  return 2;
 }
 
 export async function listEligibleSubjectFields() {
@@ -301,6 +307,7 @@ export async function submitSimulationAttempt(
         questions: {
           select: {
             id: true,
+            difficulty: true,
             answer: {
               select: {
                 selectedAlternativeId: true,
@@ -376,6 +383,7 @@ export async function submitSimulationAttempt(
         selectedAlternativeId: selectedAlternative.id,
         correctAlternativeId: correctAlternative.id,
         isCorrect: selectedAlternative.id === correctAlternative.id,
+        difficulty: attemptQuestion.difficulty,
       };
     });
 
@@ -385,7 +393,12 @@ export async function submitSimulationAttempt(
           where: {
             attemptQuestionId: answer.attemptQuestionId,
           },
-          create: answer,
+          create: {
+            attemptQuestionId: answer.attemptQuestionId,
+            selectedAlternativeId: answer.selectedAlternativeId,
+            correctAlternativeId: answer.correctAlternativeId,
+            isCorrect: answer.isCorrect,
+          },
           update: {
             selectedAlternativeId: answer.selectedAlternativeId,
             correctAlternativeId: answer.correctAlternativeId,
@@ -399,6 +412,11 @@ export async function submitSimulationAttempt(
     const answeredCount = correctedAnswers.length;
     const correctCount = correctedAnswers.filter((answer) => answer.isCorrect).length;
     const wrongCount = attempt.totalQuestions - correctCount;
+    const weightedScore = correctedAnswers.reduce(
+      (total, answer) =>
+        answer.isCorrect ? total + questionWeight(answer.difficulty) : total,
+      0,
+    );
 
     await tx.simulationAttempt.update({
       where: { id },
@@ -408,6 +426,7 @@ export async function submitSimulationAttempt(
         correctCount,
         wrongCount,
         scorePercent: scorePercent(correctCount, attempt.totalQuestions),
+        weightedScore,
         completedAt: new Date(),
       },
     });

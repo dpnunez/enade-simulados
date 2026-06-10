@@ -264,6 +264,7 @@ describe("simulated-exam.service", () => {
         questions: [
           {
             id: "attempt_question_1",
+            difficulty: "HARD",
             answer: null,
             question: {
               alternatives: [{ id: "alternative_1" }],
@@ -415,6 +416,7 @@ describe("simulated-exam.service", () => {
         questions: [
           {
             id: "attempt_question_1",
+            difficulty: "HARD",
             answer: null,
             question: {
               alternatives: [
@@ -425,6 +427,7 @@ describe("simulated-exam.service", () => {
           },
           {
             id: "attempt_question_2",
+            difficulty: "EASY",
             answer: null,
             question: {
               alternatives: [
@@ -465,6 +468,7 @@ describe("simulated-exam.service", () => {
         correctCount: 1,
         wrongCount: 1,
         scorePercent: 50,
+        weightedScore: 3,
         completedAt: expect.any(Date),
       }),
     });
@@ -479,6 +483,7 @@ describe("simulated-exam.service", () => {
         questions: [
           {
             id: "attempt_question_1",
+            difficulty: "EASY",
             answer: { selectedAlternativeId: "alternative_2" },
             question: {
               alternatives: [
@@ -489,6 +494,7 @@ describe("simulated-exam.service", () => {
           },
           {
             id: "attempt_question_2",
+            difficulty: "HARD",
             answer: { selectedAlternativeId: "alternative_4" },
             question: {
               alternatives: [
@@ -542,6 +548,7 @@ describe("simulated-exam.service", () => {
         correctCount: 1,
         wrongCount: 1,
         scorePercent: 50,
+        weightedScore: 1,
       }),
     });
   });
