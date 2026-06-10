@@ -1,7 +1,7 @@
 # Password Reset Tasks
 
 **Design**: `.specs/features/password-reset/design.md`
-**Status**: Draft
+**Status**: Implemented
 
 ---
 
@@ -32,7 +32,7 @@ T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8
 
 ### T1: Add Password Reset Data Model
 
-**Status**: Pending
+**Status**: Done
 
 **What**: Add `PasswordResetTokenStatus` and `PasswordResetToken` to Prisma, with indexes and cascade relation to `User`.
 **Where**: `prisma/schema.prisma`, new Prisma migration.
@@ -54,7 +54,7 @@ T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8
 
 ### T2: Implement Schemas and Token Service
 
-**Status**: Pending
+**Status**: Done
 
 **What**: Add request/confirm Zod schemas plus secure token generation/hash helpers.
 **Where**: `src/features/password-reset/password-reset.schema.ts`, `src/features/password-reset/password-reset-token.service.ts`, colocated tests.
@@ -77,7 +77,7 @@ T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8
 
 ### T3: Implement Password Reset Email Adapter
 
-**Status**: Pending
+**Status**: Done
 
 **What**: Add URL builder and deterministic console/log-file reset email delivery.
 **Where**: `src/features/password-reset/password-reset-email.adapter.ts`, adapter tests, `.env.example`, `.env.test`, `src/infra/env.ts`.
@@ -102,7 +102,7 @@ T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8
 
 ### T4: Implement Password Reset Service
 
-**Status**: Pending
+**Status**: Done
 
 **What**: Add domain service for request, token resolution, and reset confirmation.
 **Where**: `src/features/password-reset/password-reset.service.ts`, service tests.
@@ -126,7 +126,7 @@ T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8
 
 ### T5: Add Public API Routes
 
-**Status**: Pending
+**Status**: Done
 
 **What**: Expose request and confirm Route Handlers as thin HTTP boundaries.
 **Where**: `src/app/api/password-reset/request/route.ts`, `src/app/api/password-reset/confirm/route.ts`, route tests if existing pattern allows.
@@ -148,7 +148,7 @@ T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8
 
 ### T6: Add Forgot/Reset UI
 
-**Status**: Pending
+**Status**: Done
 
 **What**: Add public forgot-password and reset-password pages/forms.
 **Where**: `src/app/esqueci-senha/page.tsx`, `src/app/esqueci-senha/_components/*`, `src/app/redefinir-senha/[token]/page.tsx`, `src/app/redefinir-senha/[token]/_components/*`, `src/app/login/page.tsx`.
@@ -172,7 +172,7 @@ T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8
 
 ### T7: Add E2E Coverage
 
-**Status**: Pending
+**Status**: Done
 
 **What**: Cover the reset lifecycle in browser tests with deterministic email-log extraction.
 **Where**: `src/tests/e2e/password-reset.spec.ts`, optional helper under `src/tests/e2e/helpers/password-reset.ts`.
@@ -196,7 +196,7 @@ T1 -> T2 -> T3 -> T4 -> T5 -> T6 -> T7 -> T8
 
 ### T8: Final Gates and Traceability
 
-**Status**: Pending
+**Status**: Done
 
 **What**: Run final checks, update docs/status, and record implementation decisions.
 **Where**: `.specs/features/password-reset/*`, `.specs/project/STATE.md`, optional `.specs/codebase/*` updates if patterns changed.

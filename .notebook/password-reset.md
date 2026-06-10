@@ -1,10 +1,10 @@
 # Password Reset
 
-Last updated: 2026-06-09
+Last updated: 2026-06-10
 
 ## Summary
 
-Password reset is planned as a first-party application feature, not as the Better Auth generated reset endpoint flow. The plan lives in `.specs/features/password-reset/`.
+Password reset is implemented as a first-party application feature, not as the Better Auth generated reset endpoint flow. The feature plan and traceability live in `.specs/features/password-reset/`.
 
 ## Decision Pointers
 
@@ -12,10 +12,15 @@ Password reset is planned as a first-party application feature, not as the Bette
 - Better Auth 1.6.11 includes reset endpoints in `node_modules/better-auth/dist/api/routes/password.mjs`, requiring `emailAndPassword.sendResetPassword` and using generic `Verification` records.
 - Existing invitations already create Better Auth-compatible credential accounts through `src/features/invitations/invitation.service.ts:acceptInvitation()`.
 - Invitation token hashing pattern is in `src/features/invitations/invitation-token.service.ts`.
-- Reset design recommends custom token lifecycle plus `hashPassword` from `better-auth/crypto`, updating credential `Account.password`, and deleting `Session` rows after success.
+- `PasswordResetToken` stores only token hashes and lives in `prisma/schema.prisma`.
+- Reset request/confirm services live in `src/features/password-reset/password-reset.service.ts`; confirmation updates credential `Account.password` with `hashPassword` and deletes `Session` rows.
+- Console/log-file delivery lives in `src/features/password-reset/password-reset-email.adapter.ts` with `PASSWORD_RESET_EMAIL_*` envs.
+- Public routes are `src/app/api/password-reset/request/route.ts` and `src/app/api/password-reset/confirm/route.ts`; UI routes are `/esqueci-senha` and `/redefinir-senha/[token]`.
+- E2E coverage is in `src/tests/e2e/password-reset.spec.ts`; helper `src/tests/e2e/helpers/password-reset.ts` restores the seeded student password.
 
 ## Gotchas
 
 - Do not re-enable public signup to support reset.
 - Public reset request responses must not reveal whether an email exists.
 - E2E reset coverage must restore or isolate seeded user passwords, because seeded users are reused across tests.
+- `smtp` reset delivery currently validates required SMTP envs and then fails explicitly; real provider integration is deferred.

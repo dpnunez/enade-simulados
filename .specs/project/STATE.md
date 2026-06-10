@@ -1,6 +1,6 @@
 # State
 
-**Last Updated:** 2026-06-09T17:10:00-03:00
+**Last Updated:** 2026-06-10T10:58:12-03:00
 
 ---
 
@@ -118,6 +118,13 @@
 **Trade-off:** A feature tera mais codigo e testes do que configurar `emailAndPassword.sendResetPassword`, mas evita acoplar UX e token lifecycle a rotas geradas da lib.
 **Impact:** Implementacao deve reutilizar `hashPassword`/tabelas `Account` e `Session`, mas possuir modelo/servico de token proprio.
 
+### AD-017: Reset de senha entregue com email console/log-file e SMTP diferido (2026-06-10)
+
+**Decision:** Implementar reset de senha com adapter console/log-file deterministico e envs `PASSWORD_RESET_EMAIL_*`; manter `smtp` como modo que falha explicitamente ate existir provider real.
+**Reason:** O fluxo precisava de cobertura E2E deterministica agora, enquanto a escolha de provider transacional real ainda nao foi tomada.
+**Trade-off:** Producao ainda exige configurar um adapter SMTP/provider antes de usar envio real.
+**Impact:** Proximas features de email transacional podem extrair um helper compartilhado quando convites e reset convergirem em um provider real.
+
 ## Active Blockers
 
 Nenhum blocker ativo registrado no momento.
@@ -144,6 +151,8 @@ Nenhum blocker ativo registrado no momento.
 - [ ] Mapear formalmente o codebase em `.specs/codebase` antes de iniciar features maiores — Captured during: project initialization
 - [x] Definir estratégia de armazenamento de imagens para questões e anexos — Planned in `.specs/features/markdown-image-upload`
 - [ ] Definir limpeza de imagens orfas apos falha no salvamento ou remocao de referencias markdown — Deferred from markdown image upload planning
+- [ ] Implementar provider real de email transacional para convites e reset de senha — Deferred from password reset implementation
+- [ ] Avaliar email de notificacao de seguranca apos reset de senha bem-sucedido — Deferred from password reset implementation
 - [ ] Confirmar critérios de sucesso mensuráveis para o MVP com stakeholders do curso — Captured during: project initialization
 
 ## Todos
@@ -161,9 +170,9 @@ Nenhum blocker ativo registrado no momento.
 - [x] Implementar `.specs/features/student-simulated-exams`: persistencia, APIs, UI de estudante, historico, correcao e cobertura E2E
 - [x] Planejar `.specs/features/password-reset`: recuperacao de senha first-party compativel com Better Auth
 - [ ] Implementar `.specs/features/simulation-answer-drafts`: salvar respostas de simulado em andamento sem finalizar/corrigir
-- [ ] Implementar `.specs/features/password-reset`: tokens, email adapter, UI publica, APIs e cobertura E2E
+- [x] Implementar `.specs/features/password-reset`: tokens, email adapter, UI publica, APIs e cobertura E2E
 - [ ] Revisar o roadmap quando a área administrativa ganhar CRUD real
-- [ ] Definir provedor de email para envio real de convites em produção
+- [ ] Definir provedor de email para envio real de convites e reset de senha em produção
 
 ## Preferences
 

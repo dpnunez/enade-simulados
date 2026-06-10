@@ -1,7 +1,7 @@
 # Password Reset Design
 
 **Spec**: `.specs/features/password-reset/spec.md`
-**Status**: Draft
+**Status**: Implemented
 
 ---
 
@@ -258,7 +258,7 @@ Behavior:
 
 ## Open Decisions
 
-- Exact reset token expiry: recommended 1 hour.
-- Whether to add reset-specific env names or introduce a generic transactional email config.
-- Whether reset success should auto-redirect to login or show a success page with a button.
-- Whether a successful reset should send a security notification email after password change.
+- Exact reset token expiry: implemented as 1 hour.
+- Whether to add reset-specific env names or introduce a generic transactional email config: implemented with reset-specific env names.
+- Whether reset success should auto-redirect to login or show a success page with a button: implemented as an on-page success state with a login button.
+- Whether a successful reset should send a security notification email after password change: deferred.

@@ -1,6 +1,6 @@
 # Password Reset Spec
 
-**Status**: Draft
+**Status**: Implemented
 **Created**: 2026-06-09
 
 ---
@@ -15,12 +15,12 @@ O Better Auth 1.6.11 instalado possui endpoints de reset de senha (`/request-pas
 
 ## Goals
 
-- [ ] Permitir que usuários existentes solicitem um link de redefinição de senha pelo email.
-- [ ] Enviar um link de reset usando o mesmo modelo de entrega configurável já adotado para convites.
-- [ ] Permitir que o usuário defina uma nova senha a partir de um token válido e não expirado.
-- [ ] Atualizar a senha credential de forma compatível com Better Auth.
-- [ ] Revogar sessões existentes após a troca de senha.
-- [ ] Evitar enumeração de usuários por resposta, timing óbvio ou mensagens diferentes.
+- [x] Permitir que usuários existentes solicitem um link de redefinição de senha pelo email.
+- [x] Enviar um link de reset usando o mesmo modelo de entrega configurável já adotado para convites.
+- [x] Permitir que o usuário defina uma nova senha a partir de um token válido e não expirado.
+- [x] Atualizar a senha credential de forma compatível com Better Auth.
+- [x] Revogar sessões existentes após a troca de senha.
+- [x] Evitar enumeração de usuários por resposta, timing óbvio ou mensagens diferentes.
 
 ## Non-Goals
 
@@ -114,9 +114,19 @@ O Better Auth 1.6.11 instalado possui endpoints de reset de senha (`/request-pas
 
 ## Success Criteria
 
-- [ ] `student@enade.local` can reset password end-to-end in Playwright.
-- [ ] Old sessions are revoked after reset.
-- [ ] Old password no longer signs in after reset.
-- [ ] Raw tokens never appear in persisted database rows.
-- [ ] Unknown email receives the same public response as known email.
-- [ ] Unit tests cover schemas, token service, domain service, and email adapter.
+- [x] `student@enade.local` can reset password end-to-end in Playwright.
+- [x] Old sessions are revoked after reset.
+- [x] Old password no longer signs in after reset.
+- [x] Raw tokens never appear in persisted database rows.
+- [x] Unknown email receives the same public response as known email.
+- [x] Unit tests cover schemas, token service, domain service, and email adapter.
+
+## Implementation Traceability
+
+| Requirement | Implementation |
+| --- | --- |
+| RESET-01 | `src/app/esqueci-senha`, `src/app/api/password-reset/request`, `src/features/password-reset/password-reset.service.ts` |
+| RESET-02 | `src/app/redefinir-senha/[token]`, `src/app/api/password-reset/confirm`, `src/features/password-reset/password-reset.service.ts` |
+| RESET-03 | `src/features/password-reset/password-reset-email.adapter.ts`, `.env.test`, `src/tests/e2e/helpers/password-reset.ts` |
+| RESET-04 | `prisma/schema.prisma`, reset token/service tests, transactional confirmation and session deletion |
+| RESET-05 | Login link, public reset forms, and Playwright flow in `src/tests/e2e/password-reset.spec.ts` |
