@@ -7,6 +7,7 @@ import {
   ChevronRight,
   ChevronUp,
   ChevronsUpDown,
+  CircleAlert,
 } from "lucide-react";
 import {
   flexRender,
@@ -17,7 +18,7 @@ import {
   type SortingState,
 } from "@tanstack/react-table";
 
-import { Alert, AlertDescription, AlertIcon } from "@/components/ui/alert";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -224,7 +225,7 @@ export function RankingTable() {
     <div className="space-y-4">
       {error ? (
         <Alert variant="destructive">
-          <AlertIcon />
+          <CircleAlert aria-hidden="true" />
           <AlertDescription>
             Nao foi possivel carregar o ranking agora.
           </AlertDescription>

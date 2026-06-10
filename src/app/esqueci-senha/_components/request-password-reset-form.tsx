@@ -1,14 +1,13 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowRight, Mail } from "lucide-react";
+import { ArrowRight, CheckCircle2, CircleAlert, Mail } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import {
   Alert,
   AlertDescription,
-  AlertIcon,
   AlertTitle,
 } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -51,7 +50,7 @@ export function RequestPasswordResetForm() {
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
       {error ? (
         <Alert variant="destructive">
-          <AlertIcon />
+          <CircleAlert aria-hidden="true" />
           <div>
             <AlertTitle>Falha ao solicitar redefinição</AlertTitle>
             <AlertDescription>{error}</AlertDescription>
@@ -60,7 +59,7 @@ export function RequestPasswordResetForm() {
       ) : null}
       {success ? (
         <Alert>
-          <AlertIcon />
+          <CheckCircle2 aria-hidden="true" />
           <div>
             <AlertTitle>Verifique seu email</AlertTitle>
             <AlertDescription>{success}</AlertDescription>

@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { CircleAlert } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useId, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -8,7 +9,6 @@ import { useForm } from "react-hook-form";
 import {
   Alert,
   AlertDescription,
-  AlertIcon,
   AlertTitle,
 } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -98,7 +98,7 @@ export function SimulationGenerateForm({
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
       {error ? (
         <Alert variant="destructive" role="alert">
-          <AlertIcon />
+          <CircleAlert aria-hidden="true" />
           <div>
             <AlertTitle>Falha ao gerar</AlertTitle>
             <AlertDescription>{error}</AlertDescription>

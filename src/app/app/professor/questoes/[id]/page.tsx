@@ -1,8 +1,9 @@
 import Link from "next/link";
+import { Info } from "lucide-react";
 import { notFound } from "next/navigation";
 
 import { requireRole } from "@auth/session";
-import { Alert, AlertDescription, AlertIcon, AlertTitle } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -50,7 +51,7 @@ export default async function EditarQuestaoPage({ params }: EditQuestionPageProp
 
       {subjectFields.length === 0 ? (
         <Alert role="status">
-          <AlertIcon />
+          <Info aria-hidden="true" />
           <div>
             <AlertTitle>Nenhuma grande area cadastrada</AlertTitle>
             <AlertDescription>

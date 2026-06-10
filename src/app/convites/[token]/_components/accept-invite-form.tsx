@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { CircleAlert } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -8,7 +9,6 @@ import { useForm } from "react-hook-form";
 import {
   Alert,
   AlertDescription,
-  AlertIcon,
   AlertTitle,
 } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -55,7 +55,7 @@ export function AcceptInviteForm({ token, email, role }: Props) {
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
       {error ? (
         <Alert variant="destructive">
-          <AlertIcon />
+          <CircleAlert aria-hidden="true" />
           <div>
             <AlertTitle>Falha no cadastro</AlertTitle>
             <AlertDescription>{error}</AlertDescription>

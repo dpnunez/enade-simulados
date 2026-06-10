@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
-import { ArrowRight, Mail, Lock } from "lucide-react";
+import { ArrowRight, CircleAlert, Mail, Lock } from "lucide-react";
 
 import { signIn } from "@auth/client";
-import { Alert, AlertDescription, AlertIcon, AlertTitle } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -54,7 +54,7 @@ export default function LoginPage() {
         <CardContent className="space-y-6">
           {error ? (
             <Alert variant="destructive">
-              <AlertIcon />
+              <CircleAlert aria-hidden="true" />
               <div>
                 <AlertTitle>Falha ao autenticar</AlertTitle>
                 <AlertDescription>{error}</AlertDescription>

@@ -1,10 +1,10 @@
 "use client";
 
-import { Pencil, Trash2 } from "lucide-react";
+import { CircleAlert, Pencil, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { Alert, AlertDescription, AlertIcon, AlertTitle } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -146,7 +146,7 @@ export function SubjectFieldsList({ subjectFields }: SubjectFieldsListProps) {
             <CardContent className="space-y-4 p-4 pt-0">
               {deleteError && isConfirmingDelete ? (
                 <Alert variant="destructive" role="alert">
-                  <AlertIcon />
+                  <CircleAlert aria-hidden="true" />
                   <div>
                     <AlertTitle>Falha ao deletar</AlertTitle>
                     <AlertDescription>{deleteError}</AlertDescription>
@@ -162,7 +162,7 @@ export function SubjectFieldsList({ subjectFields }: SubjectFieldsListProps) {
                   <div className="space-y-1">
                     <p className="text-sm font-medium">Confirmar delecao</p>
                     <p className="text-sm text-muted-foreground">
-                      Esta acao remove a grande area "{subjectField.title}" do catalogo.
+                      Esta acao remove a grande area &quot;{subjectField.title}&quot; do catalogo.
                     </p>
                   </div>
                   <div className="flex flex-col gap-2 sm:flex-row">

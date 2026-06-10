@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { Pencil, Trash2 } from "lucide-react";
+import { CircleAlert, Pencil, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { Alert, AlertDescription, AlertIcon, AlertTitle } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -166,7 +166,7 @@ export function QuestionsList({ questions }: QuestionsListProps) {
 
               {deleteError && isConfirmingDelete ? (
                 <Alert variant="destructive" role="alert">
-                  <AlertIcon />
+                  <CircleAlert aria-hidden="true" />
                   <div>
                     <AlertTitle>Falha ao deletar</AlertTitle>
                     <AlertDescription>{deleteError}</AlertDescription>

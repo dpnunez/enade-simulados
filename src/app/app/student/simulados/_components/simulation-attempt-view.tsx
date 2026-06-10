@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle2, Circle, CircleAlert, Save } from "lucide-react";
 
-import { Alert, AlertDescription, AlertIcon, AlertTitle } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -199,7 +199,7 @@ export function SimulationAttemptView({
       <CardContent className="space-y-5">
         {error ? (
           <Alert variant="destructive" role="alert">
-            <AlertIcon />
+            <CircleAlert aria-hidden="true" />
             <div>
               <AlertTitle>{error.title}</AlertTitle>
               <AlertDescription>{error.message}</AlertDescription>
@@ -208,7 +208,7 @@ export function SimulationAttemptView({
         ) : null}
         {mode === "in-progress" && saveMessage ? (
           <Alert>
-            <AlertIcon />
+            <CheckCircle2 aria-hidden="true" />
             <div>
               <AlertTitle>{saveMessage}</AlertTitle>
               <AlertDescription>

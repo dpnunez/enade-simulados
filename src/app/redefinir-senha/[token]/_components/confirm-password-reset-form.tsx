@@ -2,14 +2,13 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, Lock } from "lucide-react";
+import { ArrowRight, CheckCircle2, CircleAlert, Lock } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import {
   Alert,
   AlertDescription,
-  AlertIcon,
   AlertTitle,
 } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -85,7 +84,7 @@ export function ConfirmPasswordResetForm({ token }: Props) {
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
       {error ? (
         <Alert variant="destructive">
-          <AlertIcon />
+          <CircleAlert aria-hidden="true" />
           <div>
             <AlertTitle>Falha ao redefinir senha</AlertTitle>
             <AlertDescription>{error}</AlertDescription>

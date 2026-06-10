@@ -1,11 +1,12 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { CheckCircle2, CircleAlert } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useState } from "react";
 import { useForm } from "react-hook-form";
 
-import { Alert, AlertDescription, AlertIcon, AlertTitle } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -115,7 +116,7 @@ export function SubjectFieldForm({
     <form onSubmit={form.handleSubmit(onSubmit)} className={cn("space-y-4", className)}>
       {error ? (
         <Alert variant="destructive" role="alert">
-          <AlertIcon />
+          <CircleAlert aria-hidden="true" />
           <div>
             <AlertTitle>Falha ao salvar</AlertTitle>
             <AlertDescription>{error}</AlertDescription>
@@ -124,7 +125,7 @@ export function SubjectFieldForm({
       ) : null}
       {success ? (
         <Alert role="status">
-          <AlertIcon />
+          <CheckCircle2 aria-hidden="true" />
           <div>
             <AlertTitle>{isEditing ? "Alteracao salva" : "Cadastro criado"}</AlertTitle>
             <AlertDescription>{success}</AlertDescription>

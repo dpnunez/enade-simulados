@@ -1,12 +1,20 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  CheckCircle2,
+  CircleAlert,
+  Info,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useId, useRef, useState } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 
-import { Alert, AlertDescription, AlertIcon, AlertTitle } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -201,7 +209,7 @@ export function QuestionForm({
   if (subjectFields.length === 0) {
     return (
       <Alert role="status">
-        <AlertIcon />
+        <Info aria-hidden="true" />
         <div>
           <AlertTitle>Nenhuma grande area cadastrada</AlertTitle>
           <AlertDescription>
@@ -216,7 +224,7 @@ export function QuestionForm({
     <form onSubmit={handleFormSubmit} className={cn("space-y-6", className)}>
       {error ? (
         <Alert variant="destructive" role="alert">
-          <AlertIcon />
+          <CircleAlert aria-hidden="true" />
           <div>
             <AlertTitle>Falha ao salvar</AlertTitle>
             <AlertDescription>{error}</AlertDescription>
@@ -225,7 +233,7 @@ export function QuestionForm({
       ) : null}
       {success ? (
         <Alert role="status">
-          <AlertIcon />
+          <CheckCircle2 aria-hidden="true" />
           <div>
             <AlertTitle>{isEditing ? "Alteracao salva" : "Cadastro criado"}</AlertTitle>
             <AlertDescription>{success}</AlertDescription>

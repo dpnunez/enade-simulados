@@ -1,10 +1,11 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { CheckCircle2, CircleAlert } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-import { Alert, AlertDescription, AlertIcon, AlertTitle } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -45,7 +46,7 @@ export function InviteForm() {
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
       {error ? (
         <Alert variant="destructive">
-          <AlertIcon />
+          <CircleAlert aria-hidden="true" />
           <div>
             <AlertTitle>Falha ao criar convite</AlertTitle>
             <AlertDescription>{error}</AlertDescription>
@@ -54,7 +55,7 @@ export function InviteForm() {
       ) : null}
       {success ? (
         <Alert>
-          <AlertIcon />
+          <CheckCircle2 aria-hidden="true" />
           <div>
             <AlertTitle>Convite enviado</AlertTitle>
             <AlertDescription>{success}</AlertDescription>
