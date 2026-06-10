@@ -17,7 +17,7 @@ Protected shell:
 - `src/proxy.ts` redirects `/app/*` without session cookie to `/login`, and `/login` with session cookie to `/app`.
 - `src/app/app/layout.tsx` requires auth, shows session identity, role, logout, and role-specific nav.
 - `src/app/app/page.tsx` requires auth and redirects to `getRoleHomePath()` from `src/infra/auth/session.ts`.
-- Role home paths: ADMIN -> `/app/admin`, STUDENT -> `/app/student`, TEACHER -> `/app/teacher`.
+- Role home paths: ADMIN -> `/app/admin`, STUDENT -> `/app/student`, TEACHER -> `/app/professor`.
 
 ADMIN:
 - Page: `src/app/app/admin/page.tsx`.

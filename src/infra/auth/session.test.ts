@@ -47,7 +47,7 @@ describe("session helpers", () => {
   it("getRoleHomePath retorna a área inicial da role", () => {
     expect(getRoleHomePath("ADMIN")).toBe("/app/admin");
     expect(getRoleHomePath("STUDENT")).toBe("/app/student");
-    expect(getRoleHomePath("TEACHER")).toBe("/app/teacher");
+    expect(getRoleHomePath("TEACHER")).toBe("/app/professor");
   });
 
   it("getCurrentSession encaminha os headers para a api de sessão", async () => {

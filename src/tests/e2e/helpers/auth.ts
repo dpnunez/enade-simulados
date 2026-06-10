@@ -5,7 +5,7 @@ import type { TestUser } from "../fixtures/users";
 const ROLE_HOME_PATHS = {
   ADMIN: "/app/admin",
   STUDENT: "/app/student",
-  TEACHER: "/app/teacher",
+  TEACHER: "/app/professor",
 } as const;
 
 export async function loginAs(page: Page, user: TestUser) {

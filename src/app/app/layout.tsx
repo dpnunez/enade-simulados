@@ -58,7 +58,7 @@ export default async function PrivateLayout({
             ) : null}
             {session.user.role === "TEACHER" ? (
               <Button asChild variant="outline" size="sm">
-                <Link href="/app/teacher">Teacher</Link>
+                <Link href="/app/professor">Professor</Link>
               </Button>
             ) : null}
             {session.user.role === "TEACHER" ? (

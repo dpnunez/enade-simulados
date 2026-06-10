@@ -4,7 +4,7 @@ import { BookOpenText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-export default async function TeacherPage() {
+export default async function ProfessorPage() {
   const session = await requireRole("TEACHER");
 
   return (
@@ -14,7 +14,7 @@ export default async function TeacherPage() {
           <BookOpenText className="h-3.5 w-3.5" />
           TEACHER
         </Badge>
-        <CardTitle>Área TEACHER</CardTitle>
+        <CardTitle>Área PROFESSOR</CardTitle>
         <CardDescription>
           Espaço restrito aos usuários com role de docente.
         </CardDescription>

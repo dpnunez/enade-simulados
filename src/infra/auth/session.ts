@@ -8,7 +8,7 @@ import { hasRole } from "./authorization";
 const ROLE_HOME_PATHS = {
   ADMIN: "/app/admin",
   STUDENT: "/app/student",
-  TEACHER: "/app/teacher",
+  TEACHER: "/app/professor",
 } as const satisfies Record<Role, string>;
 
 export function getRoleHomePath(role: Role) {
