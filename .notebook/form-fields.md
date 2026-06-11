@@ -15,6 +15,7 @@ Use for app forms:
 Migrated forms:
 - `src/app/login/_components/login-form.tsx`
 - `src/app/esqueci-senha/_components/request-password-reset-form.tsx`
+- `src/app/redefinir-senha/[token]/_components/confirm-password-reset-form.tsx`
 
 Submission pattern:
 - Keep native `<form onSubmit>` + submit button for Enter submission

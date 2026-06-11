@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ShieldCheck } from "lucide-react";
+import { connection } from "next/server";
 
 import {
   Card,
@@ -16,20 +17,28 @@ import {
 
 import { ConfirmPasswordResetForm } from "./_components/confirm-password-reset-form";
 
+export const dynamic = "force-dynamic";
+
 export default async function ResetPasswordPage({
   params,
 }: PageProps<"/redefinir-senha/[token]">) {
+  await connection();
+
   const { token } = await params;
   const resetToken = await getPasswordResetTokenOrNull(token);
 
   if (resetToken) {
     return (
-      <main className="mx-auto flex w-full max-w-lg flex-1 items-center px-6 py-12">
-        <Card className="w-full">
-          <CardHeader className="space-y-3">
-            <CardTitle>Nova senha</CardTitle>
+      <main className="mx-auto flex w-full max-w-xl flex-1 items-center px-6 py-12">
+        <Card className="w-full border-0 shadow-lg shadow-foreground/5 ring-1 ring-border/80">
+          <CardHeader className="space-y-4">
+            <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <ShieldCheck className="h-5 w-5" aria-hidden="true" />
+            </div>
+            <CardTitle className="text-2xl">Nova senha</CardTitle>
             <CardDescription>
-              Defina uma nova senha para voltar a acessar sua conta.
+              Escolha uma senha forte para proteger sua conta e voltar a acessar
+              a plataforma.
             </CardDescription>
           </CardHeader>
           <CardContent>

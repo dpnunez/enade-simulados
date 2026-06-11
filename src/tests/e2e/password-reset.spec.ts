@@ -11,7 +11,7 @@ test.describe("password reset", () => {
   test("student redefine senha, senha antiga falha e senha nova autentica", async ({
     page,
   }) => {
-    const newPassword = "student-reset-123";
+    const newPassword = "Student-reset-123!";
 
     await resetStudentPasswordResetState();
 
@@ -21,7 +21,9 @@ test.describe("password reset", () => {
       await page.waitForURL("/esqueci-senha");
 
       await page.getByLabel("Email").fill(TEST_USERS.student.email);
-      await page.getByRole("button", { name: "Enviar link" }).click();
+      await page
+        .getByRole("button", { name: "Enviar e-mail de redefinição" })
+        .click();
       await page.waitForResponse("/api/password-reset/request");
 
       await expect(page.getByText("Verifique seu email")).toBeVisible();

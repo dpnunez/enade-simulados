@@ -57,8 +57,8 @@ describe("password reset confirm route", () => {
     const response = await POST(
       createJsonRequest({
         token: "raw-token",
-        password: "new-password",
-        passwordConfirmation: "new-password",
+        password: "New-password!",
+        passwordConfirmation: "New-password!",
       }),
     );
 
@@ -66,8 +66,8 @@ describe("password reset confirm route", () => {
     expect(await json(response)).toEqual({ success: true });
     expect(mocks.confirmPasswordReset).toHaveBeenCalledWith({
       token: "raw-token",
-      password: "new-password",
-      passwordConfirmation: "new-password",
+      password: "New-password!",
+      passwordConfirmation: "New-password!",
     });
   });
 
@@ -79,8 +79,8 @@ describe("password reset confirm route", () => {
     const response = await POST(
       createJsonRequest({
         token: "raw-token",
-        password: "new-password",
-        passwordConfirmation: "new-password",
+        password: "New-password!",
+        passwordConfirmation: "New-password!",
       }),
     );
 

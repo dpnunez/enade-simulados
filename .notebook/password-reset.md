@@ -1,6 +1,6 @@
 # Password Reset
 
-Last updated: 2026-06-10
+Last updated: 2026-06-11
 
 ## Summary
 
@@ -17,6 +17,7 @@ Password reset is implemented as a first-party application feature, not as the B
 - Console/log-file delivery lives in `src/features/password-reset/password-reset-email.adapter.ts` with `PASSWORD_RESET_EMAIL_*` envs.
 - Public routes are `src/app/api/password-reset/request/route.ts` and `src/app/api/password-reset/confirm/route.ts`; UI routes are `/esqueci-senha` and `/redefinir-senha/[token]`.
 - E2E coverage is in `src/tests/e2e/password-reset.spec.ts`; helper `src/tests/e2e/helpers/password-reset.ts` restores the seeded student password.
+- Password requirements are centralized in `src/features/password-reset/password-policy.ts` and consumed by both `confirmPasswordResetSchema` and the `/redefinir-senha/[token]` UI checklist.
 
 ## Gotchas
 
@@ -24,3 +25,4 @@ Password reset is implemented as a first-party application feature, not as the B
 - Public reset request responses must not reveal whether an email exists.
 - E2E reset coverage must restore or isolate seeded user passwords, because seeded users are reused across tests.
 - `smtp` reset delivery currently validates required SMTP envs and then fails explicitly; real provider integration is deferred.
+- `/redefinir-senha/[token]` depends on mutable token state, so `src/app/redefinir-senha/[token]/page.tsx` uses request-time rendering (`connection()` plus `dynamic = "force-dynamic"`).

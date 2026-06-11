@@ -191,11 +191,11 @@ describe("password-reset.service", () => {
 
     await confirmPasswordReset({
       token: "raw-reset-token",
-      password: "new-password",
-      passwordConfirmation: "new-password",
+      password: "New-password!",
+      passwordConfirmation: "New-password!",
     });
 
-    expect(mocks.hashPassword).toHaveBeenCalledWith("new-password");
+    expect(mocks.hashPassword).toHaveBeenCalledWith("New-password!");
     expect(mocks.prisma.passwordResetToken.updateMany).toHaveBeenCalledWith({
       where: {
         id: "reset_1",
@@ -233,8 +233,8 @@ describe("password-reset.service", () => {
     await expect(
       confirmPasswordReset({
         token: "raw-reset-token",
-        password: "new-password",
-        passwordConfirmation: "new-password",
+        password: "New-password!",
+        passwordConfirmation: "New-password!",
       }),
     ).rejects.toMatchObject({
       code: "PASSWORD_RESET_TOKEN_NOT_PENDING",
