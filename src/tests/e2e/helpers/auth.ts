@@ -2,7 +2,7 @@ import { type Page } from "@playwright/test";
 
 import type { TestUser } from "../fixtures/users";
 
-const ROLE_HOME_PATHS = {
+export const ROLE_HOME_PATHS = {
   ADMIN: "/app/admin",
   STUDENT: "/app/student",
   TEACHER: "/app/professor",

@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 import { TEST_USERS } from "./fixtures/users";
+import { ROLE_HOME_PATHS } from "./helpers/auth";
 import {
   getPasswordResetUrlFromFileAndDeleteFile,
   resetStudentPasswordResetState,
@@ -29,7 +30,7 @@ test.describe("password reset", () => {
       await page.goto(resetUrl);
 
       await expect(
-        page.getByRole("heading", { name: "Nova senha" }),
+        page.getByText("Nova senha").first(),
       ).toBeVisible();
       await page.getByLabel("Nova senha").fill(newPassword);
       await page.getByLabel("Confirmar senha").fill(newPassword);
@@ -42,17 +43,19 @@ test.describe("password reset", () => {
       await page.getByLabel("Email").fill(TEST_USERS.student.email);
       await page.getByLabel("Senha").fill(TEST_USERS.student.password);
       await page.getByRole("button", { name: "Entrar" }).click();
-      await expect(page.getByText("Falha ao autenticar")).toBeVisible();
+      await expect(
+        page.getByRole("alert").filter({ hasText: "Não foi possível entrar" }),
+      ).toBeVisible();
 
       await page.getByLabel("Senha").fill(newPassword);
       await page.getByRole("button", { name: "Entrar" }).click();
 
-      await page.waitForURL(/\/app$/, { timeout: 10_000 });
+      await page.waitForURL(ROLE_HOME_PATHS.STUDENT, { timeout: 10_000 });
       await expect(page.getByText(TEST_USERS.student.email)).toBeVisible();
 
       await page.goto(resetUrl);
       await expect(
-        page.getByRole("heading", { name: "Link indisponível" }),
+        page.getByText("Link indisponível"),
       ).toBeVisible();
     } finally {
       await resetStudentPasswordResetState();

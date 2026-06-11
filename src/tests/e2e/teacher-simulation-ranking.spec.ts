@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 import { TEST_USERS } from "./fixtures/users";
-import { loginAs } from "./helpers/auth";
+import { loginAs, ROLE_HOME_PATHS } from "./helpers/auth";
 import {
   createSimulationRankingE2eData,
   eraseSimulationRankingE2eData,
@@ -61,7 +61,7 @@ test.describe("teacher simulation ranking", () => {
 
     await loginAs(page, TEST_USERS.student);
     await page.goto("/app/professor/ranking");
-    await expect(page).toHaveURL(/\/app$/);
+    await expect(page).toHaveURL(ROLE_HOME_PATHS.STUDENT);
 
     const apiResponse = await page.evaluate(async () => {
       const response = await fetch("/api/teacher/simulation-ranking");

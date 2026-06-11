@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 import { TEST_USERS } from "./fixtures/users";
-import { loginAs } from "./helpers/auth";
+import { loginAs, ROLE_HOME_PATHS } from "./helpers/auth";
 import {
   buildInvitationEmail,
   ereaseInvitationRelatedData,
@@ -45,8 +45,8 @@ test.describe("user invitations", () => {
     const res = await page.waitForResponse("/api/auth/sign-in/email");
 
     expect(res.ok()).toBe(true);
-    await page.waitForURL(/\/app$/, { timeout: 10_000 });
-    await expect(page.getByRole("heading", { name: nick })).toBeVisible();
+    await page.waitForURL(ROLE_HOME_PATHS.TEACHER, { timeout: 10_000 });
+    await expect(page.getByText(nick)).toBeVisible();
     await expect(page.getByText(inviteEmail)).toBeVisible();
   });
 
@@ -76,7 +76,7 @@ test.describe("user invitations", () => {
 
     await page.goto(`/convites/${token}`);
     await expect(
-      page.getByRole("heading", { name: "Convite inválido" }),
+      page.getByText("Convite inválido"),
     ).toBeVisible();
     await expect(
       page.getByText("Este convite não está mais disponível."),

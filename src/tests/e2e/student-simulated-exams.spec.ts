@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 import { TEST_USERS } from "./fixtures/users";
-import { loginAs } from "./helpers/auth";
+import { loginAs, ROLE_HOME_PATHS } from "./helpers/auth";
 import {
   createSimulatedExamQuestionSet,
   eraseSimulatedExamE2eData,
@@ -145,7 +145,7 @@ test.describe("student simulated exams", () => {
   }) => {
     await loginAs(page, TEST_USERS.teacher);
     await page.goto("/app/student/simulados");
-    await expect(page).toHaveURL(/\/app$/);
+    await expect(page).toHaveURL(ROLE_HOME_PATHS.TEACHER);
 
     const teacherApiResponse = await page.evaluate(async () => {
       const response = await fetch("/api/student/simulated-exams", {
@@ -170,7 +170,7 @@ test.describe("student simulated exams", () => {
 
     await loginAs(page, TEST_USERS.admin);
     await page.goto("/app/student/simulados/novo");
-    await expect(page).toHaveURL(/\/app$/);
+    await expect(page).toHaveURL(ROLE_HOME_PATHS.ADMIN);
 
     const adminApiResponse = await page.evaluate(async () => {
       const response = await fetch("/api/student/simulated-exams", {

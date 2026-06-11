@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 import { TEST_USERS } from "./fixtures/users";
-import { loginAs } from "./helpers/auth";
+import { loginAs, ROLE_HOME_PATHS } from "./helpers/auth";
 import {
   buildSubjectFieldTitle,
   countSubjectFieldRollupRows,
@@ -40,7 +40,7 @@ test.describe('"grande area" management', () => {
     );
 
     await page.reload();
-    await expect(page.getByRole("heading", { name: initialTitle })).toBeVisible();
+    await expect(page.getByText(initialTitle)).toBeVisible();
     await expect(page.getByText("#2563EB")).toBeVisible();
 
     await page.getByRole("button", { name: "Editar" }).click();
@@ -51,11 +51,11 @@ test.describe('"grande area" management', () => {
       .fill("Descricao atualizada pelo fluxo e2e de grandes areas.");
     await page.getByLabel("Hexadecimal").last().fill("#16A34A");
     await page.getByRole("button", { name: "Salvar alteracoes" }).click();
-    await expect(page.getByRole("heading", { name: updatedTitle })).toBeVisible();
+    await expect(page.getByText(updatedTitle)).toBeVisible();
     await expect(page.getByText("#16A34A")).toBeVisible();
 
     await page.reload();
-    await expect(page.getByRole("heading", { name: updatedTitle })).toBeVisible();
+    await expect(page.getByText(updatedTitle)).toBeVisible();
     await expect(page.getByText("#16A34A")).toBeVisible();
 
     await page.getByRole("button", { name: "Deletar" }).click();
@@ -63,14 +63,14 @@ test.describe('"grande area" management', () => {
       page.getByText(`Esta acao remove a grande area "${updatedTitle}" do catalogo.`),
     ).toBeVisible();
     await page.reload();
-    await expect(page.getByRole("heading", { name: updatedTitle })).toBeVisible();
+    await expect(page.getByText(updatedTitle)).toBeVisible();
 
     await page.getByRole("button", { name: "Deletar" }).click();
     await page.getByRole("button", { name: "Confirmar delecao" }).click();
-    await expect(page.getByRole("heading", { name: updatedTitle })).toHaveCount(0);
+    await expect(page.getByText(updatedTitle)).toHaveCount(0);
 
     await page.reload();
-    await expect(page.getByRole("heading", { name: updatedTitle })).toHaveCount(0);
+    await expect(page.getByText(updatedTitle)).toHaveCount(0);
   });
 
   test("teacher sees question count and deletes related questions by cascade", async ({
@@ -81,12 +81,12 @@ test.describe('"grande area" management', () => {
     await loginAs(page, TEST_USERS.teacher);
     await page.goto("/app/professor/grandes-areas");
 
-    await expect(page.getByRole("heading", { name: subjectField.title })).toBeVisible();
+    await expect(page.getByText(subjectField.title)).toBeVisible();
     await expect(page.getByText("2 questoes")).toBeVisible();
 
     await page.getByRole("button", { name: "Deletar" }).click();
     await page.getByRole("button", { name: "Confirmar delecao" }).click();
-    await expect(page.getByRole("heading", { name: subjectField.title })).toHaveCount(0);
+    await expect(page.getByText(subjectField.title)).toHaveCount(0);
 
     await expect
       .poll(() =>
@@ -107,11 +107,9 @@ test.describe('"grande area" management', () => {
 
     await page.goto("/app/professor/grandes-areas");
 
-    await expect(page).toHaveURL(/\/app$/);
+    await expect(page).toHaveURL(ROLE_HOME_PATHS.STUDENT);
     await expect(
-      page.getByRole("heading", {
-        name: "Qualquer usuário autenticado pode ver esta página.",
-      }),
+      page.getByText("Área STUDENT"),
     ).toBeVisible();
   });
 });
