@@ -12,4 +12,9 @@ Better Auth login: POST `auth/sign-in/email` via `http` → `/api/auth/sign-in/e
 - Error path catches `HTTPError` and reads response JSON `message`
 - Success path keeps router push/refresh to `/app`
 
+Invitation forms:
+- `src/app/app/admin/_components/invite-form.tsx` POSTs `invitations`
+- `src/app/convites/[token]/_components/accept-invite-form.tsx` POSTs `invitations/accept`
+- Both catch `HTTPError` and map API `error` codes to user-friendly messages
+
 Updated: 2026-06-11
