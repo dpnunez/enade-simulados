@@ -6,10 +6,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
+import { HTTPError } from "ky";
 import { z } from "zod";
 
-import { signIn } from "@auth/client";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,8 +20,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
+import { http } from "@infra/http/client";
 
 const loginSchema = z.object({
   email: z
@@ -32,6 +42,21 @@ const loginSchema = z.object({
 });
 
 type LoginInput = z.infer<typeof loginSchema>;
+
+type AuthErrorResponse = {
+  message?: string;
+};
+
+function getLoginErrorMessage(
+  requestError: HTTPError,
+  authError: AuthErrorResponse | null,
+) {
+  if (requestError.response.status === 401) {
+    return "Email ou senha inválidos.";
+  }
+
+  return authError?.message || "Falha ao autenticar.";
+}
 
 export function LoginForm() {
   const router = useRouter();
@@ -47,13 +72,28 @@ export function LoginForm() {
   async function onSubmit(values: LoginInput) {
     setError(null);
 
-    const response = await signIn.email({
-      email: values.email,
-      password: values.password,
-    });
+    try {
+      await http.post("auth/sign-in/email", {
+        json: {
+          email: values.email,
+          password: values.password,
+        },
+      });
+    } catch (requestError) {
+      if (requestError instanceof HTTPError) {
+        const authError = await requestError.response
+          .json<AuthErrorResponse>()
+          .catch(() => null);
 
-    if (response.error) {
-      setError(response.error.message || "Falha ao autenticar.");
+        setError(getLoginErrorMessage(requestError, authError));
+        return;
+      }
+
+      setError(
+        requestError instanceof Error
+          ? requestError.message
+          : "Falha ao autenticar.",
+      );
       return;
     }
 
@@ -90,60 +130,82 @@ export function LoginForm() {
             </Alert>
           ) : null}
 
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-4"
-            noValidate
-          >
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <div className="relative">
-                <Mail
-                  className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
-                  aria-hidden="true"
-                />
-                <Input
-                  id="email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder="seu.email@instituicao.edu.br"
-                  className="pl-9"
-                  aria-invalid={Boolean(form.formState.errors.email)}
-                  aria-describedby={
-                    form.formState.errors.email ? "email-error" : undefined
-                  }
-                  {...form.register("email")}
-                />
-              </div>
-              {form.formState.errors.email ? (
-                <p id="email-error" className="text-sm text-destructive">
-                  {form.formState.errors.email.message}
-                </p>
-              ) : null}
-            </div>
+          <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
+            <FieldGroup className="gap-4">
+              <Controller
+                name="email"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+                    <InputGroup>
+                      <InputGroupAddon>
+                        <Mail aria-hidden="true" />
+                      </InputGroupAddon>
+                      <InputGroupInput
+                        {...field}
+                        id={field.name}
+                        type="email"
+                        autoComplete="email"
+                        placeholder="seu.email@instituicao.edu.br"
+                        aria-invalid={fieldState.invalid}
+                        aria-describedby={
+                          fieldState.invalid ? "email-error" : undefined
+                        }
+                      />
+                    </InputGroup>
+                    {fieldState.invalid ? (
+                      <FieldError
+                        id="email-error"
+                        errors={[fieldState.error]}
+                      />
+                    ) : null}
+                  </Field>
+                )}
+              />
 
-            <div className="space-y-2">
-              <Label htmlFor="password">Senha</Label>
-              <div className="relative">
-                <Lock
-                  className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
-                  aria-hidden="true"
-                />
-                <Input
-                  id="password"
-                  type="password"
-                  autoComplete="current-password"
-                  placeholder="Digite sua senha"
-                  className="pl-9"
-                  aria-invalid={Boolean(form.formState.errors.password)}
-                  aria-describedby={
-                    form.formState.errors.password
-                      ? "password-error"
-                      : undefined
-                  }
-                  {...form.register("password")}
-                />
-              </div>
+              <Controller
+                name="password"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>Senha</FieldLabel>
+                    <InputGroup>
+                      <InputGroupAddon>
+                        <Lock aria-hidden="true" />
+                      </InputGroupAddon>
+                      <InputGroupInput
+                        {...field}
+                        id={field.name}
+                        type="password"
+                        autoComplete="current-password"
+                        placeholder="Digite sua senha"
+                        aria-invalid={fieldState.invalid}
+                        aria-describedby={
+                          fieldState.invalid ? "password-error" : undefined
+                        }
+                      />
+                    </InputGroup>
+                    {fieldState.invalid ? (
+                      <FieldError
+                        id="password-error"
+                        errors={[fieldState.error]}
+                      />
+                    ) : null}
+                  </Field>
+                )}
+              />
+
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={form.formState.isSubmitting}
+              >
+                {form.formState.isSubmitting ? "Entrando..." : "Entrar"}
+                {!form.formState.isSubmitting ? (
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                ) : null}
+              </Button>
               <div className="flex justify-end">
                 <Link
                   href="/esqueci-senha"
@@ -152,23 +214,7 @@ export function LoginForm() {
                   Esqueci minha senha
                 </Link>
               </div>
-              {form.formState.errors.password ? (
-                <p id="password-error" className="text-sm text-destructive">
-                  {form.formState.errors.password.message}
-                </p>
-              ) : null}
-            </div>
-
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={form.formState.isSubmitting}
-            >
-              {form.formState.isSubmitting ? "Entrando..." : "Entrar"}
-              {!form.formState.isSubmitting ? (
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              ) : null}
-            </Button>
+            </FieldGroup>
           </form>
         </CardContent>
 

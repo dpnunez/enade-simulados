@@ -1,8 +1,10 @@
 # .notebook
 > Project intelligence — read before every mission
 
-Last updated: 2026-06-10
+Last updated: 2026-06-11
 
+- [form-fields](form-fields.md) — shadcn Field/InputGroup pattern for inputs | pattern | forms, shadcn, a11y
+- [http-client](http-client.md) — Shared ky instance for app API requests | pattern | http, ky, api
 - [application-flow-inventory](application-flow-inventory.md) — Global MVP screen/API/service map | flow | app, routes, auth, api
 - [question-deduplication](question-deduplication.md) — Question description hash uniqueness + duplicate feedback | flow | questions, prisma, e2e
 - [password-reset](password-reset.md) — Planned first-party password reset compatible with Better Auth | decision | auth, password-reset, prisma, e2e
