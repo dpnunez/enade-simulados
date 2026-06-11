@@ -1,7 +1,15 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowRight, CheckCircle2, CircleAlert, Mail } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  CheckCircle2,
+  CircleAlert,
+  LoaderCircle,
+  Mail,
+} from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { HTTPError } from "ky";
@@ -10,6 +18,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   Field,
+  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
@@ -93,7 +102,11 @@ export function RequestPasswordResetForm() {
   }
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+    <form
+      onSubmit={form.handleSubmit(onSubmit)}
+      noValidate
+      className="space-y-5"
+    >
       {error ? (
         <Alert variant="destructive">
           <CircleAlert aria-hidden="true" />
@@ -108,7 +121,13 @@ export function RequestPasswordResetForm() {
           <CheckCircle2 aria-hidden="true" />
           <div>
             <AlertTitle>Verifique seu email</AlertTitle>
-            <AlertDescription>{success}</AlertDescription>
+            <AlertDescription>
+              <p>{success}</p>
+              <p>
+                Confira também a caixa de spam. Depois de abrir o link, você
+                poderá escolher uma nova senha.
+              </p>
+            </AlertDescription>
           </div>
         </Alert>
       ) : null}
@@ -138,6 +157,9 @@ export function RequestPasswordResetForm() {
                   }
                 />
               </InputGroup>
+              <FieldDescription>
+                Use o mesmo email que recebeu o convite ou acessa a plataforma.
+              </FieldDescription>
               {fieldState.invalid ? (
                 <FieldError
                   id="password-reset-email-error"
@@ -153,13 +175,24 @@ export function RequestPasswordResetForm() {
           className="w-full"
           disabled={form.formState.isSubmitting}
         >
+          {form.formState.isSubmitting ? (
+            <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
+          ) : (
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          )}
           {form.formState.isSubmitting
             ? "Enviando..."
             : "Enviar e-mail de redefinição"}
-          {!form.formState.isSubmitting ? (
-            <ArrowRight className="h-4 w-4" aria-hidden="true" />
-          ) : null}
         </Button>
+
+        {success ? (
+          <Button asChild variant="outline" className="w-full">
+            <Link href="/login">
+              <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+              Voltar para o login
+            </Link>
+          </Button>
+        ) : null}
       </FieldGroup>
     </form>
   );
