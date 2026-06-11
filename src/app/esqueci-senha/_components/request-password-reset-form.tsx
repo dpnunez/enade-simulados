@@ -132,7 +132,9 @@ export function RequestPasswordResetForm() {
                   placeholder="seu.email@instituicao.edu.br"
                   aria-invalid={fieldState.invalid}
                   aria-describedby={
-                    fieldState.invalid ? "password-reset-email-error" : undefined
+                    fieldState.invalid
+                      ? "password-reset-email-error"
+                      : undefined
                   }
                 />
               </InputGroup>
