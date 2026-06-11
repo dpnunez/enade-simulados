@@ -19,7 +19,8 @@ export default function ForgotPasswordPage() {
         <CardHeader className="space-y-3">
           <CardTitle>Redefinir senha</CardTitle>
           <CardDescription>
-            Informe o email usado na sua conta para receber o link de redefinição.
+            Informe o email usado na sua conta para receber o link de
+            redefinição.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">

@@ -3,20 +3,47 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowRight, CheckCircle2, CircleAlert, Mail } from "lucide-react";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
+import { HTTPError } from "ky";
 
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import {
   requestPasswordResetSchema,
   type RequestPasswordResetInput,
 } from "@/features/password-reset/password-reset.schema";
+import { http } from "@infra/http/client";
+
+type PasswordResetRequestResponse = {
+  success?: boolean;
+  message?: string;
+};
+
+type PasswordResetErrorResponse = {
+  message?: string;
+};
+
+function getPasswordResetErrorMessage(
+  requestError: HTTPError,
+  payload: PasswordResetErrorResponse | null,
+) {
+  if (requestError.response.status === 400) {
+    return "Informe um email válido.";
+  }
+
+  return payload?.message || "Não foi possível solicitar a redefinição agora.";
+}
 
 export function RequestPasswordResetForm() {
   const [error, setError] = useState<string | null>(null);
@@ -30,20 +57,39 @@ export function RequestPasswordResetForm() {
     setError(null);
     setSuccess(null);
 
-    const response = await fetch("/api/password-reset/request", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(values),
-    });
-    const payload = await response.json();
+    try {
+      const payload = await http
+        .post("password-reset/request", {
+          json: values,
+        })
+        .json<PasswordResetRequestResponse>();
 
-    if (!response.ok || !payload.success) {
-      setError("Não foi possível solicitar a redefinição agora.");
+      if (!payload.success) {
+        setError("Não foi possível solicitar a redefinição agora.");
+        return;
+      }
+    } catch (requestError) {
+      if (requestError instanceof HTTPError) {
+        const payload = await requestError.response
+          .json<PasswordResetErrorResponse>()
+          .catch(() => null);
+
+        setError(getPasswordResetErrorMessage(requestError, payload));
+        return;
+      }
+
+      setError(
+        requestError instanceof Error
+          ? requestError.message
+          : "Não foi possível solicitar a redefinição agora.",
+      );
       return;
     }
 
     form.reset({ email: "" });
-    setSuccess("Se o email estiver cadastrado, enviaremos um link de redefinição.");
+    setSuccess(
+      "Se o email estiver cadastrado, enviaremos um link de redefinição.",
+    );
   }
 
   return (
@@ -67,34 +113,52 @@ export function RequestPasswordResetForm() {
         </Alert>
       ) : null}
 
-      <div className="space-y-2">
-        <Label htmlFor="password-reset-email">Email</Label>
-        <div className="relative">
-          <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            id="password-reset-email"
-            type="email"
-            autoComplete="email"
-            placeholder="student@enade.local"
-            className="pl-9"
-            {...form.register("email")}
-          />
-        </div>
-        {form.formState.errors.email ? (
-          <p className="text-sm text-destructive">
-            {form.formState.errors.email.message}
-          </p>
-        ) : null}
-      </div>
+      <FieldGroup className="gap-4">
+        <Controller
+          name="email"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+              <InputGroup>
+                <InputGroupAddon>
+                  <Mail aria-hidden="true" />
+                </InputGroupAddon>
+                <InputGroupInput
+                  {...field}
+                  id={field.name}
+                  type="email"
+                  autoComplete="email"
+                  placeholder="seu.email@instituicao.edu.br"
+                  aria-invalid={fieldState.invalid}
+                  aria-describedby={
+                    fieldState.invalid ? "password-reset-email-error" : undefined
+                  }
+                />
+              </InputGroup>
+              {fieldState.invalid ? (
+                <FieldError
+                  id="password-reset-email-error"
+                  errors={[fieldState.error]}
+                />
+              ) : null}
+            </Field>
+          )}
+        />
 
-      <Button
-        type="submit"
-        className="w-full"
-        disabled={form.formState.isSubmitting}
-      >
-        {form.formState.isSubmitting ? "Enviando..." : "Enviar link"}
-        {!form.formState.isSubmitting ? <ArrowRight className="h-4 w-4" /> : null}
-      </Button>
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={form.formState.isSubmitting}
+        >
+          {form.formState.isSubmitting
+            ? "Enviando..."
+            : "Enviar e-mail de redefinição"}
+          {!form.formState.isSubmitting ? (
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          ) : null}
+        </Button>
+      </FieldGroup>
     </form>
   );
 }

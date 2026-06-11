@@ -12,8 +12,12 @@ Use for app forms:
 - `FieldError errors={[fieldState.error]}` renders validation feedback
 - `InputGroup` + `InputGroupAddon` + `InputGroupInput` for inputs with icons/addons
 
-First migrated form: `src/app/login/_components/login-form.tsx`
-- Keeps native `<form onSubmit>` + submit button for Enter submission
-- Uses `Controller` for email/password; other forms intentionally not migrated yet
+Migrated forms:
+- `src/app/login/_components/login-form.tsx`
+- `src/app/esqueci-senha/_components/request-password-reset-form.tsx`
+
+Submission pattern:
+- Keep native `<form onSubmit>` + submit button for Enter submission
+- Use `http` from `@infra/http/client` for app API calls when the form submits to internal API routes
 
 Updated: 2026-06-11
