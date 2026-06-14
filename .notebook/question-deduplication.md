@@ -16,9 +16,10 @@ Migration:
 Gotchas:
 - Prisma 7 with `@prisma/adapter-pg` can return `P2002` without the old `meta.target` array; the service maps `P2002` in question writes to `QUESTION_DUPLICATE_CONTENT`
 - MDXEditor exposes the editable statement field to Playwright as textbox `editable markdown`
+- Supabase can install `pgcrypto` functions in the `extensions` schema; the backfill migration sets `search_path = public, extensions` before calling `digest`
 
 E2E:
 - `src/tests/e2e/questions.spec.ts` covers duplicate create/update feedback through the professor UI
 - `src/tests/e2e/helpers/questions.ts` provides deterministic question cleanup and description-hash counting
 
-Updated: 2026-05-28
+Updated: 2026-06-13

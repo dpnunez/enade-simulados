@@ -4,6 +4,8 @@ ALTER TABLE "Question" ADD COLUMN "descriptionHash" TEXT;
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
+SET search_path = public, extensions;
+
 UPDATE "Question"
 SET "descriptionHash" = encode(
   digest(
@@ -15,7 +17,7 @@ SET "descriptionHash" = encode(
       ' ',
       'g'
     ),
-    'sha256'
+    'sha256'::text
   ),
   'hex'
 );
