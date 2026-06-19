@@ -34,9 +34,10 @@ export const env = createEnv({
     SUPABASE_STORAGE_PUBLIC_URL: optionalTrimmedString.transform((value) =>
       value.replace(/\/+$/, ""),
     ),
-    VERCEL_URL: z.url().default("http://localhost:3000"),
   },
-  experimental__runtimeEnv: {},
+  experimental__runtimeEnv: {
+    NEXT_PUBLIC_URL: z.url().default("http://localhost:3000"),
+  },
   emptyStringAsUndefined: true,
   isServer: typeof window === "undefined" || process.env.NODE_ENV === "test",
 });
