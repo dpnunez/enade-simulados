@@ -33,13 +33,25 @@ describe("password-reset-email.adapter", () => {
     }
   });
 
-  it("builds reset URL from NEXT_PUBLIC_URL and token", async () => {
+  it("builds reset URL from explicit NEXT_PUBLIC_URL and token", async () => {
     process.env.NEXT_PUBLIC_URL = "https://enade.local";
     const { buildPasswordResetUrl } = await loadAdapter();
 
     const url = buildPasswordResetUrl("token-123");
 
     expect(url).toBe("https://enade.local/redefinir-senha/token-123");
+  });
+
+  it("builds reset URL from VERCEL_URL when NEXT_PUBLIC_URL is omitted", async () => {
+    process.env.NEXT_PUBLIC_URL = "";
+    process.env.VERCEL_URL = "enade-git-feature.vercel.app";
+    const { buildPasswordResetUrl } = await loadAdapter();
+
+    const url = buildPasswordResetUrl("token-123");
+
+    expect(url).toBe(
+      "https://enade-git-feature.vercel.app/redefinir-senha/token-123",
+    );
   });
 
   it("requires reset email delivery envs", async () => {

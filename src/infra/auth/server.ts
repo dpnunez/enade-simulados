@@ -4,9 +4,14 @@ import { nextCookies } from "better-auth/next-js";
 
 import { prisma } from "@infra/db/prisma";
 import { env } from "@infra/env";
+import { getAppBaseUrl, getAppBaseUrlHost } from "@infra/url/app-base-url";
 
 export const auth = betterAuth({
-  baseURL: env.NEXT_PUBLIC_URL,
+  baseURL: {
+    allowedHosts: [getAppBaseUrlHost(), "localhost:*", "*.vercel.app"],
+    protocol: "auto",
+    fallback: getAppBaseUrl(),
+  },
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
@@ -14,7 +19,6 @@ export const auth = betterAuth({
     enabled: true,
     disableSignUp: true,
   },
-  trustedOrigins: [env.NEXT_PUBLIC_URL],
   rateLimit: {
     enabled: !env.BETTER_AUTH_RATE_LIMIT_DISABLED,
   },

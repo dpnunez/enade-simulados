@@ -1,6 +1,7 @@
 import { appendFile, mkdir } from "node:fs/promises";
 
 import { env } from "@infra/env";
+import { getAppBaseUrl } from "@infra/url/app-base-url";
 
 export interface SendPasswordResetEmailInput {
   email: string;
@@ -10,7 +11,7 @@ export interface SendPasswordResetEmailInput {
 export function buildPasswordResetUrl(token: string) {
   return new URL(
     `/redefinir-senha/${encodeURIComponent(token)}`,
-    env.NEXT_PUBLIC_URL,
+    getAppBaseUrl(),
   ).toString();
 }
 

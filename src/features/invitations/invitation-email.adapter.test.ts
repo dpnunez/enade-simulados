@@ -24,13 +24,25 @@ describe("invitation-email.adapter", () => {
     vi.restoreAllMocks();
   });
 
-  it("builds invitation URL from NEXT_PUBLIC_URL and token", async () => {
+  it("builds invitation URL from explicit NEXT_PUBLIC_URL and token", async () => {
     process.env.NEXT_PUBLIC_URL = "https://enade.local";
     const { buildInvitationUrl } = await loadAdapter();
 
     const url = buildInvitationUrl("token-123");
 
     expect(url).toBe("https://enade.local/convites/token-123");
+  });
+
+  it("builds invitation URL from VERCEL_URL when NEXT_PUBLIC_URL is omitted", async () => {
+    process.env.NEXT_PUBLIC_URL = "";
+    process.env.VERCEL_URL = "enade-git-feature.vercel.app";
+    const { buildInvitationUrl } = await loadAdapter();
+
+    const url = buildInvitationUrl("token-123");
+
+    expect(url).toBe(
+      "https://enade-git-feature.vercel.app/convites/token-123",
+    );
   });
 
   it("uses console delivery without external SMTP", async () => {
