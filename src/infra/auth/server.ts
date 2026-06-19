@@ -13,6 +13,7 @@ export const auth = betterAuth({
     enabled: true,
     disableSignUp: true,
   },
+  trustedOrigins: [env.VERCEL_URL],
   rateLimit: {
     enabled: !env.BETTER_AUTH_RATE_LIMIT_DISABLED,
   },
