@@ -13,7 +13,7 @@ describe("invitation-email.adapter", () => {
       ...ORIGINAL_ENV,
       DATABASE_URL: "postgresql://user:password@localhost:5432/enade_test",
       BETTER_AUTH_SECRET: "test-secret",
-      BETTER_AUTH_URL: "http://localhost:3000",
+      NEXT_PUBLIC_URL: "http://localhost:3000",
       PASSWORD_RESET_EMAIL_DELIVERY: "console",
       PASSWORD_RESET_EMAIL_FROM: "Equipe <noreply@enade.local>",
     };
@@ -24,8 +24,8 @@ describe("invitation-email.adapter", () => {
     vi.restoreAllMocks();
   });
 
-  it("builds invitation URL from APP_BASE_URL and token", async () => {
-    process.env.APP_BASE_URL = "https://enade.local";
+  it("builds invitation URL from NEXT_PUBLIC_URL and token", async () => {
+    process.env.NEXT_PUBLIC_URL = "https://enade.local";
     const { buildInvitationUrl } = await loadAdapter();
 
     const url = buildInvitationUrl("token-123");

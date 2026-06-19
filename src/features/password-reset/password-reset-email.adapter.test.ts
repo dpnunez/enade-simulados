@@ -17,7 +17,7 @@ describe("password-reset-email.adapter", () => {
       ...ORIGINAL_ENV,
       DATABASE_URL: "postgresql://user:password@localhost:5432/enade_test",
       BETTER_AUTH_SECRET: "test-secret",
-      BETTER_AUTH_URL: "http://localhost:3000",
+      NEXT_PUBLIC_URL: "http://localhost:3000",
       PASSWORD_RESET_EMAIL_DELIVERY: "console",
       PASSWORD_RESET_EMAIL_FROM: "Equipe <noreply@enade.local>",
     };
@@ -33,8 +33,8 @@ describe("password-reset-email.adapter", () => {
     }
   });
 
-  it("builds reset URL from APP_BASE_URL and token", async () => {
-    process.env.APP_BASE_URL = "https://enade.local";
+  it("builds reset URL from NEXT_PUBLIC_URL and token", async () => {
+    process.env.NEXT_PUBLIC_URL = "https://enade.local";
     const { buildPasswordResetUrl } = await loadAdapter();
 
     const url = buildPasswordResetUrl("token-123");

@@ -26,7 +26,7 @@ describe("supabase-storage.adapter", () => {
       ...originalEnv,
       DATABASE_URL: "postgresql://user:password@localhost:5432/enade_test",
       BETTER_AUTH_SECRET: "test-secret",
-      BETTER_AUTH_URL: "http://localhost:3000",
+      NEXT_PUBLIC_URL: "http://localhost:3000",
       PASSWORD_RESET_EMAIL_DELIVERY: "console",
       PASSWORD_RESET_EMAIL_FROM: "Equipe <noreply@enade.local>",
       SUPABASE_URL: "https://project.supabase.co",

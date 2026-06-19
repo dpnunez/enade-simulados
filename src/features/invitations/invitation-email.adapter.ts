@@ -12,7 +12,7 @@ export interface SendInvitationEmailInput {
 export function buildInvitationUrl(token: string) {
   return new URL(
     `/convites/${encodeURIComponent(token)}`,
-    env.APP_BASE_URL,
+    env.NEXT_PUBLIC_URL,
   ).toString();
 }
 

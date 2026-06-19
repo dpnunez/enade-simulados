@@ -10,7 +10,7 @@ export interface SendPasswordResetEmailInput {
 export function buildPasswordResetUrl(token: string) {
   return new URL(
     `/redefinir-senha/${encodeURIComponent(token)}`,
-    env.APP_BASE_URL,
+    env.NEXT_PUBLIC_URL,
   ).toString();
 }
 
