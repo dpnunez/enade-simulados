@@ -1,7 +1,7 @@
 # Gmail SMTP Email Tasks
 
 **Design**: `.specs/features/gmail-smtp-email/design.md`
-**Status**: In Progress
+**Status**: Done for code; external Gmail setup/smoke pending
 
 ---
 
@@ -223,13 +223,13 @@ T7 -> T8
 
 - [x] `pnpm test:unit` passa.
 - [x] `pnpm build` passa.
-- [ ] `pnpm test:e2e` passa mantendo `console`/log-file.
+- [x] `pnpm test:e2e` passa mantendo `console`/log-file.
 - [x] Nenhum teste foi removido para fazer gate passar.
 
 **Tests**: unit, e2e, build
 **Gate**: full/build
 
-**Result**: Partial. `pnpm test:unit` passed with 181 tests and `pnpm build` passed. `pnpm test:e2e` did not reach browser tests because PostgreSQL on `localhost:5432` refused connection; `pnpm db:up` also failed because the Docker daemon/socket was unavailable.
+**Result**: Complete. `pnpm test:unit` passed with 181 tests, `pnpm build` passed, and `pnpm test:e2e` passed with 18 tests after Docker/PostgreSQL was available.
 
 ---
 

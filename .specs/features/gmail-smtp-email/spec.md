@@ -115,7 +115,7 @@ Observacao: a documentacao do Google tambem lista porta `587` com TLS. Se essa p
 | EMAIL-01 | P1: Envio real de convite via Gmail SMTP | Execute | Code implemented; real Gmail smoke pending |
 | EMAIL-02 | P1: Envio real de reset de senha via Gmail SMTP | Execute | Code implemented; real Gmail smoke pending |
 | EMAIL-03 | P1: Configuracao externa segura no Gmail | Execute | Documented; external setup pending |
-| EMAIL-04 | Edge: manter console/log-file para dev/E2E | Execute | Unit verified; E2E blocked by local DB/Docker |
+| EMAIL-04 | Edge: manter console/log-file para dev/E2E | Execute | Unit and E2E verified |
 | EMAIL-05 | Edge: validar envs e combinacao porta/secure | Execute | Implemented and unit verified |
 | EMAIL-06 | Edge: documentar deploy e verificacao manual | Execute | Documented; manual smoke pending |
 
@@ -131,4 +131,4 @@ Observacao: a documentacao do Google tambem lista porta `587` com TLS. Se essa p
 - [x] `pnpm build` passa com a nova dependencia e env parsing.
 - [ ] Checklist Gmail/deploy concluido sem segredos versionados.
 
-**Automated Verification Note:** `pnpm test:unit` passou com 181 testes e `pnpm build` passou. `pnpm test:e2e` ficou bloqueado porque o PostgreSQL local em `localhost:5432` recusou conexao, e `pnpm db:up` falhou por Docker daemon/socket indisponivel.
+**Automated Verification Note:** `pnpm test:unit` passou com 181 testes, `pnpm build` passou, e `pnpm test:e2e` passou com 18 testes depois que Docker/PostgreSQL ficou disponivel.
