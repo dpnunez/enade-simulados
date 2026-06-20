@@ -18,7 +18,8 @@ Password reset is implemented as a first-party application feature, not as the B
 - SMTP delivery uses `src/infra/email/smtp-mailer.ts:sendSmtpEmail()`.
 - Public routes are `src/app/api/password-reset/request/route.ts` and `src/app/api/password-reset/confirm/route.ts`; UI routes are `/esqueci-senha` and `/redefinir-senha/[token]`.
 - E2E coverage is in `src/tests/e2e/password-reset.spec.ts`; helper `src/tests/e2e/helpers/password-reset.ts` restores the seeded student password.
-- Password requirements are centralized in `src/features/password-reset/password-policy.ts` and consumed by both `confirmPasswordResetSchema` and the `/redefinir-senha/[token]` UI checklist.
+- Password requirements are centralized in `src/features/auth/password-policy.ts`; `src/features/password-reset/password-policy.ts` re-exports that contract for compatibility.
+- The shared `src/components/password-requirements.tsx` checklist is consumed by both `/redefinir-senha/[token]` and `/convites/[token]`.
 
 ## Gotchas
 

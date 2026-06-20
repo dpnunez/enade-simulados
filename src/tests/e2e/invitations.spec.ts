@@ -26,12 +26,14 @@ test.describe("user invitations", () => {
 
     const token = await getInvitationTokenFromFile();
     const nick = "Maria Silva";
+    const password = "Password-123";
 
     await page.context().clearCookies();
     await page.goto(`/convites/${token}`);
 
     await page.getByLabel("Nick").fill(nick);
-    await page.getByLabel("Senha").fill("password123");
+    await page.getByLabel("Senha", { exact: true }).fill(password);
+    await page.getByLabel("Confirmar senha").fill(password);
     await page.getByTestId("accept-invite-button").click();
 
     // Esperar redirecionamento para login
@@ -39,7 +41,7 @@ test.describe("user invitations", () => {
 
     // Fazer login com o usuário convidado
     await page.getByLabel("Email").fill(inviteEmail);
-    await page.getByLabel("Senha").fill("password123");
+    await page.getByLabel("Senha").fill(password);
     await page.getByRole("button", { name: "Entrar" }).click();
 
     const res = await page.waitForResponse("/api/auth/sign-in/email");

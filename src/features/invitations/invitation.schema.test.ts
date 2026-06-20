@@ -68,14 +68,16 @@ describe("invitation.schema", () => {
       const result = acceptInvitationSchema.safeParse({
         token: "raw-token",
         name: "  Maria Silva  ",
-        password: "password123",
+        password: "Password-123",
+        passwordConfirmation: "Password-123",
       });
 
       expect(result.success).toBe(true);
       expect(result.data).toEqual({
         token: "raw-token",
         name: "Maria Silva",
-        password: "password123",
+        password: "Password-123",
+        passwordConfirmation: "Password-123",
       });
     });
 
@@ -84,7 +86,8 @@ describe("invitation.schema", () => {
         acceptInvitationSchema.safeParse({
           token: "",
           name: "maria_silva",
-          password: "password123",
+          password: "Password-123",
+          passwordConfirmation: "Password-123",
         }).success,
       ).toBe(false);
     });
@@ -94,7 +97,8 @@ describe("invitation.schema", () => {
         acceptInvitationSchema.safeParse({
           token: "raw-token",
           name: "   ",
-          password: "password123",
+          password: "Password-123",
+          passwordConfirmation: "Password-123",
         }).success,
       ).toBe(false);
     });
@@ -104,7 +108,8 @@ describe("invitation.schema", () => {
         acceptInvitationSchema.safeParse({
           token: "raw-token",
           name: "Hide on Bush",
-          password: "password123",
+          password: "Password-123",
+          passwordConfirmation: "Password-123",
         }).success,
       ).toBe(true);
     });
@@ -114,7 +119,8 @@ describe("invitation.schema", () => {
         acceptInvitationSchema.safeParse({
           token: "raw-token",
           name: "maria@summoner",
-          password: "password123",
+          password: "Password-123",
+          passwordConfirmation: "Password-123",
         }).success,
       ).toBe(false);
     });
@@ -124,7 +130,8 @@ describe("invitation.schema", () => {
         acceptInvitationSchema.safeParse({
           token: "raw-token",
           name: "ma",
-          password: "password123",
+          password: "Password-123",
+          passwordConfirmation: "Password-123",
         }).success,
       ).toBe(false);
     });
@@ -135,6 +142,18 @@ describe("invitation.schema", () => {
           token: "raw-token",
           name: "maria_silva",
           password: "short",
+          passwordConfirmation: "short",
+        }).success,
+      ).toBe(false);
+    });
+
+    it("rejects password confirmation mismatches", () => {
+      expect(
+        acceptInvitationSchema.safeParse({
+          token: "raw-token",
+          name: "maria_silva",
+          password: "Password-123",
+          passwordConfirmation: "Different-123",
         }).success,
       ).toBe(false);
     });
