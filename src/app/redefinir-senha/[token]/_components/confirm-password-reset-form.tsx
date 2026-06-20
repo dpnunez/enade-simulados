@@ -16,6 +16,7 @@ import { HTTPError } from "ky";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { PasswordRequirements } from "@/components/password-requirements";
 import {
   Field,
   FieldError,
@@ -33,8 +34,6 @@ import {
   type ConfirmPasswordResetInput,
 } from "@/features/password-reset/password-reset.schema";
 import { http } from "@infra/http/client";
-
-import { PasswordRequirements } from "./password-requirements";
 
 type Props = {
   token: string;

@@ -143,7 +143,8 @@ describe("invitation.service", () => {
     await acceptInvitation({
       token: "raw-token",
       name: "Maria Silva",
-      password: "password123",
+      password: "Password-123",
+      passwordConfirmation: "Password-123",
     });
 
     expect(tx.user.create).toHaveBeenCalledWith(
@@ -178,7 +179,8 @@ describe("invitation.service", () => {
       acceptInvitation({
         token: "raw-token",
         name: "maria_silva",
-        password: "password123",
+        password: "Password-123",
+        passwordConfirmation: "Password-123",
       }),
     ).rejects.toMatchObject({
       code: "NAME_ALREADY_REGISTERED",
@@ -203,7 +205,8 @@ describe("invitation.service", () => {
       acceptInvitation({
         token: "raw-token",
         name: "maria_silva",
-        password: "password123",
+        password: "Password-123",
+        passwordConfirmation: "Password-123",
       }),
     ).rejects.toMatchObject({
       code: "NAME_ALREADY_REGISTERED",

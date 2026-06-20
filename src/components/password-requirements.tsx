@@ -4,7 +4,7 @@ import type * as React from "react";
 import { Check, ShieldCheck } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import { getPasswordRequirementStates } from "@/features/password-reset/password-policy";
+import { getPasswordRequirementStates } from "@/features/auth/password-policy";
 import { cn } from "@/lib/utils";
 
 type PasswordRequirementsProps = {

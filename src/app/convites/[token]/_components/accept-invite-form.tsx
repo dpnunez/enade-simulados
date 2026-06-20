@@ -15,8 +15,10 @@ import {
 import { HTTPError } from "ky";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
+import { toast } from "sonner";
 
+import { PasswordRequirements } from "@/components/password-requirements";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -75,9 +77,20 @@ export function AcceptInviteForm({ token, email, role }: Props) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isPasswordConfirmationVisible, setIsPasswordConfirmationVisible] =
+    useState(false);
   const form = useForm<FormValues>({
     resolver: zodResolver(acceptInvitationSchema),
-    defaultValues: { token, name: "", password: "" },
+    defaultValues: {
+      token,
+      name: "",
+      password: "",
+      passwordConfirmation: "",
+    },
+  });
+  const passwordValue = useWatch({
+    control: form.control,
+    name: "password",
   });
 
   async function onSubmit(values: FormValues) {
@@ -121,12 +134,15 @@ export function AcceptInviteForm({ token, email, role }: Props) {
       return;
     }
 
+    toast.success("Convite aceito", {
+      description: "Seu cadastro foi concluído. Entre com seu email e senha.",
+    });
     router.push("/login");
     router.refresh();
   }
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} noValidate className="space-y-5">
+    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
       {error ? (
         <Alert variant="destructive">
           <CircleAlert aria-hidden="true" />
@@ -219,8 +235,8 @@ export function AcceptInviteForm({ token, email, role }: Props) {
                   aria-invalid={fieldState.invalid}
                   aria-describedby={
                     fieldState.invalid
-                      ? "invite-password-error invite-password-help"
-                      : "invite-password-help"
+                      ? "invite-password-requirements invite-password-error"
+                      : "invite-password-requirements"
                   }
                 />
                 <InputGroupAddon align="inline-end">
@@ -242,12 +258,68 @@ export function AcceptInviteForm({ token, email, role }: Props) {
                   </InputGroupButton>
                 </InputGroupAddon>
               </InputGroup>
-              <FieldDescription id="invite-password-help">
-                Escolha uma senha com pelo menos 8 caracteres.
-              </FieldDescription>
               {fieldState.invalid ? (
                 <FieldError
                   id="invite-password-error"
+                  errors={[fieldState.error]}
+                />
+              ) : null}
+            </Field>
+          )}
+        />
+
+        <PasswordRequirements
+          id="invite-password-requirements"
+          password={passwordValue ?? ""}
+        />
+
+        <Controller
+          name="passwordConfirmation"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={field.name}>Confirmar senha</FieldLabel>
+              <InputGroup>
+                <InputGroupAddon>
+                  <Lock aria-hidden="true" />
+                </InputGroupAddon>
+                <InputGroupInput
+                  {...field}
+                  id={field.name}
+                  type={isPasswordConfirmationVisible ? "text" : "password"}
+                  autoComplete="new-password"
+                  placeholder="Repita a nova senha"
+                  aria-invalid={fieldState.invalid}
+                  aria-describedby={
+                    fieldState.invalid
+                      ? "invite-password-confirmation-error"
+                      : undefined
+                  }
+                />
+                <InputGroupAddon align="inline-end">
+                  <InputGroupButton
+                    type="button"
+                    size="icon-xs"
+                    aria-label={
+                      isPasswordConfirmationVisible
+                        ? "Ocultar confirmação de senha"
+                        : "Mostrar confirmação de senha"
+                    }
+                    onClick={() =>
+                      setIsPasswordConfirmationVisible((isVisible) => !isVisible)
+                    }
+                  >
+                    {isPasswordConfirmationVisible ? (
+                      <EyeOff aria-hidden="true" />
+                    ) : (
+                      <Eye aria-hidden="true" />
+                    )}
+                  </InputGroupButton>
+                </InputGroupAddon>
+              </InputGroup>
+              {fieldState.invalid ? (
+                <FieldError
+                  id="invite-password-confirmation-error"
                   errors={[fieldState.error]}
                 />
               ) : null}
