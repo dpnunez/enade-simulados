@@ -37,12 +37,6 @@ export default function ForgotPasswordPage() {
         </CardContent>
         <CardFooter className="flex flex-col items-start gap-4 border-t text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <p>O link expira por segurança e pode ser usado apenas uma vez.</p>
-          <Button asChild variant="ghost" className="px-0">
-            <Link href="/login">
-              <ArrowLeft className="h-4 w-4" />
-              Voltar para o login
-            </Link>
-          </Button>
         </CardFooter>
       </Card>
     </main>

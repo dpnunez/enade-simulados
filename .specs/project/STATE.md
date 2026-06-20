@@ -1,6 +1,6 @@
 # State
 
-**Last Updated:** 2026-06-10T13:43:40-03:00
+**Last Updated:** 2026-06-20T00:00:00-03:00
 
 ---
 
@@ -132,6 +132,13 @@
 **Trade-off:** A finalizacao do simulado ganha um agregado a mais e dados legados precisam de backfill por migration.
 **Impact:** Ranking soma `weightedScore` por tentativa `COMPLETED`; migrations devem preservar backfill e fixtures/testes que inserem tentativas finalizadas diretamente devem informar o score quando precisarem de pontuacao real.
 
+### AD-019: Gmail SMTP como provedor inicial de email transacional (2026-06-20)
+
+**Decision:** Planejar envio real de convites e reset de senha via SMTP do Gmail, usando app password e mantendo `console`/log-file para desenvolvimento local e E2E.
+**Reason:** O usuario definiu Gmail SMTP como provedor inicial, e os fluxos de convite/reset ja possuem adapters preparados para trocar o branch `smtp` por entrega real.
+**Trade-off:** Gmail SMTP e simples para MVP, mas depende de politica da conta Google, limites do Gmail e credenciais de app password; volumes maiores podem exigir provedor transacional dedicado.
+**Impact:** A feature `.specs/features/gmail-smtp-email` deve implementar helper SMTP compartilhado, atualizar adapters e documentar passos externos no Gmail antes do deploy.
+
 ## Active Blockers
 
 Nenhum blocker ativo registrado no momento.
@@ -158,7 +165,8 @@ Nenhum blocker ativo registrado no momento.
 - [ ] Mapear formalmente o codebase em `.specs/codebase` antes de iniciar features maiores — Captured during: project initialization
 - [x] Definir estratégia de armazenamento de imagens para questões e anexos — Planned in `.specs/features/markdown-image-upload`
 - [ ] Definir limpeza de imagens orfas apos falha no salvamento ou remocao de referencias markdown — Deferred from markdown image upload planning
-- [ ] Implementar provider real de email transacional para convites e reset de senha — Deferred from password reset implementation
+- [x] Definir provedor de email para envio real de convites e reset de senha em produção — Planned in `.specs/features/gmail-smtp-email`
+- [ ] Implementar provider real de email transacional para convites e reset de senha — Planned in `.specs/features/gmail-smtp-email`
 - [ ] Avaliar email de notificacao de seguranca apos reset de senha bem-sucedido — Deferred from password reset implementation
 - [ ] Confirmar critérios de sucesso mensuráveis para o MVP com stakeholders do curso — Captured during: project initialization
 
@@ -181,7 +189,8 @@ Nenhum blocker ativo registrado no momento.
 - [x] Planejar `.specs/features/teacher-simulation-ranking`: ranking paginado de estudantes para professores com pontuacao ponderada
 - [x] Implementar `.specs/features/teacher-simulation-ranking`: service/API/page, React Table, fixtures E2E e gates completos
 - [ ] Revisar o roadmap quando a área administrativa ganhar CRUD real
-- [ ] Definir provedor de email para envio real de convites e reset de senha em produção
+- [x] Definir provedor de email para envio real de convites e reset de senha em produção
+- [ ] Implementar `.specs/features/gmail-smtp-email`: Gmail SMTP para convites e reset de senha
 
 ## Preferences
 
