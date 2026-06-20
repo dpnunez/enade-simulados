@@ -1,8 +1,9 @@
 # .notebook
 > Project intelligence — read before every mission
 
-Last updated: 2026-06-19
+Last updated: 2026-06-20
 
+- [smtp-email](smtp-email.md) — Gmail SMTP helper shared by invite/reset adapters | flow | email, smtp, gmail
 - [env-config](env-config.md) — App base URL resolves from NEXT_PUBLIC_URL, VERCEL_URL, then local fallback; DB uses DATABASE_URL | pattern | env, auth, db
 - [form-fields](form-fields.md) — shadcn Field/InputGroup pattern for inputs | pattern | forms, shadcn, a11y
 - [http-client](http-client.md) — Shared ky instance for app API requests | pattern | http, ky, api

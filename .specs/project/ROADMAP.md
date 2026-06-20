@@ -42,6 +42,12 @@
 - Reset usa token hashado, expiração e revogação de sessões
 - Fluxo first-party compatível com Better Auth e alinhado ao email adapter de convites
 
+**Email transacional via Gmail SMTP** - PLANNED
+
+- Convites e reset de senha usam envio real via SMTP do Gmail em produção
+- Console/log-file seguem como modo local e E2E determinístico
+- Setup externo do Gmail usa 2-Step Verification e app password
+
 ---
 
 ## Milestone 2: Banco acadêmico e operação do professor

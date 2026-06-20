@@ -108,3 +108,32 @@ A aplicação ficará disponível em [http://localhost:3000](http://localhost:30
 - `pnpm prisma:generate` — gera o client do Prisma
 - `pnpm prisma:migrate` — executa migrações locais
 - `pnpm prisma:studio` — abre o Prisma Studio
+
+## Email transacional com Gmail SMTP
+
+Por padrão, convites e redefinição de senha usam entrega `console`, que mantém
+desenvolvimento local e E2E determinísticos. Para envio real, configure Gmail
+SMTP no ambiente alvo:
+
+1. Habilite 2-Step Verification na conta Google remetente.
+2. Gere uma app password em `https://myaccount.google.com/apppasswords`.
+3. Armazene a app password somente como segredo do ambiente.
+4. Configure:
+
+```bash
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=465
+SMTP_SECURE=true
+SMTP_USER=sender@gmail.com
+SMTP_PASSWORD=<app-password>
+INVITATION_EMAIL_DELIVERY=smtp
+PASSWORD_RESET_EMAIL_DELIVERY=smtp
+INVITATION_EMAIL_FROM="ENADE Engenharia <sender@gmail.com>"
+PASSWORD_RESET_EMAIL_FROM="ENADE Engenharia <sender@gmail.com>"
+NEXT_PUBLIC_URL=https://sua-url-publica.example
+```
+
+Use `SMTP_PORT=587` somente com `SMTP_SECURE=false`, para STARTTLS. Antes de
+habilitar em produção, faça um envio controlado de convite e reset, confirme os
+links recebidos e verifique que a senha de app e tokens não aparecem em logs
+públicos.
