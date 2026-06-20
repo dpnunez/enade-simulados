@@ -1,109 +1,37 @@
-import Link from "next/link";
-import {
-  BookOpenCheck,
-  ClipboardList,
-  Trophy,
-  History,
-  PenLine,
-  ShieldCheck,
-  UserRound,
-} from "lucide-react";
+import type { Role } from "@prisma-generated-client";
 
 import { requireAuth } from "@auth/session";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { LogoutButton } from "./logout-button";
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "./app-sidebar";
 
 export default async function PrivateLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const session = await requireAuth();
-  const primaryIdentity = session.user.name?.trim() || session.user.email;
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-6 py-8">
-      <Card>
-        <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0">
-          <div className="space-y-2">
-            <Badge variant="secondary" className="gap-1.5">
-              <ShieldCheck className="h-3.5 w-3.5" />
-              Sessão ativa
-            </Badge>
-            <CardTitle className="text-2xl">{primaryIdentity}</CardTitle>
-            <CardDescription className="flex flex-wrap items-center gap-2">
-              <UserRound className="h-4 w-4" />
-              <span>{session.user.email}</span>
-              <span>Role atual:</span>
-              <Badge variant="outline">{session.user.role}</Badge>
-            </CardDescription>
+    <SidebarProvider>
+      <AppSidebar
+        user={{
+          name: session.user.name,
+          email: session.user.email,
+          role: session.user.role as Role,
+        }}
+      />
+      <SidebarInset>
+        <header className="sticky top-0 flex h-14 shrink-0 items-center gap-2 border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+          <SidebarTrigger />
+          <div className="flex min-w-0 flex-col">
+            <span className="text-sm font-medium">Área logada</span>
+            <span className="truncate text-xs text-muted-foreground">
+              Use o menu para navegar pelas funcionalidades disponíveis.
+            </span>
           </div>
-
-          <LogoutButton />
-        </CardHeader>
-
-        <CardContent className="space-y-4">
-          <Separator />
-          <nav className="flex flex-wrap gap-2">
-            {session.user.role === "ADMIN" ? (
-              <Button asChild variant="outline" size="sm">
-                <Link href="/app/admin">Admin</Link>
-              </Button>
-            ) : null}
-            {session.user.role === "STUDENT" ? (
-              <Button asChild variant="outline" size="sm">
-                <Link href="/app/student">Student</Link>
-              </Button>
-            ) : null}
-            {session.user.role === "TEACHER" ? (
-              <Button asChild variant="outline" size="sm">
-                <Link href="/app/professor">Professor</Link>
-              </Button>
-            ) : null}
-            {session.user.role === "TEACHER" ? (
-              <>
-                <Button asChild variant="outline" size="sm">
-                  <Link href="/app/professor/grandes-areas">
-                    <BookOpenCheck aria-hidden="true" />
-                    Grandes areas
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" size="sm">
-                  <Link href="/app/professor/questoes">
-                    <ClipboardList aria-hidden="true" />
-                    Questoes
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" size="sm">
-                  <Link href="/app/professor/ranking">
-                    <Trophy aria-hidden="true" />
-                    Ranking
-                  </Link>
-                </Button>
-              </>
-            ) : null}
-            {session.user.role === "STUDENT" ? (
-              <>
-                <Button asChild variant="outline" size="sm">
-                  <Link href="/app/student/simulados/novo">
-                    <PenLine aria-hidden="true" />
-                    Gerar simulado
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" size="sm">
-                  <Link href="/app/student/simulados">
-                    <History aria-hidden="true" />
-                    Historico
-                  </Link>
-                </Button>
-              </>
-            ) : null}
-          </nav>
-        </CardContent>
-      </Card>
-
-      <div>{children}</div>
-    </div>
+        </header>
+        <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-6 md:px-6 lg:px-8">
+          {children}
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
