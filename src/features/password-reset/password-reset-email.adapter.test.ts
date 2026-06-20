@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const ORIGINAL_ENV = process.env;
 let tmpLogDir: string | null = null;
+const sendSmtpEmailMock = vi.fn();
 
 async function loadAdapter() {
   vi.resetModules();
@@ -26,6 +27,8 @@ describe("password-reset-email.adapter", () => {
   afterEach(async () => {
     process.env = ORIGINAL_ENV;
     vi.restoreAllMocks();
+    sendSmtpEmailMock.mockReset();
+    vi.doUnmock("@infra/email/smtp-mailer");
 
     if (tmpLogDir) {
       await rm(tmpLogDir, { force: true, recursive: true });
@@ -127,5 +130,37 @@ describe("password-reset-email.adapter", () => {
         token: "abc",
       }),
     ).rejects.toThrow("Missing SMTP_HOST for SMTP delivery.");
+  });
+
+  it("sends password reset email through SMTP with reset link", async () => {
+    process.env.PASSWORD_RESET_EMAIL_DELIVERY = "smtp";
+    process.env.PASSWORD_RESET_EMAIL_FROM = "ENADE <sender@gmail.com>";
+    process.env.SMTP_HOST = "smtp.gmail.com";
+    process.env.SMTP_PORT = "465";
+    process.env.SMTP_USER = "sender@gmail.com";
+    process.env.SMTP_PASSWORD = "app-password";
+    process.env.SMTP_SECURE = "true";
+    vi.doMock("@infra/email/smtp-mailer", () => ({
+      sendSmtpEmail: sendSmtpEmailMock,
+    }));
+
+    const { sendPasswordResetEmail } = await loadAdapter();
+
+    await sendPasswordResetEmail({
+      email: "student@example.com",
+      token: "token-123",
+    });
+
+    expect(sendSmtpEmailMock).toHaveBeenCalledWith({
+      from: "ENADE <sender@gmail.com>",
+      to: "student@example.com",
+      subject: "Redefinicao de senha da plataforma ENADE Engenharia",
+      text: expect.stringContaining(
+        "http://localhost:3000/redefinir-senha/token-123",
+      ),
+      html: expect.stringContaining(
+        "http://localhost:3000/redefinir-senha/token-123",
+      ),
+    });
   });
 });

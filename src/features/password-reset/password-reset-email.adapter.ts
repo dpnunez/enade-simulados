@@ -1,5 +1,6 @@
 import { appendFile, mkdir } from "node:fs/promises";
 
+import { sendSmtpEmail } from "@infra/email/smtp-mailer";
 import { env } from "@infra/env";
 import { getAppBaseUrl } from "@infra/url/app-base-url";
 
@@ -47,17 +48,23 @@ export async function sendPasswordResetEmail(input: SendPasswordResetEmailInput)
   }
 
   if (delivery === "smtp") {
-    const required = [
-      "SMTP_HOST",
-      "SMTP_PORT",
-      "SMTP_USER",
-      "SMTP_PASSWORD",
-    ] as const;
-    for (const key of required) {
-      if (!env[key]) throw new Error(`Missing ${key} for SMTP delivery.`);
-    }
+    await sendSmtpEmail({
+      from,
+      to: input.email,
+      subject: "Redefinicao de senha da plataforma ENADE Engenharia",
+      text: [
+        "Recebemos uma solicitacao para redefinir sua senha na plataforma ENADE Engenharia.",
+        `Acesse: ${resetUrl}`,
+        "Se voce nao solicitou essa redefinicao, ignore este email.",
+      ].join("\n\n"),
+      html: [
+        "<p>Recebemos uma solicitacao para redefinir sua senha na plataforma ENADE Engenharia.</p>",
+        `<p><a href="${resetUrl}">Redefinir senha</a></p>`,
+        "<p>Se voce nao solicitou essa redefinicao, ignore este email.</p>",
+      ].join(""),
+    });
 
-    throw new Error("SMTP delivery not implemented yet.");
+    return;
   }
 
   throw new Error(`Unsupported PASSWORD_RESET_EMAIL_DELIVERY: ${delivery}`);
