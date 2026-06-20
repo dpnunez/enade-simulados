@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const ORIGINAL_ENV = process.env;
+const sendSmtpEmailMock = vi.fn();
 
 async function loadAdapter() {
   vi.resetModules();
@@ -22,6 +23,8 @@ describe("invitation-email.adapter", () => {
   afterEach(() => {
     process.env = ORIGINAL_ENV;
     vi.restoreAllMocks();
+    sendSmtpEmailMock.mockReset();
+    vi.doUnmock("@infra/email/smtp-mailer");
   });
 
   it("builds invitation URL from explicit NEXT_PUBLIC_URL and token", async () => {
@@ -88,5 +91,38 @@ describe("invitation-email.adapter", () => {
         token: "abc",
       }),
     ).rejects.toThrow("Missing SMTP_HOST for SMTP delivery.");
+  });
+
+  it("sends invitation email through SMTP with invite link", async () => {
+    process.env.INVITATION_EMAIL_DELIVERY = "smtp";
+    process.env.INVITATION_EMAIL_FROM = "ENADE <sender@gmail.com>";
+    process.env.SMTP_HOST = "smtp.gmail.com";
+    process.env.SMTP_PORT = "465";
+    process.env.SMTP_USER = "sender@gmail.com";
+    process.env.SMTP_PASSWORD = "app-password";
+    process.env.SMTP_SECURE = "true";
+    vi.doMock("@infra/email/smtp-mailer", () => ({
+      sendSmtpEmail: sendSmtpEmailMock,
+    }));
+
+    const { sendInvitationEmail } = await loadAdapter();
+
+    await sendInvitationEmail({
+      email: "student@example.com",
+      role: "STUDENT",
+      token: "token-123",
+    });
+
+    expect(sendSmtpEmailMock).toHaveBeenCalledWith({
+      from: "ENADE <sender@gmail.com>",
+      to: "student@example.com",
+      subject: "Convite para acessar a plataforma ENADE Engenharia",
+      text: expect.stringContaining(
+        "http://localhost:3000/convites/token-123",
+      ),
+      html: expect.stringContaining(
+        "http://localhost:3000/convites/token-123",
+      ),
+    });
   });
 });
