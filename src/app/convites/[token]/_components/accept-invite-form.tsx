@@ -16,6 +16,7 @@ import { HTTPError } from "ky";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
+import { toast } from "sonner";
 
 import { PasswordRequirements } from "@/components/password-requirements";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -133,6 +134,9 @@ export function AcceptInviteForm({ token, email, role }: Props) {
       return;
     }
 
+    toast.success("Convite aceito", {
+      description: "Seu cadastro foi concluído. Entre com seu email e senha.",
+    });
     router.push("/login");
     router.refresh();
   }

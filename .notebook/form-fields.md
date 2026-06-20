@@ -22,5 +22,6 @@ Migrated forms:
 Submission pattern:
 - Keep native `<form onSubmit>` + submit button for Enter submission
 - Use `http` from `@infra/http/client` for app API calls when the form submits to internal API routes
+- Global toast feedback uses shadcn `sonner`: `src/app/layout.tsx` mounts `src/components/ui/sonner.tsx:Toaster`; client forms can call `toast()` from `sonner` after successful mutations.
 
-Updated: 2026-06-11
+Updated: 2026-06-20
