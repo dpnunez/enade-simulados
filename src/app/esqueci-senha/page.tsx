@@ -1,5 +1,4 @@
-import Link from "next/link";
-import { ArrowLeft, MailCheck } from "lucide-react";
+import { MailCheck } from "lucide-react";
 
 import {
   Card,
@@ -9,7 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 
 import { RequestPasswordResetForm } from "./_components/request-password-reset-form";
 
