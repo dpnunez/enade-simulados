@@ -1,6 +1,6 @@
 # State
 
-**Last Updated:** 2026-06-20T00:00:00-03:00
+**Last Updated:** 2026-06-21T00:00:00-03:00
 
 ---
 
@@ -139,6 +139,13 @@
 **Trade-off:** Gmail SMTP e simples para MVP, mas depende de politica da conta Google, limites do Gmail e credenciais de app password; volumes maiores podem exigir provedor transacional dedicado.
 **Impact:** A feature `.specs/features/gmail-smtp-email` deve implementar helper SMTP compartilhado, atualizar adapters e documentar passos externos no Gmail antes do deploy.
 
+### AD-020: Area do professor separa criacao/listagem de catalogo sem tocar no ranking (2026-06-21)
+
+**Decision:** Planejar reorganizacao da area do professor em `.specs/features/professor-content-organization`, separando criacao/listagem de grandes areas, melhorando UX de questoes e usando React Table + React Query nas listagens.
+**Reason:** O usuario quer telas dedicadas para reduzir ruido operacional e listagens mais eficientes, mas informou explicitamente que o ranking esta otimo.
+**Trade-off:** Grandes areas usam API simples sem paginacao por volume esperado baixo; questoes usam API paginada para manter a listagem escalavel.
+**Impact:** A implementacao deve adicionar `@tanstack/react-query`, criar/ajustar APIs de leitura, usar `sonner` para feedbacks transientes de sucesso/erro em formularios e mutacoes, paginar `GET /api/questions`, manter `GET /api/subject-fields` simples, e evitar alteracoes em `src/app/app/professor/ranking`, `src/app/api/teacher/simulation-ranking` e `src/features/simulation-ranking`.
+
 ## Active Blockers
 
 Nenhum blocker ativo registrado no momento.
@@ -188,6 +195,7 @@ Nenhum blocker ativo registrado no momento.
 - [x] Implementar `.specs/features/password-reset`: tokens, email adapter, UI publica, APIs e cobertura E2E
 - [x] Planejar `.specs/features/teacher-simulation-ranking`: ranking paginado de estudantes para professores com pontuacao ponderada
 - [x] Implementar `.specs/features/teacher-simulation-ranking`: service/API/page, React Table, fixtures E2E e gates completos
+- [x] Planejar `.specs/features/professor-content-organization`: telas separadas para grandes areas, UX de questoes e listagens com React Table/React Query
 - [ ] Revisar o roadmap quando a área administrativa ganhar CRUD real
 - [x] Definir provedor de email para envio real de convites e reset de senha em produção
 - [ ] Implementar `.specs/features/gmail-smtp-email`: Gmail SMTP para convites e reset de senha
