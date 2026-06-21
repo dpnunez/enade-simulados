@@ -1,7 +1,11 @@
 import type { Role } from "@prisma-generated-client";
 
 import { requireAuth } from "@auth/session";
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
 import { AppSidebar } from "./app-sidebar";
 
 export default async function PrivateLayout({
@@ -19,7 +23,7 @@ export default async function PrivateLayout({
         }}
       />
       <SidebarInset>
-        <header className="sticky top-0 flex h-14 shrink-0 items-center gap-2 border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+        <header className="z-10 sticky top-0 flex h-14 shrink-0 items-center gap-2 border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/80">
           <SidebarTrigger />
           <div className="flex min-w-0 flex-col">
             <span className="text-sm font-medium">Área logada</span>

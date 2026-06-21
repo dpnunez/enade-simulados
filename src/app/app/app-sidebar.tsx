@@ -19,7 +19,6 @@ import {
 import { signOut } from "@auth/client";
 import type { Role } from "@prisma-generated-client";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
