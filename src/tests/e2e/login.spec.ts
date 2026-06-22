@@ -36,8 +36,8 @@ test("redireciona a raiz para a área da role quando há sessão", async ({ page
 
   await page.goto("/");
 
-  await expect(page).toHaveURL(/\/app\/student$/);
-  await expect(page.getByText("Área STUDENT")).toBeVisible();
+  await expect(page).toHaveURL(/\/app\/aluno$/);
+  await expect(page.getByText("Área do aluno")).toBeVisible();
 });
 
 test("faz login de professor na rota /app/professor", async ({ page }) => {

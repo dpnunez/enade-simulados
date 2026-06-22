@@ -17,7 +17,7 @@ Protected shell:
 - `src/proxy.ts` redirects `/app/*` without session cookie to `/login`, and `/login` with session cookie to `/app`.
 - `src/app/app/layout.tsx` requires auth, shows session identity, role, logout, and role-specific nav.
 - `src/app/app/page.tsx` requires auth and redirects to `getRoleHomePath()` from `src/infra/auth/session.ts`.
-- Role home paths: ADMIN -> `/app/admin`, STUDENT -> `/app/student`, TEACHER -> `/app/professor`.
+- Role home paths: ADMIN -> `/app/admin`, STUDENT -> `/app/aluno`, TEACHER -> `/app/professor`.
 
 ADMIN:
 - Page: `src/app/app/admin/page.tsx`.
@@ -58,16 +58,17 @@ TEACHER ranking:
 
 STUDENT simulations:
 - Pages/components/API/service:
-  `src/app/app/student/simulados/page.tsx`,
-  `src/app/app/student/simulados/novo/page.tsx`,
-  `src/app/app/student/simulados/[attemptId]/page.tsx`,
+  `src/app/app/aluno/lista-simulados/page.tsx`,
+  `src/app/app/aluno/lista-simulados/_components/simulation-attempts-table.tsx`,
+  `src/app/app/aluno/simulados/novo/page.tsx`,
+  `src/app/app/aluno/simulados/[attemptId]/page.tsx`,
   `src/app/api/student/simulated-exams/route.ts`,
   `src/app/api/student/simulated-exams/[attemptId]/route.ts`,
   `src/app/api/student/simulated-exams/[attemptId]/answers/route.ts`,
   `src/features/simulated-exams/simulated-exam.service.ts`.
-- Flow: eligible subject fields -> generate attempt -> answer/draft-save -> finalize/correct -> review/history.
+- Flow: eligible subject fields -> generate attempt -> answer/draft-save -> finalize/correct -> review/list. Legacy `/app/student/*` UI routes redirect to `/app/aluno/*`.
 
 Coverage pointers:
 - E2E specs: `src/tests/e2e/login.spec.ts`, `src/tests/e2e/admin-authorization.spec.ts`, `src/tests/e2e/invitations.spec.ts`, `src/tests/e2e/password-reset.spec.ts`, `src/tests/e2e/subject-fields.spec.ts`, `src/tests/e2e/questions.spec.ts`, `src/tests/e2e/student-simulated-exams.spec.ts`, `src/tests/e2e/teacher-simulation-ranking.spec.ts`.
 
-Updated: 2026-06-10
+Updated: 2026-06-21

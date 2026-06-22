@@ -11,9 +11,7 @@ test("bloqueia student na rota admin e redireciona para home da role", async ({
   await page.goto("/app/admin");
 
   await expect(page).toHaveURL(ROLE_HOME_PATHS.STUDENT);
-  await expect(
-    page.getByText("Área STUDENT"),
-  ).toBeVisible();
+  await expect(page.getByText("Área do aluno")).toBeVisible();
   await expect(
     page
       .getByText(new RegExp(`Role atual:\\s*${TEST_USERS.student.role}`))

@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CircleAlert } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useId, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import {
@@ -11,6 +11,7 @@ import {
   AlertDescription,
   AlertTitle,
 } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -55,6 +56,21 @@ export function SimulationGenerateForm({
     defaultValues,
   });
   const selectedSubjectFieldIds = form.watch("subjectFieldIds");
+  const questionCount = Number(form.watch("questionCount") ?? 0);
+  const selectedSubjectFields = useMemo(
+    () =>
+      subjectFields.filter((subjectField) =>
+        selectedSubjectFieldIds.includes(subjectField.id),
+      ),
+    [selectedSubjectFieldIds, subjectFields],
+  );
+  const selectedAvailableQuestionCount = selectedSubjectFields.reduce(
+    (total, subjectField) => total + subjectField._count.questions,
+    0,
+  );
+  const isAboveSelectedAvailability =
+    selectedAvailableQuestionCount > 0 &&
+    questionCount > selectedAvailableQuestionCount;
 
   function toggleSubjectField(subjectFieldId: string, checked: boolean) {
     const nextIds = checked
@@ -82,7 +98,7 @@ export function SimulationGenerateForm({
       return;
     }
 
-    router.push(`/app/student/simulados/${payload.attempt.id}`);
+    router.push(`/app/aluno/simulados/${payload.attempt.id}`);
     router.refresh();
   }
 
@@ -95,7 +111,7 @@ export function SimulationGenerateForm({
   }
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+    <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5">
       {error ? (
         <Alert variant="destructive" role="alert">
           <CircleAlert aria-hidden="true" />
@@ -106,8 +122,16 @@ export function SimulationGenerateForm({
         </Alert>
       ) : null}
 
-      <div className="space-y-3">
+      <div className="flex flex-col gap-3">
         <Label>Grandes areas</Label>
+        <div className="flex flex-wrap gap-2">
+          <Badge variant="secondary">
+            {selectedSubjectFields.length} selecionadas
+          </Badge>
+          <Badge variant="outline">
+            {selectedAvailableQuestionCount} questoes disponiveis na selecao
+          </Badge>
+        </div>
         <div className="grid gap-3 sm:grid-cols-2">
           {subjectFields.map((subjectField) => {
             const inputId = `${formId}-${subjectField.id}`;
@@ -131,11 +155,11 @@ export function SimulationGenerateForm({
                     toggleSubjectField(subjectField.id, event.target.checked)
                   }
                 />
-                <span className="space-y-1">
+                <span className="flex flex-col gap-1">
                   <span className="flex items-center gap-2 font-medium">
                     <span
                       aria-hidden="true"
-                      className="h-3 w-3 rounded-full border"
+                      className="size-3 rounded-full border"
                       style={{ backgroundColor: subjectField.colorHex }}
                     />
                     {subjectField.title}
@@ -155,7 +179,7 @@ export function SimulationGenerateForm({
         ) : null}
       </div>
 
-      <div className="max-w-48 space-y-2">
+      <div className="flex max-w-72 flex-col gap-2">
         <Label htmlFor={`${formId}-question-count`}>Quantidade</Label>
         <Input
           id={`${formId}-question-count`}
@@ -168,6 +192,12 @@ export function SimulationGenerateForm({
         {form.formState.errors.questionCount ? (
           <p className="text-sm text-destructive">
             {form.formState.errors.questionCount.message}
+          </p>
+        ) : null}
+        {isAboveSelectedAvailability ? (
+          <p className="text-sm text-muted-foreground">
+            A selecao atual tem {selectedAvailableQuestionCount} questoes. Reduza
+            a quantidade ou selecione mais grandes areas.
           </p>
         ) : null}
       </div>

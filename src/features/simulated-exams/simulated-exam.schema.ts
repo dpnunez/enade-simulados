@@ -15,6 +15,20 @@ const idSchema = z.string().transform(normalizeId).pipe(z.string().min(1));
 
 export const simulationAttemptIdSchema = idSchema;
 
+export const simulationAttemptsListQuerySchema = z.object({
+  page: z.coerce
+    .number()
+    .int("Informe uma pagina inteira.")
+    .min(1, "Informe uma pagina maior que zero.")
+    .default(1),
+  pageSize: z.coerce
+    .number()
+    .int("Informe um tamanho de pagina inteiro.")
+    .min(10, "Informe pelo menos 10 linhas por pagina.")
+    .max(100, "Informe no maximo 100 linhas por pagina.")
+    .default(20),
+});
+
 export const simulationGenerationInputSchema = z.object({
   subjectFieldIds: z
     .array(z.string().transform(normalizeId))
@@ -67,6 +81,12 @@ export const simulationSubmitInputSchema = simulationAnswerListInputSchema;
 
 export type SimulationGenerationInput = z.input<
   typeof simulationGenerationInputSchema
+>;
+export type SimulationAttemptsListQuery = z.input<
+  typeof simulationAttemptsListQuerySchema
+>;
+export type ParsedSimulationAttemptsListQuery = z.output<
+  typeof simulationAttemptsListQuerySchema
 >;
 export type ParsedSimulationGenerationInput = z.output<
   typeof simulationGenerationInputSchema
