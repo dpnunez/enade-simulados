@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => {
       findMany: vi.fn(),
     },
     simulationAttempt: {
+      count: vi.fn(),
       create: vi.fn(),
       findFirst: vi.fn(),
       findMany: vi.fn(),
@@ -37,6 +38,7 @@ import {
   getCompletedSimulationAttemptForStudent,
   getInProgressSimulationAttemptForStudent,
   listEligibleSubjectFields,
+  listSimulationAttemptsPageForStudent,
   listSimulationAttemptsForStudent,
   saveSimulationAttemptAnswers,
   submitSimulationAttempt,
@@ -612,6 +614,99 @@ describe("simulated-exam.service", () => {
       where: { studentId: "student_1" },
       select: expect.any(Object),
       orderBy: { createdAt: "desc" },
+    });
+  });
+
+  it("lists a paginated page of student attempt summaries", async () => {
+    const createdAt = new Date("2026-06-09T12:00:00Z");
+    const completedAt = new Date("2026-06-09T12:30:00Z");
+
+    mocks.prisma.simulationAttempt.count.mockResolvedValue(21);
+    mocks.prisma.simulationAttempt.findMany.mockResolvedValue([
+      {
+        id: "attempt_1",
+        status: "COMPLETED",
+        totalQuestions: 10,
+        answeredCount: 10,
+        correctCount: 7,
+        wrongCount: 3,
+        scorePercent: 70,
+        completedAt,
+        createdAt,
+        subjectFields: [
+          {
+            subjectField: {
+              id: "subject_field_1",
+              title: "Calculo",
+              colorHex: "#2563EB",
+            },
+          },
+        ],
+      },
+    ]);
+
+    const result = await listSimulationAttemptsPageForStudent("student_1", {
+      page: 2,
+      pageSize: 10,
+    });
+
+    expect(mocks.prisma.simulationAttempt.count).toHaveBeenCalledWith({
+      where: { studentId: "student_1" },
+    });
+    expect(mocks.prisma.simulationAttempt.findMany).toHaveBeenCalledWith({
+      where: { studentId: "student_1" },
+      select: expect.any(Object),
+      orderBy: { createdAt: "desc" },
+      skip: 10,
+      take: 10,
+    });
+    expect(result).toEqual({
+      rows: [
+        {
+          id: "attempt_1",
+          status: "COMPLETED",
+          totalQuestions: 10,
+          answeredCount: 10,
+          correctCount: 7,
+          wrongCount: 3,
+          scorePercent: 70,
+          completedAt,
+          startedAt: createdAt,
+          subjectFields: [
+            {
+              id: "subject_field_1",
+              title: "Calculo",
+              colorHex: "#2563EB",
+            },
+          ],
+        },
+      ],
+      rowCount: 21,
+      page: 2,
+      pageSize: 10,
+      pageCount: 3,
+    });
+  });
+
+  it("uses default pagination values for student attempt summaries", async () => {
+    mocks.prisma.simulationAttempt.count.mockResolvedValue(0);
+    mocks.prisma.simulationAttempt.findMany.mockResolvedValue([]);
+
+    const result = await listSimulationAttemptsPageForStudent("student_1", {});
+
+    expect(mocks.prisma.simulationAttempt.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { studentId: "student_1" },
+        skip: 0,
+        take: 20,
+      }),
+    );
+    expect(result).toMatchObject({
+      rows: [],
+      rowCount: 0,
+      page: 1,
+      pageSize: 20,
+      pageCount: 0,
     });
   });
 });

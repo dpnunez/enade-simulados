@@ -6,7 +6,6 @@ import {
   BookOpenCheck,
   ClipboardList,
   GraduationCap,
-  History,
   Home,
   LogOut,
   PenLine,
@@ -73,22 +72,22 @@ const ROLE_NAV_ITEMS = {
   ],
   STUDENT: [
     {
-      href: "/app/student",
+      href: "/app/aluno",
       label: "Inicio",
       description: "Resumo da sua jornada",
       icon: Home,
     },
     {
-      href: "/app/student/simulados/novo",
+      href: "/app/aluno/simulados/novo",
       label: "Gerar simulado",
       description: "Monte uma nova pratica",
       icon: PenLine,
     },
     {
-      href: "/app/student/simulados",
-      label: "Histórico",
-      description: "Revise tentativas anteriores",
-      icon: History,
+      href: "/app/aluno/lista-simulados",
+      label: "Lista de simulados",
+      description: "Retome ou revise simulados",
+      icon: ClipboardList,
     },
   ],
   TEACHER: [

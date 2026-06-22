@@ -8,8 +8,8 @@ Entry: `src/app/app/layout.tsx`
 - `src/app/app/app-sidebar.tsx` is a Client Component so it can use `next/navigation:usePathname()` for active links and `@auth/client:signOut()` for logout.
 - Role-specific navigation lives in `ROLE_NAV_ITEMS`:
   - `ADMIN`: `/app/admin`
-  - `STUDENT`: `/app/student`, `/app/student/simulados/novo`, `/app/student/simulados`
+  - `STUDENT`: `/app/aluno`, `/app/aluno/simulados/novo`, `/app/aluno/lista-simulados`
   - `TEACHER`: `/app/professor`, `/app/professor/grandes-areas`, `/app/professor/questoes`, `/app/professor/ranking`
-- The root layout wraps the app with `src/components/ui/tooltip.tsx:TooltipProvider` because shadcn Sidebar tooltips depend on it when collapsed.
+- The private layout wraps page content with `src/app/app/query-provider.tsx` so logged-in client pages can use React Query.
 
-Updated: 2026-06-20
+Updated: 2026-06-21

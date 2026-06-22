@@ -1,14 +1,16 @@
 # Student Simulated Exams
-> Student-only generated attempts, draft answer saves, final correction, and history review
+> Student-only generated attempts, draft answer saves, final correction, and paginated simulation list
 
 Entry points:
-- Pages: `src/app/app/student/simulados/page.tsx`, `src/app/app/student/simulados/novo/page.tsx`, `src/app/app/student/simulados/[attemptId]/page.tsx`
+- Canonical pages: `src/app/app/aluno/lista-simulados/page.tsx`, `src/app/app/aluno/simulados/novo/page.tsx`, `src/app/app/aluno/simulados/[attemptId]/page.tsx`
+- Legacy `/app/student/*` pages redirect to equivalent `/app/aluno/*` routes.
 - APIs: `src/app/api/student/simulated-exams/route.ts`, `src/app/api/student/simulated-exams/[attemptId]/route.ts`, `src/app/api/student/simulated-exams/[attemptId]/answers/route.ts`
 
 Domain flow:
-- `src/features/simulated-exams/simulated-exam.schema.ts` validates generation, draft-save, and submit payloads.
+- `src/features/simulated-exams/simulated-exam.schema.ts` validates generation, paginated list query, draft-save, and submit payloads.
 - `src/features/simulated-exams/question-selection.ts` computes difficulty quotas and selects eligible questions by selected grande area.
-- `src/features/simulated-exams/simulated-exam.service.ts` owns attempt creation, safe in-progress DTOs, draft answer persistence, completed review DTOs, final correction, score aggregates, and student-scoped history.
+- `src/features/simulated-exams/simulated-exam.service.ts` owns attempt creation, safe in-progress DTOs, draft answer persistence, completed review DTOs, final correction, score aggregates, and student-scoped paginated list.
+- `GET /api/student/simulated-exams?page&pageSize` returns `{ rows, rowCount, page, pageSize, pageCount }` and uses DB `skip/take`.
 
 Security notes:
 - Pages and APIs require `STUDENT`.
@@ -24,7 +26,7 @@ Persistence:
 - Student deletion cascades attempts; attempt-owned rows cascade with attempts; catalog subject fields/questions/alternatives are restricted once referenced by simulation history.
 
 E2E:
-- `src/tests/e2e/student-simulated-exams.spec.ts` covers generation, out-of-order answers, draft saves/reopen/finalize, final review, history, and non-student denial.
+- `src/tests/e2e/student-simulated-exams.spec.ts` covers generation, out-of-order answers, draft saves/reopen/finalize, final review, paginated list actions, legacy redirects, and non-student denial.
 - `src/tests/e2e/helpers/simulated-exams.ts` cleans simulation attempts before deleting deterministic catalog rows.
 
-Updated: 2026-06-09
+Updated: 2026-06-21

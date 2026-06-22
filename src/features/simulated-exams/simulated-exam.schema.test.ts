@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import {
   simulationAttemptIdSchema,
+  simulationAttemptsListQuerySchema,
   simulationGenerationInputSchema,
   simulationSaveAnswersInputSchema,
   simulationSubmitInputSchema,
@@ -176,5 +177,29 @@ describe("simulated-exam.schema", () => {
     expect(simulationSubmitInputSchema.parse(input)).toEqual(
       simulationSaveAnswersInputSchema.parse(input),
     );
+  });
+
+  it("normalizes list pagination query defaults and numeric strings", () => {
+    expect(simulationAttemptsListQuerySchema.parse({})).toEqual({
+      page: 1,
+      pageSize: 20,
+    });
+
+    expect(
+      simulationAttemptsListQuerySchema.parse({ page: "2", pageSize: "10" }),
+    ).toEqual({
+      page: 2,
+      pageSize: 10,
+    });
+  });
+
+  it("rejects invalid list pagination query", () => {
+    expect(() =>
+      simulationAttemptsListQuerySchema.parse({ page: "0", pageSize: "20" }),
+    ).toThrow(z.ZodError);
+
+    expect(() =>
+      simulationAttemptsListQuerySchema.parse({ page: "1", pageSize: "101" }),
+    ).toThrow(z.ZodError);
   });
 });

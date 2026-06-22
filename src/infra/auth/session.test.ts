@@ -46,7 +46,7 @@ describe("session helpers", () => {
 
   it("getRoleHomePath retorna a área inicial da role", () => {
     expect(getRoleHomePath("ADMIN")).toBe("/app/admin");
-    expect(getRoleHomePath("STUDENT")).toBe("/app/student");
+    expect(getRoleHomePath("STUDENT")).toBe("/app/aluno");
     expect(getRoleHomePath("TEACHER")).toBe("/app/professor");
   });
 
@@ -81,7 +81,7 @@ describe("session helpers", () => {
       },
     });
 
-    await expect(requireRole("ADMIN")).rejects.toThrow("REDIRECT:/app/student");
+    await expect(requireRole("ADMIN")).rejects.toThrow("REDIRECT:/app/aluno");
   });
 
   it("requireRole retorna a sessão quando a role é válida", async () => {

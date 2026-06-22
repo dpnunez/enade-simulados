@@ -4,9 +4,11 @@ import { prisma } from "@infra/db/prisma";
 
 import {
   simulationAttemptIdSchema,
+  simulationAttemptsListQuerySchema,
   simulationGenerationInputSchema,
   simulationSaveAnswersInputSchema,
   simulationSubmitInputSchema,
+  type SimulationAttemptsListQuery,
   type SimulationGenerationInput,
   type SimulationSaveAnswersInput,
   type SimulationSubmitInput,
@@ -37,6 +39,12 @@ type SimulationPrismaClient = typeof prisma | Prisma.TransactionClient;
 export type SimulationAttemptSummary = Awaited<
   ReturnType<typeof listSimulationAttemptsForStudent>
 >[number];
+export type SimulationAttemptListRow = Awaited<
+  ReturnType<typeof listSimulationAttemptsPageForStudent>
+>["rows"][number];
+export type SimulationAttemptsPage = Awaited<
+  ReturnType<typeof listSimulationAttemptsPageForStudent>
+>;
 export type SimulationAttemptInProgressDetail = Awaited<
   ReturnType<typeof getInProgressSimulationAttemptForStudent>
 >;
@@ -573,4 +581,68 @@ export async function listSimulationAttemptsForStudent(studentId: string) {
     },
     orderBy: { createdAt: "desc" },
   });
+}
+
+export async function listSimulationAttemptsPageForStudent(
+  studentId: string,
+  input: SimulationAttemptsListQuery,
+) {
+  const parsed = simulationAttemptsListQuerySchema.parse(input);
+  const skip = (parsed.page - 1) * parsed.pageSize;
+  const where = { studentId };
+
+  const [rows, rowCount] = await Promise.all([
+    prisma.simulationAttempt.findMany({
+      where,
+      select: {
+        id: true,
+        status: true,
+        totalQuestions: true,
+        answeredCount: true,
+        correctCount: true,
+        wrongCount: true,
+        scorePercent: true,
+        completedAt: true,
+        createdAt: true,
+        subjectFields: {
+          select: {
+            subjectField: {
+              select: {
+                id: true,
+                title: true,
+                colorHex: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+      skip,
+      take: parsed.pageSize,
+    }),
+    prisma.simulationAttempt.count({ where }),
+  ]);
+
+  return {
+    rows: rows.map((attempt) => ({
+      id: attempt.id,
+      status: attempt.status,
+      totalQuestions: attempt.totalQuestions,
+      answeredCount: attempt.answeredCount,
+      correctCount: attempt.correctCount,
+      wrongCount: attempt.wrongCount,
+      scorePercent: attempt.scorePercent,
+      completedAt: attempt.completedAt,
+      startedAt: attempt.createdAt,
+      subjectFields: attempt.subjectFields.map(({ subjectField }) => ({
+        id: subjectField.id,
+        title: subjectField.title,
+        colorHex: subjectField.colorHex,
+      })),
+    })),
+    rowCount,
+    page: parsed.page,
+    pageSize: parsed.pageSize,
+    pageCount: Math.ceil(rowCount / parsed.pageSize),
+  };
 }

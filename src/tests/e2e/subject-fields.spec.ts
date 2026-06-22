@@ -117,8 +117,6 @@ test.describe('"grande area" management', () => {
     await page.goto("/app/professor/grandes-areas");
 
     await expect(page).toHaveURL(ROLE_HOME_PATHS.STUDENT);
-    await expect(
-      page.getByText("Área STUDENT"),
-    ).toBeVisible();
+    await expect(page.getByText("Área do aluno")).toBeVisible();
   });
 });
