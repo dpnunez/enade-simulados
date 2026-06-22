@@ -4,12 +4,14 @@ import { hasRole } from "@auth/authorization";
 import { auth } from "@auth/server";
 
 import {
+  questionListQuerySchema,
   questionInputSchema,
   type QuestionInput,
 } from "@/features/questions/question.schema";
 import {
   QuestionDomainError,
   createQuestion,
+  listQuestionsPaginated,
 } from "@/features/questions/question.service";
 
 async function parseJson(request: Request) {
@@ -61,4 +63,21 @@ export async function POST(request: Request) {
     }
     throw error;
   }
+}
+
+export async function GET(request: Request) {
+  const session = await auth.api.getSession({ headers: await headers() });
+
+  if (!session || !hasRole(session, "TEACHER")) {
+    return Response.json(
+      { success: false, error: "UNAUTHORIZED" },
+      { status: 401 },
+    );
+  }
+
+  const params = Object.fromEntries(new URL(request.url).searchParams);
+  const query = questionListQuerySchema.parse(params);
+  const result = await listQuestionsPaginated(query);
+
+  return Response.json({ success: true, ...result });
 }

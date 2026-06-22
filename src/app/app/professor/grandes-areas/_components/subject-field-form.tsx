@@ -1,12 +1,11 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CheckCircle2, CircleAlert } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,6 +26,7 @@ type SubjectFieldFormProps = {
   subjectField?: SubjectFieldFormValue;
   onSaved?: (subjectField: SavedSubjectField) => void;
   onCancel?: () => void;
+  afterSaveHref?: string;
   className?: string;
 };
 
@@ -64,13 +64,12 @@ export function SubjectFieldForm({
   subjectField,
   onSaved,
   onCancel,
+  afterSaveHref,
   className,
 }: SubjectFieldFormProps) {
   const router = useRouter();
   const formId = useId();
   const isEditing = Boolean(subjectField);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
   const form = useForm<SubjectFieldInput>({
     resolver: zodResolver(subjectFieldInputSchema),
     defaultValues: valuesFromSubjectField(subjectField),
@@ -79,60 +78,48 @@ export function SubjectFieldForm({
 
   useEffect(() => {
     form.reset(valuesFromSubjectField(subjectField));
-    setError(null);
-    setSuccess(null);
   }, [form, subjectField]);
 
   async function onSubmit(values: SubjectFieldInput) {
-    setError(null);
-    setSuccess(null);
+    try {
+      const response = await fetch(
+        isEditing
+          ? `/api/subject-fields/${subjectField?.id}`
+          : "/api/subject-fields",
+        {
+          method: isEditing ? "PATCH" : "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(values),
+        },
+      );
+      const payload = await response.json();
 
-    const response = await fetch(
-      isEditing ? `/api/subject-fields/${subjectField?.id}` : "/api/subject-fields",
-      {
-        method: isEditing ? "PATCH" : "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(values),
-      },
-    );
-    const payload = await response.json();
+      if (!response.ok || !payload.success) {
+        toast.error(messageForError(payload.error));
+        return;
+      }
 
-    if (!response.ok || !payload.success) {
-      setError(messageForError(payload.error));
+      toast.success(
+        isEditing
+          ? "Grande area atualizada com sucesso."
+          : "Grande area criada com sucesso.",
+      );
+      if (!isEditing) {
+        form.reset(emptyValues);
+      }
+      onSaved?.(payload.subjectField);
+      if (afterSaveHref) {
+        router.push(afterSaveHref);
+      }
+      router.refresh();
+    } catch {
+      toast.error("Nao foi possivel salvar a grande area.");
       return;
     }
-
-    if (isEditing) {
-      setSuccess("Grande area atualizada com sucesso.");
-    } else {
-      form.reset(emptyValues);
-      setSuccess("Grande area criada com sucesso.");
-    }
-    onSaved?.(payload.subjectField);
-    router.refresh();
   }
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className={cn("space-y-4", className)}>
-      {error ? (
-        <Alert variant="destructive" role="alert">
-          <CircleAlert aria-hidden="true" />
-          <div>
-            <AlertTitle>Falha ao salvar</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-          </div>
-        </Alert>
-      ) : null}
-      {success ? (
-        <Alert role="status">
-          <CheckCircle2 aria-hidden="true" />
-          <div>
-            <AlertTitle>{isEditing ? "Alteracao salva" : "Cadastro criado"}</AlertTitle>
-            <AlertDescription>{success}</AlertDescription>
-          </div>
-        </Alert>
-      ) : null}
-
       <div className="space-y-2">
         <Label htmlFor={`${formId}-title`}>Titulo</Label>
         <Input

@@ -5,7 +5,14 @@ import { notFound } from "next/navigation";
 import { requireRole } from "@auth/session";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   getQuestionForEdit,
   QuestionDomainError,
@@ -37,18 +44,6 @@ export default async function EditarQuestaoPage({ params }: EditQuestionPageProp
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-semibold tracking-normal">Editar questao</h1>
-          <p className="text-sm text-muted-foreground">
-            Atualize enunciado, metadados e alternativas da questao.
-          </p>
-        </div>
-        <Button asChild variant="outline">
-          <Link href="/app/professor/questoes">Voltar para lista</Link>
-        </Button>
-      </div>
-
       {subjectFields.length === 0 ? (
         <Alert role="status">
           <Info aria-hidden="true" />
@@ -63,10 +58,15 @@ export default async function EditarQuestaoPage({ params }: EditQuestionPageProp
 
       <Card>
         <CardHeader>
-          <CardTitle>Dados da questao</CardTitle>
+          <CardTitle>Editar questao</CardTitle>
           <CardDescription>
             As alternativas sao substituidas em conjunto ao salvar alteracoes.
           </CardDescription>
+          <CardAction>
+            <Button asChild variant="outline">
+              <Link href="/app/professor/questoes">Voltar para lista</Link>
+            </Button>
+          </CardAction>
         </CardHeader>
         <CardContent>
           <QuestionForm

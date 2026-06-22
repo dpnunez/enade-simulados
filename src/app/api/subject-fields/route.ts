@@ -8,6 +8,7 @@ import type { SubjectFieldInput } from "@/features/subject-fields/subject-field.
 import {
   SubjectFieldDomainError,
   createSubjectField,
+  listSubjectFields,
 } from "@/features/subject-fields/subject-field.service";
 
 async function parseJson(request: Request) {
@@ -56,4 +57,18 @@ export async function POST(request: Request) {
     }
     throw error;
   }
+}
+
+export async function GET() {
+  const session = await auth.api.getSession({ headers: await headers() });
+
+  if (!session || !hasRole(session, "TEACHER")) {
+    return Response.json(
+      { success: false, error: "UNAUTHORIZED" },
+      { status: 401 },
+    );
+  }
+
+  const rows = await listSubjectFields();
+  return Response.json({ success: true, rows });
 }

@@ -56,6 +56,40 @@ test.describe("question deduplication", () => {
     await eraseQuestionE2eData();
   });
 
+  test("teacher creates, edits from table, and deletes a question", async ({
+    page,
+  }) => {
+    const subjectFieldId = await ensureQuestionSubjectField("Tabela CRUD");
+    const description = buildQuestionDescription("Tabela CRUD");
+
+    await loginAs(page, TEST_USERS.teacher);
+    await page.goto("/app/professor/questoes/nova");
+
+    await fillCreateQuestionForm(page, subjectFieldId, description);
+    await page.getByRole("button", { name: "Criar questao" }).click();
+    await expect(page).toHaveURL(/\/app\/professor\/questoes$/);
+    await expect(page.getByText("Questao criada com sucesso.")).toBeVisible();
+    await expect(page.getByText("E2E Questao Tabela CRUD")).toBeVisible();
+    await expect(page.getByText("1 questoes cadastradas")).toBeVisible();
+
+    await page.getByRole("link", { name: "Editar" }).first().click();
+    await expect(page).toHaveURL(/\/app\/professor\/questoes\/.+/);
+    await expect(await descriptionEditor(page)).toContainText(
+      "E2E Questao Tabela CRUD",
+    );
+
+    await page.goto("/app/professor/questoes");
+    await page.getByRole("button", { name: "Deletar" }).first().click();
+    await expect(
+      page.getByText("Esta acao remove a questao e suas alternativas do banco."),
+    ).toBeVisible();
+    await page.getByRole("button", { name: "Confirmar delecao" }).click();
+    await expect(page.getByText("Questao deletada com sucesso.")).toBeVisible();
+    await expect
+      .poll(() => countQuestionsByEquivalentDescription(description))
+      .toBe(0);
+  });
+
   test("teacher cannot create an equivalent duplicate question", async ({ page }) => {
     const subjectFieldId = await ensureQuestionSubjectField("Deduplicacao Criacao");
     const description = buildQuestionDescription("Deduplicacao Criacao");

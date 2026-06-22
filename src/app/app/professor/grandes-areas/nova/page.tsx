@@ -1,5 +1,5 @@
-import { Plus } from "lucide-react";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 import { requireRole } from "@auth/session";
 import { Button } from "@/components/ui/button";
@@ -12,30 +12,31 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-import { SubjectFieldsTable } from "./_components/subject-fields-table";
+import { SubjectFieldForm } from "../_components/subject-field-form";
 
-export default async function GrandesAreasPage() {
+export default async function NovaGrandeAreaPage() {
   await requireRole("TEACHER");
 
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Grandes areas cadastradas</CardTitle>
+          <CardTitle>Criar grande area</CardTitle>
           <CardDescription>
-            Use a tabela para filtrar, ordenar, editar ou remover registros.
+            Use um titulo claro e uma descricao curta para orientar o cadastro de
+            questoes.
           </CardDescription>
           <CardAction>
-            <Button asChild>
-              <Link href="/app/professor/grandes-areas/nova">
-                <Plus aria-hidden="true" />
-                Criar grande area
+            <Button asChild variant="outline">
+              <Link href="/app/professor/grandes-areas">
+                <ArrowLeft aria-hidden="true" />
+                Voltar para listagem
               </Link>
             </Button>
           </CardAction>
         </CardHeader>
         <CardContent>
-          <SubjectFieldsTable />
+          <SubjectFieldForm afterSaveHref="/app/professor/grandes-areas" />
         </CardContent>
       </Card>
     </div>

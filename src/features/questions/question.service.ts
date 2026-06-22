@@ -4,7 +4,10 @@ import { Prisma } from "@prisma-generated-client";
 import {
   questionIdSchema,
   questionInputSchema,
+  questionListQuerySchema,
   type ParsedQuestionInput,
+  type ParsedQuestionListQuery,
+  type QuestionListQueryInput,
   type QuestionInput,
 } from "./question.schema";
 import { createQuestionDescriptionHash } from "./question-description-hash";
@@ -22,6 +25,7 @@ export class QuestionDomainError extends Error {
 }
 
 export type QuestionListItem = Awaited<ReturnType<typeof listQuestions>>[number];
+export type PaginatedQuestionList = Awaited<ReturnType<typeof listQuestionsPaginated>>;
 export type QuestionEditable = Awaited<ReturnType<typeof getQuestionForEdit>>;
 
 const questionInclude = {
@@ -97,6 +101,39 @@ export async function listQuestions() {
     include: questionInclude,
     orderBy: { updatedAt: "desc" },
   });
+}
+
+function orderByForQuestionList(query: ParsedQuestionListQuery) {
+  if (query.sort === "subjectField") {
+    return { subjectField: { title: query.direction } };
+  }
+
+  return { [query.sort]: query.direction };
+}
+
+export async function listQuestionsPaginated(
+  input: Partial<QuestionListQueryInput> = {},
+) {
+  const query = questionListQuerySchema.parse(input);
+  const skip = (query.page - 1) * query.pageSize;
+
+  const [rows, rowCount] = await prisma.$transaction([
+    prisma.question.findMany({
+      include: questionInclude,
+      orderBy: orderByForQuestionList(query),
+      skip,
+      take: query.pageSize,
+    }),
+    prisma.question.count(),
+  ]);
+
+  return {
+    rows,
+    rowCount,
+    page: query.page,
+    pageSize: query.pageSize,
+    pageCount: Math.max(1, Math.ceil(rowCount / query.pageSize)),
+  };
 }
 
 export async function getQuestionForEdit(questionId: string) {
