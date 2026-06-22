@@ -15,7 +15,7 @@ test.describe("user invitations", () => {
     await ereaseInvitationRelatedData();
 
     await loginAs(page, TEST_USERS.admin);
-    await page.goto("/app/admin");
+    await page.goto("/app/admin/convites");
 
     const inviteEmail = buildInvitationEmail("teacher-accepted");
     await page.getByLabel("Email").fill(inviteEmail);
@@ -23,6 +23,7 @@ test.describe("user invitations", () => {
     await page.getByRole("button", { name: "Enviar convite" }).click();
 
     await page.waitForResponse("/api/invitations");
+    await expect(page.getByText(inviteEmail)).toBeVisible();
 
     const token = await getInvitationTokenFromFile();
     const nick = "Maria Silva";
@@ -58,7 +59,7 @@ test.describe("user invitations", () => {
     await ereaseInvitationRelatedData();
     await loginAs(page, TEST_USERS.admin);
 
-    await page.goto("/app/admin");
+    await page.goto("/app/admin/convites");
 
     const inviteEmail = buildInvitationEmail("cancelled");
     await page.getByLabel("Email").fill(inviteEmail);
@@ -66,13 +67,13 @@ test.describe("user invitations", () => {
     await page.getByRole("button", { name: "Enviar convite" }).click();
 
     await page.waitForResponse("/api/invitations");
-
-    await page.reload();
+    await expect(page.getByText(inviteEmail)).toBeVisible();
 
     const token = await getInvitationTokenFromFile();
 
-    await page.getByRole("button", { name: "Cancelar" }).last().click();
-    await page.reload();
+    const invitationRow = page.locator("tr", { hasText: inviteEmail });
+    await invitationRow.getByRole("button", { name: "Cancelar" }).click();
+    await expect(invitationRow).toBeHidden();
 
     await page.context().clearCookies();
 
@@ -82,6 +83,33 @@ test.describe("user invitations", () => {
     ).toBeVisible();
     await expect(
       page.getByText("Este convite não está mais disponível."),
+    ).toBeVisible();
+  });
+
+  test("admin recebe erro especifico ao convidar email ja cadastrado", async ({
+    page,
+  }) => {
+    await loginAs(page, TEST_USERS.admin);
+
+    await page.goto("/app/admin/convites");
+    await page.getByLabel("Email").fill(TEST_USERS.teacher.email);
+    await page.getByLabel("Papel").selectOption("TEACHER");
+
+    const responsePromise = page.waitForResponse(
+      (response) =>
+        response.url().endsWith("/api/invitations") &&
+        response.request().method() === "POST",
+    );
+    await page.getByRole("button", { name: "Enviar convite" }).click();
+    const response = await responsePromise;
+
+    expect(response.status()).toBe(409);
+    await expect(response.json()).resolves.toMatchObject({
+      error: "EMAIL_ALREADY_REGISTERED",
+    });
+
+    await expect(
+      page.getByText("Este email já possui uma conta ativa."),
     ).toBeVisible();
   });
 });

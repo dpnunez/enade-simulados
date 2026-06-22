@@ -6,10 +6,11 @@ import { loginAs } from "./helpers/auth";
 test("faz login com usuário seeded e abre a área privada", async ({ page }) => {
   await loginAs(page, TEST_USERS.admin);
 
-  await expect(page.getByText("Convidar usuário")).toBeVisible();
-  await expect(page.getByText("Convites pendentes")).toBeVisible();
-  await expect(page.getByText(TEST_USERS.admin.email, { exact: true })).toBeVisible();
-  await expect(page).toHaveURL(/\/app\/admin$/);
+  await expect(page.getByText("Usuários cadastrados")).toBeVisible();
+  await expect(
+    page.getByRole("cell", { name: TEST_USERS.admin.email, exact: true }),
+  ).toBeVisible();
+  await expect(page).toHaveURL(/\/app\/admin\/usuarios$/);
 });
 
 test("redireciona a raiz para login quando não há sessão", async ({ page }) => {

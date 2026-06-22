@@ -7,9 +7,12 @@ import {
   acceptInvitationSchema,
   cancelInvitationSchema,
   createInvitationSchema,
+  invitationsQuerySchema,
   type AcceptInvitationInput,
   type CancelInvitationInput,
   type CreateInvitationInput,
+  type InvitationsQuery,
+  type ParsedInvitationsQuery,
 } from "./invitation.schema";
 import {
   generateInvitationToken,
@@ -28,6 +31,22 @@ export class InvitationDomainError extends Error {
     super(code);
     this.name = "InvitationDomainError";
   }
+}
+
+export interface InvitationRow {
+  id: string;
+  email: string;
+  role: Role;
+  status: InvitationStatus;
+  createdAt: string;
+}
+
+export interface InvitationsPage {
+  rows: InvitationRow[];
+  rowCount: number;
+  page: number;
+  pageSize: number;
+  pageCount: number;
 }
 
 const prismaKnownRequestErrorCode = {
@@ -80,6 +99,48 @@ export async function listPendingInvitations() {
     where: { status: InvitationStatus.PENDING },
     orderBy: { createdAt: "desc" },
   });
+}
+
+function buildInvitationOrderBy(
+  input: ParsedInvitationsQuery,
+): Prisma.InvitationOrderByWithRelationInput[] {
+  return [{ [input.sort]: input.direction }, { id: "asc" }];
+}
+
+export async function listPendingInvitationsPage(
+  input: InvitationsQuery,
+): Promise<InvitationsPage> {
+  const parsed = invitationsQuerySchema.parse(input);
+  const skip = (parsed.page - 1) * parsed.pageSize;
+  const where = { status: InvitationStatus.PENDING };
+
+  const [invitations, rowCount] = await Promise.all([
+    prisma.invitation.findMany({
+      where,
+      orderBy: buildInvitationOrderBy(parsed),
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        status: true,
+        createdAt: true,
+      },
+      skip,
+      take: parsed.pageSize,
+    }),
+    prisma.invitation.count({ where }),
+  ]);
+
+  return {
+    rows: invitations.map((invitation) => ({
+      ...invitation,
+      createdAt: invitation.createdAt.toISOString(),
+    })),
+    rowCount,
+    page: parsed.page,
+    pageSize: parsed.pageSize,
+    pageCount: Math.ceil(rowCount / parsed.pageSize),
+  };
 }
 
 export async function resolveInvitationToken(token: string) {

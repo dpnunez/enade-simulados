@@ -10,6 +10,7 @@ import {
   LogOut,
   PenLine,
   ShieldCheck,
+  UserPlus,
   Trophy,
   UserRound,
   UsersRound,
@@ -64,10 +65,16 @@ const ROLE_LABELS = {
 const ROLE_NAV_ITEMS = {
   ADMIN: [
     {
-      href: "/app/admin",
-      label: "Admin",
-      description: "Convites e gestão de acesso",
+      href: "/app/admin/usuarios",
+      label: "Usuários",
+      description: "Contas cadastradas",
       icon: UsersRound,
+    },
+    {
+      href: "/app/admin/convites",
+      label: "Convites",
+      description: "Criar e acompanhar convites",
+      icon: UserPlus,
     },
   ],
   STUDENT: [
