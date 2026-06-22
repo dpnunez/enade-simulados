@@ -25,14 +25,10 @@ test.describe('"grande area" management', () => {
     await loginAs(page, TEST_USERS.teacher);
     await page.goto("/app/professor/grandes-areas");
 
-    await expect(
-      page.getByRole("heading", { name: "Grandes areas" }),
-    ).toBeVisible();
+    await expect(page.getByText("Grandes areas cadastradas")).toBeVisible();
 
     await page.goto("/app/professor/grandes-areas/nova");
-    await expect(
-      page.getByRole("heading", { name: "Criar grande area" }),
-    ).toBeVisible();
+    await expect(page.getByText("Criar grande area").first()).toBeVisible();
     await page.getByLabel("Titulo").fill(initialTitle);
     await page
       .getByLabel("Descricao")

@@ -48,6 +48,25 @@ export const createInvitationSchema = z.object({
   role: invitationRoleSchema,
 });
 
+export const invitationSortFields = ["createdAt", "email", "role"] as const;
+export const invitationDirections = ["asc", "desc"] as const;
+
+export const invitationsQuerySchema = z.object({
+  page: z.coerce
+    .number()
+    .int("Informe uma pagina inteira.")
+    .min(1, "Informe uma pagina maior que zero.")
+    .default(1),
+  pageSize: z.coerce
+    .number()
+    .int("Informe um tamanho de pagina inteiro.")
+    .min(10, "Informe pelo menos 10 linhas por pagina.")
+    .max(100, "Informe no maximo 100 linhas por pagina.")
+    .default(20),
+  sort: z.enum(invitationSortFields).default("createdAt"),
+  direction: z.enum(invitationDirections).default("desc"),
+});
+
 export const cancelInvitationSchema = z.object({
   invitationId: nonEmptyStringSchema,
 });
@@ -65,5 +84,9 @@ export const acceptInvitationSchema = z
   });
 
 export type CreateInvitationInput = z.infer<typeof createInvitationSchema>;
+export type InvitationsQuery = z.input<typeof invitationsQuerySchema>;
+export type ParsedInvitationsQuery = z.output<typeof invitationsQuerySchema>;
+export type InvitationSortField = (typeof invitationSortFields)[number];
+export type InvitationDirection = (typeof invitationDirections)[number];
 export type CancelInvitationInput = z.infer<typeof cancelInvitationSchema>;
 export type AcceptInvitationInput = z.infer<typeof acceptInvitationSchema>;

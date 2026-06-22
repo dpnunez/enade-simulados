@@ -18,6 +18,7 @@ const mocks = vi.hoisted(() => ({
       findFirst: vi.fn(),
       create: vi.fn(),
       findMany: vi.fn(),
+      count: vi.fn(),
       findUnique: vi.fn(),
       update: vi.fn(),
     },
@@ -51,6 +52,7 @@ import {
   acceptInvitation,
   cancelInvitation,
   createInvitation,
+  listPendingInvitationsPage,
   resolveInvitationToken,
 } from "./invitation.service";
 
@@ -120,6 +122,58 @@ describe("invitation.service", () => {
     expect(mocks.prisma.invitation.update).toHaveBeenCalledWith(
       expect.objectContaining({ where: { id: "inv_1" } }),
     );
+  });
+
+  it("lista convites pendentes com metadados de paginacao", async () => {
+    const createdAt = new Date("2026-01-10T12:00:00.000Z");
+    mocks.prisma.invitation.findMany.mockResolvedValue([
+      {
+        id: "inv_1",
+        email: "teacher@enade.local",
+        role: Role.TEACHER,
+        status: InvitationStatus.PENDING,
+        createdAt,
+      },
+    ]);
+    mocks.prisma.invitation.count.mockResolvedValue(21);
+
+    const result = await listPendingInvitationsPage({ page: 2, pageSize: 20 });
+
+    expect(result).toEqual({
+      rows: [
+        {
+          id: "inv_1",
+          email: "teacher@enade.local",
+          role: Role.TEACHER,
+          status: InvitationStatus.PENDING,
+          createdAt: createdAt.toISOString(),
+        },
+      ],
+      rowCount: 21,
+      page: 2,
+      pageSize: 20,
+      pageCount: 2,
+    });
+    expect(mocks.prisma.invitation.findMany).toHaveBeenCalledWith({
+      where: { status: InvitationStatus.PENDING },
+      orderBy: [{ createdAt: "desc" }, { id: "asc" }],
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        status: true,
+        createdAt: true,
+      },
+      skip: 20,
+      take: 20,
+    });
+  });
+
+  it("rejeita parametros invalidos da listagem antes da consulta", async () => {
+    await expect(listPendingInvitationsPage({ page: 0 })).rejects.toThrowError();
+
+    expect(mocks.prisma.invitation.findMany).not.toHaveBeenCalled();
+    expect(mocks.prisma.invitation.count).not.toHaveBeenCalled();
   });
 
   it("accepts invitation with transaction and creates credential account using submitted nick", async () => {

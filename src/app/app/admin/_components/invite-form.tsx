@@ -2,18 +2,14 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  CheckCircle2,
-  CircleAlert,
   GraduationCap,
   LoaderCircle,
   Mail,
   Send,
 } from "lucide-react";
-import { HTTPError } from "ky";
-import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
 
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -38,95 +34,73 @@ type CreateInvitationResponse = {
   error?: string;
 };
 
-function getCreateInvitationErrorMessage(
-  requestError: HTTPError,
-  payload: CreateInvitationResponse | null,
-) {
-  if (payload?.error === "EMAIL_ALREADY_REGISTERED") {
+function getCreateInvitationErrorMessage(errorCode?: string, status?: number) {
+  if (errorCode === "EMAIL_ALREADY_REGISTERED") {
     return "Este email já possui uma conta ativa.";
   }
 
-  if (payload?.error === "PENDING_INVITATION_EXISTS") {
+  if (errorCode === "PENDING_INVITATION_EXISTS") {
     return "Já existe um convite pendente para este email.";
   }
 
-  if (payload?.error === "VALIDATION_ERROR" || requestError.response.status === 400) {
+  if (errorCode === "VALIDATION_ERROR" || status === 400) {
     return "Revise os dados do formulário e tente novamente.";
   }
 
-  if (requestError.response.status === 401) {
+  if (errorCode === "UNAUTHORIZED" || status === 401) {
     return "Sua sessão não tem permissão para enviar convites.";
   }
 
   return "Não foi possível criar o convite.";
 }
 
-export function InviteForm() {
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+type InviteFormProps = {
+  onCreated?: () => void | Promise<void>;
+};
+
+export function InviteForm({ onCreated }: InviteFormProps) {
   const form = useForm<CreateInvitationInput>({
     resolver: zodResolver(createInvitationSchema),
     defaultValues: { email: "", role: "STUDENT" },
   });
 
   async function onSubmit(values: CreateInvitationInput) {
-    setError(null);
-    setSuccess(null);
-
     try {
       const payload = await http
         .post("invitations", {
           json: values,
+          throwHttpErrors: false,
         })
         .json<CreateInvitationResponse>();
 
       if (!payload.success) {
-        setError("Não foi possível criar o convite.");
+        toast.error(getCreateInvitationErrorMessage(payload.error));
         return;
       }
     } catch (requestError) {
-      if (requestError instanceof HTTPError) {
-        const payload = await requestError.response
-          .json<CreateInvitationResponse>()
-          .catch(() => null);
-
-        setError(getCreateInvitationErrorMessage(requestError, payload));
-        return;
-      }
-
-      setError(
+      toast.error(
         requestError instanceof Error
           ? requestError.message
           : "Não foi possível criar o convite.",
+        {
+          description:
+            "Se o problema continuar, atualize a página e tente novamente.",
+        },
       );
       return;
     }
 
     form.reset({ email: "", role: values.role });
-    setSuccess("O convite foi enviado para o email informado.");
+    await onCreated?.();
+    toast.success("O convite foi enviado para o email informado.");
   }
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} noValidate className="space-y-5">
-      {error ? (
-        <Alert variant="destructive">
-          <CircleAlert aria-hidden="true" />
-          <div>
-            <AlertTitle>Falha ao criar convite</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-          </div>
-        </Alert>
-      ) : null}
-      {success ? (
-        <Alert>
-          <CheckCircle2 aria-hidden="true" />
-          <div>
-            <AlertTitle>Convite enviado</AlertTitle>
-            <AlertDescription>{success}</AlertDescription>
-          </div>
-        </Alert>
-      ) : null}
-
+    <form
+      onSubmit={form.handleSubmit(onSubmit)}
+      noValidate
+      className="flex flex-col gap-5"
+    >
       <FieldGroup className="gap-4">
         <Controller
           name="email"
@@ -200,9 +174,9 @@ export function InviteForm() {
           disabled={form.formState.isSubmitting}
         >
           {form.formState.isSubmitting ? (
-            <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
+            <LoaderCircle className="animate-spin" aria-hidden="true" />
           ) : (
-            <Send className="h-4 w-4" aria-hidden="true" />
+            <Send aria-hidden="true" />
           )}
           {form.formState.isSubmitting ? "Enviando..." : "Enviar convite"}
         </Button>

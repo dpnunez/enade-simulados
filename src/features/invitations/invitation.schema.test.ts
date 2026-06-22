@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
+import { z } from "zod";
 
 import {
   acceptInvitationSchema,
   cancelInvitationSchema,
   createInvitationSchema,
+  invitationsQuerySchema,
 } from "./invitation.schema";
 
 describe("invitation.schema", () => {
@@ -60,6 +62,57 @@ describe("invitation.schema", () => {
       expect(
         cancelInvitationSchema.safeParse({ invitationId: "" }).success,
       ).toBe(false);
+    });
+  });
+
+  describe("invitationsQuerySchema", () => {
+    it("aplica defaults para paginacao e ordenacao", () => {
+      expect(invitationsQuerySchema.parse({})).toEqual({
+        page: 1,
+        pageSize: 20,
+        sort: "createdAt",
+        direction: "desc",
+      });
+    });
+
+    it("coage parametros validos de query string", () => {
+      expect(
+        invitationsQuerySchema.parse({
+          page: "2",
+          pageSize: "50",
+          sort: "email",
+          direction: "asc",
+        }),
+      ).toEqual({
+        page: 2,
+        pageSize: 50,
+        sort: "email",
+        direction: "asc",
+      });
+    });
+
+    it("rejeita pagina invalida", () => {
+      expect(() => invitationsQuerySchema.parse({ page: "0" })).toThrow(
+        z.ZodError,
+      );
+    });
+
+    it("rejeita pageSize fora do limite operacional", () => {
+      expect(() => invitationsQuerySchema.parse({ pageSize: "101" })).toThrow(
+        z.ZodError,
+      );
+    });
+
+    it("restringe campos de ordenacao permitidos", () => {
+      expect(() =>
+        invitationsQuerySchema.parse({ sort: "updatedAt" }),
+      ).toThrow(z.ZodError);
+    });
+
+    it("restringe direcao de ordenacao", () => {
+      expect(() =>
+        invitationsQuerySchema.parse({ direction: "sideways" }),
+      ).toThrow(z.ZodError);
     });
   });
 

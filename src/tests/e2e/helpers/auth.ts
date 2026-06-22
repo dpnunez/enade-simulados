@@ -3,7 +3,7 @@ import { type Page } from "@playwright/test";
 import type { TestUser } from "../fixtures/users";
 
 export const ROLE_HOME_PATHS = {
-  ADMIN: "/app/admin",
+  ADMIN: "/app/admin/usuarios",
   STUDENT: "/app/aluno",
   TEACHER: "/app/professor",
 } as const;

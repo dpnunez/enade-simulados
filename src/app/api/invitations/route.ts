@@ -2,17 +2,19 @@ import { headers } from "next/headers";
 
 import { hasRole } from "@auth/authorization";
 import { auth } from "@auth/server";
-import { prisma } from "@infra/db/prisma";
 
 import { sendInvitationEmail } from "@/features/invitations/invitation-email.adapter";
-import { createInvitationSchema } from "@/features/invitations/invitation.schema";
+import {
+  createInvitationSchema,
+  invitationsQuerySchema,
+} from "@/features/invitations/invitation.schema";
 import {
   InvitationDomainError,
   createInvitation,
-  listPendingInvitations,
+  listPendingInvitationsPage,
 } from "@/features/invitations/invitation.service";
 
-export async function GET() {
+export async function GET(request: Request) {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -24,21 +26,24 @@ export async function GET() {
     );
   }
 
-  const [users, invitations] = await Promise.all([
-    prisma.user.findMany({
-      orderBy: { createdAt: "desc" },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        createdAt: true,
-      },
-    }),
-    listPendingInvitations(),
-  ]);
+  const parsed = invitationsQuerySchema.safeParse(
+    Object.fromEntries(new URL(request.url).searchParams),
+  );
 
-  return Response.json({ success: true, users, invitations });
+  if (!parsed.success) {
+    return Response.json(
+      {
+        success: false,
+        error: "VALIDATION_ERROR",
+        issues: parsed.error.issues,
+      },
+      { status: 400 },
+    );
+  }
+
+  const invitations = await listPendingInvitationsPage(parsed.data);
+
+  return Response.json({ success: true, ...invitations });
 }
 
 export async function POST(request: Request) {
