@@ -7,7 +7,7 @@ test("faz login com usuário seeded e abre a área privada", async ({ page }) =>
   await loginAs(page, TEST_USERS.admin);
 
   await expect(page.getByText("Convidar usuário")).toBeVisible();
-  await expect(page.getByText("Sessão ativa")).toBeVisible();
+  await expect(page.getByText("Convites pendentes")).toBeVisible();
   await expect(page.getByText(TEST_USERS.admin.email, { exact: true })).toBeVisible();
   await expect(page).toHaveURL(/\/app\/admin$/);
 });
@@ -17,6 +17,18 @@ test("redireciona a raiz para login quando não há sessão", async ({ page }) =
   await page.goto("/");
 
   await expect(page).toHaveURL(/\/login$/);
+});
+
+test("permite visualizar e ocultar a senha no login", async ({ page }) => {
+  await page.goto("/login");
+
+  const passwordInput = page.getByLabel("Senha");
+
+  await expect(passwordInput).toHaveAttribute("type", "password");
+  await page.getByRole("button", { name: "Mostrar valor do campo" }).click();
+  await expect(passwordInput).toHaveAttribute("type", "text");
+  await page.getByRole("button", { name: "Ocultar valor do campo" }).click();
+  await expect(passwordInput).toHaveAttribute("type", "password");
 });
 
 test("redireciona a raiz para a área da role quando há sessão", async ({ page }) => {
