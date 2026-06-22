@@ -1,6 +1,6 @@
 # State
 
-**Last Updated:** 2026-06-21T00:00:00-03:00
+**Last Updated:** 2026-06-21T16:05:00-03:00
 
 ---
 
@@ -146,9 +146,17 @@
 **Trade-off:** Grandes areas usam API simples sem paginacao por volume esperado baixo; questoes usam API paginada para manter a listagem escalavel.
 **Impact:** A implementacao deve adicionar `@tanstack/react-query`, criar/ajustar APIs de leitura, usar `sonner` para feedbacks transientes de sucesso/erro em formularios e mutacoes, paginar `GET /api/questions`, manter `GET /api/subject-fields` simples, e evitar alteracoes em `src/app/app/professor/ranking`, `src/app/api/teacher/simulation-ranking` e `src/features/simulation-ranking`.
 
+### AD-021: Listagens do professor usam React Query no layout privado (2026-06-21)
+
+**Decision:** Implementar `QueryClientProvider` no layout privado `/app` e consumir `GET /api/subject-fields` e `GET /api/questions` nas tabelas client-side.
+**Reason:** As listagens de professor agora precisam de React Query para loading/error/invalidation sem manter dados server-side duplicados.
+**Trade-off:** Todo `/app` recebe o provider client, mas paginas publicas seguem sem esse wrapper.
+**Impact:** Mutacoes de grandes areas e questoes invalidam suas query keys; feedback transiente usa `sonner`; ranking nao foi alterado.
+
 ## Active Blockers
 
-Nenhum blocker ativo registrado no momento.
+- `pnpm build` com `.env.local` carregado falha porque `next/font` tenta buscar Inter em `fonts.googleapis.com` e a rede nao esta disponivel/autorizada nesta sessao.
+- `pnpm test:e2e` teve 18/19 testes passando; o teste legado `src/tests/e2e/login.spec.ts` espera o texto `Sessao ativa`, que nao aparece no snapshot atual da pagina admin. Os fluxos novos de grandes areas e questoes passaram.
 
 ## Lessons Learned
 
@@ -196,6 +204,7 @@ Nenhum blocker ativo registrado no momento.
 - [x] Planejar `.specs/features/teacher-simulation-ranking`: ranking paginado de estudantes para professores com pontuacao ponderada
 - [x] Implementar `.specs/features/teacher-simulation-ranking`: service/API/page, React Table, fixtures E2E e gates completos
 - [x] Planejar `.specs/features/professor-content-organization`: telas separadas para grandes areas, UX de questoes e listagens com React Table/React Query
+- [x] Implementar `.specs/features/professor-content-organization`: telas separadas, APIs de leitura, tabelas React Query/React Table e feedback com sonner
 - [ ] Revisar o roadmap quando a área administrativa ganhar CRUD real
 - [x] Definir provedor de email para envio real de convites e reset de senha em produção
 - [ ] Implementar `.specs/features/gmail-smtp-email`: Gmail SMTP para convites e reset de senha

@@ -26,22 +26,29 @@ test.describe('"grande area" management', () => {
     await page.goto("/app/professor/grandes-areas");
 
     await expect(
-      page.getByRole("heading", { name: "Gerenciar grandes areas" }),
+      page.getByRole("heading", { name: "Grandes areas" }),
     ).toBeVisible();
 
+    await page.goto("/app/professor/grandes-areas/nova");
+    await expect(
+      page.getByRole("heading", { name: "Criar grande area" }),
+    ).toBeVisible();
     await page.getByLabel("Titulo").fill(initialTitle);
     await page
       .getByLabel("Descricao")
       .fill("Descricao criada pelo fluxo e2e de grandes areas.");
     await page.getByLabel("Hexadecimal").fill("#2563EB");
     await page.getByRole("button", { name: "Criar grande area" }).click();
-    await expect(page.getByRole("status")).toContainText(
+    await expect(page).toHaveURL(/\/app\/professor\/grandes-areas$/);
+    await expect(page.getByText(initialTitle)).toBeVisible();
+    await expect(page.getByLabel("Cor #2563EB")).toBeVisible();
+    await expect(page.getByText(
       "Grande area criada com sucesso.",
-    );
+    )).toBeVisible();
 
     await page.reload();
     await expect(page.getByText(initialTitle)).toBeVisible();
-    await expect(page.getByText("#2563EB")).toBeVisible();
+    await expect(page.getByLabel("Cor #2563EB")).toBeVisible();
 
     await page.getByRole("button", { name: "Editar" }).click();
     await page.getByLabel("Titulo").last().fill(updatedTitle);
@@ -52,15 +59,17 @@ test.describe('"grande area" management', () => {
     await page.getByLabel("Hexadecimal").last().fill("#16A34A");
     await page.getByRole("button", { name: "Salvar alteracoes" }).click();
     await expect(page.getByText(updatedTitle)).toBeVisible();
-    await expect(page.getByText("#16A34A")).toBeVisible();
+    await expect(page.getByLabel("Cor #16A34A")).toBeVisible();
 
     await page.reload();
     await expect(page.getByText(updatedTitle)).toBeVisible();
-    await expect(page.getByText("#16A34A")).toBeVisible();
+    await expect(page.getByLabel("Cor #16A34A")).toBeVisible();
 
     await page.getByRole("button", { name: "Deletar" }).click();
     await expect(
-      page.getByText(`Esta acao remove a grande area "${updatedTitle}" do catalogo.`),
+      page.getByText(
+        `Esta acao remove a grande area "${updatedTitle}" e tambem remove as questoes relacionadas.`,
+      ),
     ).toBeVisible();
     await page.reload();
     await expect(page.getByText(updatedTitle)).toBeVisible();

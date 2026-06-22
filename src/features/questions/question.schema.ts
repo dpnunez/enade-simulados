@@ -8,6 +8,13 @@ const maxQuestionYear = 2100;
 
 const questionDifficulties = ["EASY", "MEDIUM", "HARD"] as const;
 const questionSources = ["ENADE", "MANUAL", "ADAPTED", "OTHER"] as const;
+const questionListSortFields = [
+  "updatedAt",
+  "year",
+  "difficulty",
+  "subjectField",
+] as const;
+const questionListDirections = ["asc", "desc"] as const;
 
 function normalizeMarkdown(value: string) {
   return value.trim();
@@ -62,6 +69,13 @@ const optionalYearSchema = z.preprocess(
 
 export const questionIdSchema = z.string().trim().min(1, "Questao invalida.");
 
+export const questionListQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).catch(1),
+  pageSize: z.coerce.number().int().min(5).max(50).catch(10),
+  sort: z.enum(questionListSortFields).catch("updatedAt"),
+  direction: z.enum(questionListDirections).catch("desc"),
+});
+
 export const questionAlternativeInputSchema = z.object({
   contentMarkdown: z
     .string()
@@ -107,3 +121,5 @@ export const questionInputSchema = z
 
 export type QuestionInput = z.input<typeof questionInputSchema>;
 export type ParsedQuestionInput = z.output<typeof questionInputSchema>;
+export type QuestionListQueryInput = z.input<typeof questionListQuerySchema>;
+export type ParsedQuestionListQuery = z.output<typeof questionListQuerySchema>;

@@ -114,14 +114,14 @@ A area logada do professor hoje concentra criacao e listagem de grandes areas em
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| PCO-01 | P1: Criar Grande Area Em Tela Dedicada | Design | Pending |
-| PCO-02 | P1: Criar Grande Area Em Tela Dedicada | Design | Pending |
-| PCO-03 | P1: Listar Grandes Areas Com Tabela Simples | Design | Pending |
-| PCO-04 | P1: Listar Grandes Areas Com Tabela Simples | Design | Pending |
-| PCO-05 | P1: Melhorar UX Do Cadastro De Questoes | Design | Pending |
-| PCO-06 | P1: Listar Questoes Com Tabela Paginada | Design | Pending |
-| PCO-07 | P1: Listar Questoes Com Tabela Paginada | Design | Pending |
-| PCO-08 | Edge cases: auth/error/loading/empty states | Design | Pending |
+| PCO-01 | P1: Criar Grande Area Em Tela Dedicada | Execute | Implemented |
+| PCO-02 | P1: Criar Grande Area Em Tela Dedicada | Execute | Implemented |
+| PCO-03 | P1: Listar Grandes Areas Com Tabela Simples | Execute | Implemented |
+| PCO-04 | P1: Listar Grandes Areas Com Tabela Simples | Execute | Implemented |
+| PCO-05 | P1: Melhorar UX Do Cadastro De Questoes | Execute | Implemented |
+| PCO-06 | P1: Listar Questoes Com Tabela Paginada | Execute | Implemented |
+| PCO-07 | P1: Listar Questoes Com Tabela Paginada | Execute | Implemented |
+| PCO-08 | Edge cases: auth/error/loading/empty states | Execute | Implemented |
 
 **Coverage:** 8 total, 8 mapped to tasks, 0 unmapped.
 
@@ -129,9 +129,16 @@ A area logada do professor hoje concentra criacao e listagem de grandes areas em
 
 ## Success Criteria
 
-- [ ] Professor consegue criar grande area em tela dedicada e retorna automaticamente para a listagem.
-- [ ] `/app/professor/grandes-areas` contem apenas listagem/tabela e acoes relacionadas.
-- [ ] Listagem de grandes areas usa React Table + React Query e API simples sem paginacao.
-- [ ] Formulario de questoes fica mais escaneavel, com controles e feedback mais claros.
-- [ ] Listagem de questoes usa React Table + React Query com API paginada.
-- [ ] Fluxos existentes de ranking permanecem sem alteracoes de arquivo ou comportamento.
+- [x] Professor consegue criar grande area em tela dedicada e retorna automaticamente para a listagem.
+- [x] `/app/professor/grandes-areas` contem apenas listagem/tabela e acoes relacionadas.
+- [x] Listagem de grandes areas usa React Table + React Query e API simples sem paginacao.
+- [x] Formulario de questoes fica mais escaneavel, com controles e feedback mais claros.
+- [x] Listagem de questoes usa React Table + React Query com API paginada.
+- [x] Fluxos existentes de ranking permanecem sem alteracoes de arquivo ou comportamento.
+
+## Implementation Notes
+
+- Implemented on 2026-06-21.
+- `pnpm test:unit` passed with 28 files and 187 tests.
+- `pnpm test:e2e` ran the full suite: feature flows for grandes areas and questoes passed; the suite has one unrelated/stale login assertion expecting text `Sessao ativa`, which is not rendered by the current admin UI.
+- `pnpm build` with the available `.env.local` failed before app compilation completed because `next/font` could not fetch Inter from `fonts.googleapis.com` under the current network restrictions.

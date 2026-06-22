@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
 
-import { questionInputSchema } from "./question.schema";
+import { questionInputSchema, questionListQuerySchema } from "./question.schema";
 
 const validQuestionInput = {
   descriptionMarkdown: "  Qual e o resultado de **2 + 2**?  ",
@@ -135,5 +135,48 @@ describe("question.schema", () => {
         ],
       }),
     ).toThrow(z.ZodError);
+  });
+});
+
+describe("questionListQuerySchema", () => {
+  it("uses defaults when params are omitted", () => {
+    expect(questionListQuerySchema.parse({})).toEqual({
+      page: 1,
+      pageSize: 10,
+      sort: "updatedAt",
+      direction: "desc",
+    });
+  });
+
+  it("coerces pagination and accepts supported sorting", () => {
+    expect(
+      questionListQuerySchema.parse({
+        page: "3",
+        pageSize: "25",
+        sort: "subjectField",
+        direction: "asc",
+      }),
+    ).toEqual({
+      page: 3,
+      pageSize: 25,
+      sort: "subjectField",
+      direction: "asc",
+    });
+  });
+
+  it("normalizes invalid params to safe defaults", () => {
+    expect(
+      questionListQuerySchema.parse({
+        page: "0",
+        pageSize: "500",
+        sort: "descriptionMarkdown",
+        direction: "sideways",
+      }),
+    ).toEqual({
+      page: 1,
+      pageSize: 10,
+      sort: "updatedAt",
+      direction: "desc",
+    });
   });
 });

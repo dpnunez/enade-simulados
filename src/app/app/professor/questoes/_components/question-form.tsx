@@ -4,15 +4,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ArrowDown,
   ArrowUp,
-  CheckCircle2,
-  CircleAlert,
   Info,
   Plus,
   Trash2,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { type FormEvent, useEffect, useId, useRef, useState } from "react";
+import { type FormEvent, type ReactNode, useEffect, useId, useRef, useState } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -101,6 +100,26 @@ function alternativeLabel(index: number) {
   return `Alternativa ${String.fromCharCode(65 + index)}`;
 }
 
+function FormSection({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description: string;
+  children: ReactNode;
+}) {
+  return (
+    <section className="space-y-4 rounded-md border p-4">
+      <div className="space-y-1">
+        <h2 className="text-base font-medium">{title}</h2>
+        <p className="text-sm text-muted-foreground">{description}</p>
+      </div>
+      {children}
+    </section>
+  );
+}
+
 export function QuestionForm({
   subjectFields,
   question,
@@ -112,8 +131,6 @@ export function QuestionForm({
   const router = useRouter();
   const formId = useId();
   const isEditing = Boolean(question);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
   const descriptionDraftRef = useRef(valuesFromQuestion(question).descriptionMarkdown);
   const [descriptionResetKey, setDescriptionResetKey] = useState(0);
   const form = useForm<QuestionInput>({
@@ -130,8 +147,6 @@ export function QuestionForm({
     descriptionDraftRef.current = nextValues.descriptionMarkdown;
     form.reset(nextValues);
     setDescriptionResetKey((current) => current + 1);
-    setError(null);
-    setSuccess(null);
   }, [form, question]);
 
   function syncDescriptionDraft() {
@@ -167,37 +182,39 @@ export function QuestionForm({
   }
 
   async function onSubmit(values: QuestionInput) {
-    setError(null);
-    setSuccess(null);
+    try {
+      const response = await fetch(
+        isEditing ? `/api/questions/${question?.id}` : "/api/questions",
+        {
+          method: isEditing ? "PATCH" : "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(values),
+        },
+      );
+      const payload = await response.json();
 
-    const response = await fetch(
-      isEditing ? `/api/questions/${question?.id}` : "/api/questions",
-      {
-        method: isEditing ? "PATCH" : "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(values),
-      },
-    );
-    const payload = await response.json();
+      if (!response.ok || !payload.success) {
+        toast.error(messageForError(payload.error));
+        return;
+      }
 
-    if (!response.ok || !payload.success) {
-      setError(messageForError(payload.error));
+      toast.success(
+        isEditing ? "Questao atualizada com sucesso." : "Questao criada com sucesso.",
+      );
+      if (!isEditing) {
+        descriptionDraftRef.current = emptyValues.descriptionMarkdown;
+        form.reset(emptyValues);
+        setDescriptionResetKey((current) => current + 1);
+      }
+      onSaved?.(payload.question);
+      if (afterSaveHref) {
+        router.push(afterSaveHref);
+      }
+      router.refresh();
+    } catch {
+      toast.error("Nao foi possivel salvar a questao.");
       return;
     }
-
-    if (isEditing) {
-      setSuccess("Questao atualizada com sucesso.");
-    } else {
-      descriptionDraftRef.current = emptyValues.descriptionMarkdown;
-      form.reset(emptyValues);
-      setDescriptionResetKey((current) => current + 1);
-      setSuccess("Questao criada com sucesso.");
-    }
-    onSaved?.(payload.question);
-    if (afterSaveHref) {
-      router.push(afterSaveHref);
-    }
-    router.refresh();
   }
 
   function handleFormSubmit(event: FormEvent<HTMLFormElement>) {
@@ -222,55 +239,45 @@ export function QuestionForm({
 
   return (
     <form onSubmit={handleFormSubmit} className={cn("space-y-6", className)}>
-      {error ? (
-        <Alert variant="destructive" role="alert">
-          <CircleAlert aria-hidden="true" />
-          <div>
-            <AlertTitle>Falha ao salvar</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-          </div>
-        </Alert>
-      ) : null}
-      {success ? (
-        <Alert role="status">
-          <CheckCircle2 aria-hidden="true" />
-          <div>
-            <AlertTitle>{isEditing ? "Alteracao salva" : "Cadastro criado"}</AlertTitle>
-            <AlertDescription>{success}</AlertDescription>
-          </div>
-        </Alert>
-      ) : null}
+      <FormSection
+        title="Enunciado"
+        description="Escreva o texto principal da questao. Markdown e upload de imagem continuam disponiveis."
+      >
+        <div className="space-y-2">
+          <Label htmlFor={`${formId}-description`}>Texto da questao</Label>
+          <Controller
+            control={form.control}
+            name="descriptionMarkdown"
+            render={({ field }) => (
+              <MarkdownEditor
+                value={field.value}
+                onChange={(value) => {
+                  descriptionDraftRef.current = value;
+                }}
+                onBlur={syncDescriptionDraft}
+                imageUploadHandler={uploadQuestionMarkdownImage}
+                resetKey={descriptionResetKey}
+                ariaLabel="Enunciado da questao"
+                className={cn(
+                  form.formState.errors.descriptionMarkdown &&
+                    "border-destructive focus-within:ring-2 focus-within:ring-destructive/30",
+                )}
+              />
+            )}
+          />
+          {form.formState.errors.descriptionMarkdown ? (
+            <p className="text-sm text-destructive">
+              {form.formState.errors.descriptionMarkdown.message}
+            </p>
+          ) : null}
+        </div>
+      </FormSection>
 
-      <div className="space-y-2">
-        <Label htmlFor={`${formId}-description`}>Enunciado</Label>
-        <Controller
-          control={form.control}
-          name="descriptionMarkdown"
-          render={({ field }) => (
-            <MarkdownEditor
-              value={field.value}
-              onChange={(value) => {
-                descriptionDraftRef.current = value;
-              }}
-              onBlur={syncDescriptionDraft}
-              imageUploadHandler={uploadQuestionMarkdownImage}
-              resetKey={descriptionResetKey}
-              ariaLabel="Enunciado da questao"
-              className={cn(
-                form.formState.errors.descriptionMarkdown &&
-                  "border-destructive focus-within:ring-2 focus-within:ring-destructive/30",
-              )}
-            />
-          )}
-        />
-        {form.formState.errors.descriptionMarkdown ? (
-          <p className="text-sm text-destructive">
-            {form.formState.errors.descriptionMarkdown.message}
-          </p>
-        ) : null}
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
+      <FormSection
+        title="Metadados"
+        description="Classifique a questao para facilitar listagem, filtros e simulados."
+      >
+        <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor={`${formId}-subject-field`}>Grande area</Label>
           <select
@@ -346,28 +353,39 @@ export function QuestionForm({
             <p className="text-sm text-destructive">{form.formState.errors.year.message}</p>
           ) : null}
         </div>
-      </div>
+        </div>
+      </FormSection>
 
-      <div className="space-y-2">
-        <Label htmlFor={`${formId}-explanation`}>Explicacao da resposta correta</Label>
-        <textarea
-          id={`${formId}-explanation`}
-          rows={4}
-          placeholder="Explique por que a alternativa correta resolve a questao."
-          aria-invalid={Boolean(form.formState.errors.correctAnswerExplanation)}
-          className="flex min-h-28 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
-          {...form.register("correctAnswerExplanation")}
-        />
-        {form.formState.errors.correctAnswerExplanation ? (
-          <p className="text-sm text-destructive">
-            {form.formState.errors.correctAnswerExplanation.message}
-          </p>
-        ) : null}
-      </div>
+      <FormSection
+        title="Explicacao"
+        description="Registre a justificativa que ajuda a revisar a resposta correta."
+      >
+        <div className="space-y-2">
+          <Label htmlFor={`${formId}-explanation`}>Explicacao da resposta correta</Label>
+          <textarea
+            id={`${formId}-explanation`}
+            rows={4}
+            placeholder="Explique por que a alternativa correta resolve a questao."
+            aria-invalid={Boolean(form.formState.errors.correctAnswerExplanation)}
+            className="flex min-h-28 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
+            {...form.register("correctAnswerExplanation")}
+          />
+          {form.formState.errors.correctAnswerExplanation ? (
+            <p className="text-sm text-destructive">
+              {form.formState.errors.correctAnswerExplanation.message}
+            </p>
+          ) : null}
+        </div>
+      </FormSection>
 
-      <fieldset className="space-y-3">
+      <fieldset className="space-y-4 rounded-md border p-4">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <legend className="text-sm font-medium">Alternativas</legend>
+          <div className="space-y-1">
+            <legend className="text-base font-medium">Alternativas</legend>
+            <p className="text-sm text-muted-foreground">
+              Marque exatamente uma correta. Voce pode adicionar, remover e reordenar.
+            </p>
+          </div>
           <Button
             type="button"
             variant="outline"
@@ -421,7 +439,9 @@ export function QuestionForm({
                       size="sm"
                       onClick={() => markCorrect(index)}
                     >
-                      Correta
+                      {form.watch(`alternatives.${index}.isCorrect`)
+                        ? "Correta selecionada"
+                        : "Marcar correta"}
                     </Button>
                     <Button
                       type="button"

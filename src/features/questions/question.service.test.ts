@@ -4,6 +4,7 @@ import { Prisma } from "@prisma-generated-client";
 const mocks = vi.hoisted(() => {
   const prisma = {
     question: {
+      count: vi.fn(),
       findMany: vi.fn(),
       findUnique: vi.fn(),
       create: vi.fn(),
@@ -31,6 +32,7 @@ import {
   deleteQuestion,
   getQuestionForEdit,
   listQuestions,
+  listQuestionsPaginated,
   updateQuestion,
 } from "./question.service";
 
@@ -72,6 +74,55 @@ describe("question.service", () => {
       },
       orderBy: { updatedAt: "desc" },
     });
+  });
+
+  it("lists questions with pagination metadata", async () => {
+    mocks.prisma.question.findMany.mockResolvedValue([{ id: "question_1" }]);
+    mocks.prisma.question.count.mockResolvedValue(21);
+    mocks.prisma.$transaction.mockResolvedValue([[{ id: "question_1" }], 21]);
+
+    const result = await listQuestionsPaginated({
+      page: "2",
+      pageSize: "10",
+      sort: "year",
+      direction: "asc",
+    });
+
+    expect(result).toEqual({
+      rows: [{ id: "question_1" }],
+      rowCount: 21,
+      page: 2,
+      pageSize: 10,
+      pageCount: 3,
+    });
+    expect(mocks.prisma.question.findMany).toHaveBeenCalledWith({
+      include: {
+        subjectField: true,
+        alternatives: { orderBy: { position: "asc" } },
+      },
+      orderBy: { year: "asc" },
+      skip: 10,
+      take: 10,
+    });
+    expect(mocks.prisma.question.count).toHaveBeenCalledWith();
+  });
+
+  it("lists questions sorted by subject field title", async () => {
+    mocks.prisma.question.findMany.mockResolvedValue([]);
+    mocks.prisma.question.count.mockResolvedValue(0);
+    mocks.prisma.$transaction.mockResolvedValue([[], 0]);
+
+    const result = await listQuestionsPaginated({
+      sort: "subjectField",
+      direction: "asc",
+    });
+
+    expect(result.pageCount).toBe(1);
+    expect(mocks.prisma.question.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        orderBy: { subjectField: { title: "asc" } },
+      }),
+    );
   });
 
   it("gets a question for edit with relations", async () => {
