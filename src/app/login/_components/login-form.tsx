@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowRight, CircleAlert, Lock, Mail } from "lucide-react";
+import { ArrowRight, CircleAlert, Eye, EyeOff, Lock, Mail } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -29,6 +29,7 @@ import {
 import {
   InputGroup,
   InputGroupAddon,
+  InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { http } from "@infra/http/client";
@@ -61,6 +62,7 @@ function getLoginErrorMessage(
 export function LoginForm() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const form = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -177,7 +179,7 @@ export function LoginForm() {
                       <InputGroupInput
                         {...field}
                         id={field.name}
-                        type="password"
+                        type={isPasswordVisible ? "text" : "password"}
                         autoComplete="current-password"
                         placeholder="Digite sua senha"
                         aria-invalid={fieldState.invalid}
@@ -185,6 +187,26 @@ export function LoginForm() {
                           fieldState.invalid ? "password-error" : undefined
                         }
                       />
+                      <InputGroupAddon align="inline-end">
+                        <InputGroupButton
+                          type="button"
+                          size="icon-xs"
+                          aria-label={
+                            isPasswordVisible
+                              ? "Ocultar valor do campo"
+                              : "Mostrar valor do campo"
+                          }
+                          onClick={() =>
+                            setIsPasswordVisible((isVisible) => !isVisible)
+                          }
+                        >
+                          {isPasswordVisible ? (
+                            <EyeOff aria-hidden="true" />
+                          ) : (
+                            <Eye aria-hidden="true" />
+                          )}
+                        </InputGroupButton>
+                      </InputGroupAddon>
                     </InputGroup>
                     {fieldState.invalid ? (
                       <FieldError
