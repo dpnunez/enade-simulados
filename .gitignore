@@ -46,3 +46,5 @@ next-env.d.ts
 **/generated/*
 
 /e2e-fixtures/**/*
+
+/playwright-report/**/*

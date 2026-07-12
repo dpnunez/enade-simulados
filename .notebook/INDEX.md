@@ -1,7 +1,8 @@
 # .notebook
+
 > Project intelligence — read before every mission
 
-Last updated: 2026-06-21
+Last updated: 2026-06-28
 
 - [smtp-email](smtp-email.md) — Gmail SMTP helper shared by invite/reset adapters | flow | email, smtp, gmail
 - [env-config](env-config.md) — App base URL resolves from NEXT_PUBLIC_URL, VERCEL_URL, then local fallback; DB uses DATABASE_URL | pattern | env, auth, db

@@ -32,7 +32,9 @@ test("permite visualizar e ocultar a senha no login", async ({ page }) => {
   await expect(passwordInput).toHaveAttribute("type", "password");
 });
 
-test("redireciona a raiz para a área da role quando há sessão", async ({ page }) => {
+test("redireciona a raiz para a área da role quando há sessão", async ({
+  page,
+}) => {
   await loginAs(page, TEST_USERS.student);
 
   await page.goto("/");
