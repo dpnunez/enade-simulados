@@ -5,6 +5,7 @@ Entry points:
 - Canonical pages: `src/app/app/aluno/lista-simulados/page.tsx`, `src/app/app/aluno/simulados/novo/page.tsx`, `src/app/app/aluno/simulados/[attemptId]/page.tsx`
 - Legacy `/app/student/*` pages redirect to equivalent `/app/aluno/*` routes.
 - APIs: `src/app/api/student/simulated-exams/route.ts`, `src/app/api/student/simulated-exams/[attemptId]/route.ts`, `src/app/api/student/simulated-exams/[attemptId]/answers/route.ts`
+- Attempt UI: `src/app/app/aluno/simulados/_components/simulation-attempt-view.tsx`
 
 Domain flow:
 - `src/features/simulated-exams/simulated-exam.schema.ts` validates generation, paginated list query, draft-save, and submit payloads.
@@ -25,8 +26,12 @@ Persistence:
 - `submitSimulationAttempt()` merges persisted draft answers with payload answers, with payload values taking precedence, then fills correction fields and marks the attempt `COMPLETED`.
 - Student deletion cascades attempts; attempt-owned rows cascade with attempts; catalog subject fields/questions/alternatives are restricted once referenced by simulation history.
 
+Markdown rendering:
+- Professor question form uses `src/components/markdown/markdown-editor.tsx` with `@mdxeditor/editor` and image upload for `descriptionMarkdown`.
+- Student attempt view currently prints `descriptionMarkdown` and `contentMarkdown` as plain text in `simulation-attempt-view.tsx`; markdown image syntax is stored but not rendered.
+
 E2E:
 - `src/tests/e2e/student-simulated-exams.spec.ts` covers generation, out-of-order answers, draft saves/reopen/finalize, final review, paginated list actions, legacy redirects, and non-student denial.
 - `src/tests/e2e/helpers/simulated-exams.ts` cleans simulation attempts before deleting deterministic catalog rows.
 
-Updated: 2026-06-21
+Updated: 2026-07-20
