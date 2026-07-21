@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle2, Circle, CircleAlert, Save } from "lucide-react";
 
+import { MarkdownContent } from "@/components/markdown/markdown-content";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -275,9 +276,10 @@ export function SimulationAttemptView({
             ) : null}
           </div>
 
-          <p className="whitespace-pre-wrap text-sm">
-            {activeQuestion.question.descriptionMarkdown}
-          </p>
+          <MarkdownContent
+            value={activeQuestion.question.descriptionMarkdown}
+            className="text-sm"
+          />
 
           <div className="mt-5 space-y-2">
             {activeQuestion.question.alternatives.map((alternative) => {
@@ -318,8 +320,12 @@ export function SimulationAttemptView({
                       }));
                     }}
                   />
-                  <span>
-                    <span className="block">{alternative.contentMarkdown}</span>
+                  <span className="min-w-0 flex-1">
+                    <MarkdownContent
+                      value={alternative.contentMarkdown}
+                      className="text-sm"
+                      compact
+                    />
                     {mode === "completed" && selected ? (
                       <span className="mt-1 block text-xs text-muted-foreground">
                         Alternativa escolhida
