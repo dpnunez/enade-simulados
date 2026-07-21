@@ -12,6 +12,8 @@ const mocks = vi.hoisted(() => {
       delete: vi.fn(),
     },
     questionAlternative: {
+      findMany: vi.fn(),
+      update: vi.fn(),
       deleteMany: vi.fn(),
       createMany: vi.fn(),
     },
@@ -226,10 +228,14 @@ describe("question.service", () => {
     expect(mocks.prisma.subjectField.findUnique).not.toHaveBeenCalled();
   });
 
-  it("updates a question and replaces alternatives transactionally", async () => {
+  it("updates a question and syncs alternatives transactionally", async () => {
     mocks.prisma.question.findUnique.mockResolvedValue({ id: "question_1" });
     mocks.prisma.subjectField.findUnique.mockResolvedValue({ id: "subject_field_1" });
     mocks.prisma.question.update.mockResolvedValue({ id: "question_1" });
+    mocks.prisma.questionAlternative.findMany.mockResolvedValue([
+      { id: "alternative_1" },
+      { id: "alternative_2" },
+    ]);
 
     await updateQuestion("question_1", validInput, "teacher_1");
 
@@ -245,17 +251,51 @@ describe("question.service", () => {
         correctAnswerExplanation: "Explicacao da resposta.",
       },
     });
-    expect(mocks.prisma.questionAlternative.deleteMany).toHaveBeenCalledWith({
+    expect(mocks.prisma.questionAlternative.findMany).toHaveBeenCalledWith({
       where: { questionId: "question_1" },
+      orderBy: { position: "asc" },
+      select: { id: true },
+    });
+    expect(mocks.prisma.questionAlternative.update).toHaveBeenNthCalledWith(1, {
+      where: { id: "alternative_1" },
+      data: {
+        contentMarkdown: "Alternativa A",
+        position: 0,
+        isCorrect: false,
+      },
+    });
+    expect(mocks.prisma.questionAlternative.update).toHaveBeenNthCalledWith(2, {
+      where: { id: "alternative_2" },
+      data: {
+        contentMarkdown: "Alternativa B",
+        position: 1,
+        isCorrect: true,
+      },
+    });
+    expect(mocks.prisma.questionAlternative.deleteMany).not.toHaveBeenCalled();
+    expect(mocks.prisma.questionAlternative.createMany).not.toHaveBeenCalled();
+  });
+
+  it("creates extra alternatives when an update adds options", async () => {
+    mocks.prisma.question.findUnique.mockResolvedValue({ id: "question_1" });
+    mocks.prisma.subjectField.findUnique.mockResolvedValue({ id: "subject_field_1" });
+    mocks.prisma.question.update.mockResolvedValue({ id: "question_1" });
+    mocks.prisma.questionAlternative.findMany.mockResolvedValue([
+      { id: "alternative_1" },
+    ]);
+
+    await updateQuestion("question_1", validInput, "teacher_1");
+
+    expect(mocks.prisma.questionAlternative.update).toHaveBeenCalledWith({
+      where: { id: "alternative_1" },
+      data: {
+        contentMarkdown: "Alternativa A",
+        position: 0,
+        isCorrect: false,
+      },
     });
     expect(mocks.prisma.questionAlternative.createMany).toHaveBeenCalledWith({
       data: [
-        {
-          questionId: "question_1",
-          contentMarkdown: "Alternativa A",
-          position: 0,
-          isCorrect: false,
-        },
         {
           questionId: "question_1",
           contentMarkdown: "Alternativa B",
@@ -263,6 +303,23 @@ describe("question.service", () => {
           isCorrect: true,
         },
       ],
+    });
+  });
+
+  it("deletes extra alternatives when an update removes options", async () => {
+    mocks.prisma.question.findUnique.mockResolvedValue({ id: "question_1" });
+    mocks.prisma.subjectField.findUnique.mockResolvedValue({ id: "subject_field_1" });
+    mocks.prisma.question.update.mockResolvedValue({ id: "question_1" });
+    mocks.prisma.questionAlternative.findMany.mockResolvedValue([
+      { id: "alternative_1" },
+      { id: "alternative_2" },
+      { id: "alternative_3" },
+    ]);
+
+    await updateQuestion("question_1", validInput, "teacher_1");
+
+    expect(mocks.prisma.questionAlternative.deleteMany).toHaveBeenCalledWith({
+      where: { id: { in: ["alternative_3"] } },
     });
   });
 
@@ -314,6 +371,23 @@ describe("question.service", () => {
     expect(mocks.prisma.questionAlternative.createMany).not.toHaveBeenCalled();
   });
 
+  it("maps relation conflicts on update without reporting a missing subject field", async () => {
+    mocks.prisma.question.findUnique.mockResolvedValue({ id: "question_1" });
+    mocks.prisma.subjectField.findUnique.mockResolvedValue({ id: "subject_field_1" });
+    mocks.prisma.question.update.mockRejectedValue(
+      new Prisma.PrismaClientKnownRequestError("Foreign key constraint failed", {
+        code: "P2003",
+        clientVersion: "test",
+      }),
+    );
+
+    await expect(
+      updateQuestion("question_1", validInput, "teacher_1"),
+    ).rejects.toMatchObject({
+      code: "QUESTION_RELATION_IN_USE",
+    } satisfies Partial<QuestionDomainError>);
+  });
+
   it("rolls back invalid update before replacing alternatives", async () => {
     await expect(
       updateQuestion(
@@ -353,6 +427,19 @@ describe("question.service", () => {
 
     await expect(deleteQuestion("missing", "teacher_1")).rejects.toMatchObject({
       code: "QUESTION_NOT_FOUND",
+    } satisfies Partial<QuestionDomainError>);
+  });
+
+  it("maps relation conflicts on delete", async () => {
+    mocks.prisma.question.delete.mockRejectedValue(
+      new Prisma.PrismaClientKnownRequestError("Foreign key constraint failed", {
+        code: "P2003",
+        clientVersion: "test",
+      }),
+    );
+
+    await expect(deleteQuestion("question_1", "teacher_1")).rejects.toMatchObject({
+      code: "QUESTION_RELATION_IN_USE",
     } satisfies Partial<QuestionDomainError>);
   });
 });

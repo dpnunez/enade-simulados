@@ -70,6 +70,9 @@ function deleteErrorMessage(error: string) {
   if (error === "QUESTION_NOT_FOUND") {
     return "Esta questao nao foi encontrada. Atualize a lista e tente novamente.";
   }
+  if (error === "QUESTION_RELATION_IN_USE") {
+    return "Esta questao ja foi usada em simulados e nao pode ser deletada.";
+  }
 
   return "Nao foi possivel deletar a questao.";
 }

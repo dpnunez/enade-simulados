@@ -174,6 +174,8 @@ async function deleteQuestion(questionId: string) {
     throw new Error(
       payload.error === "QUESTION_NOT_FOUND"
         ? "Esta questao nao foi encontrada. Atualize a lista e tente novamente."
+        : payload.error === "QUESTION_RELATION_IN_USE"
+          ? "Esta questao ja foi usada em simulados e nao pode ser deletada."
         : "Nao foi possivel deletar a questao.",
     );
   }

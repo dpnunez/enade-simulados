@@ -15,7 +15,8 @@ import { createQuestionDescriptionHash } from "./question-description-hash";
 export type QuestionErrorCode =
   | "QUESTION_NOT_FOUND"
   | "QUESTION_SUBJECT_FIELD_NOT_FOUND"
-  | "QUESTION_DUPLICATE_CONTENT";
+  | "QUESTION_DUPLICATE_CONTENT"
+  | "QUESTION_RELATION_IN_USE";
 
 export class QuestionDomainError extends Error {
   constructor(public readonly code: QuestionErrorCode) {
@@ -59,7 +60,7 @@ function mapQuestionWriteError(error: unknown): never {
   }
 
   if (prismaErrorCode === prismaKnownRequestErrorCode.foreignKeyConstraintFailed) {
-    throw new QuestionDomainError("QUESTION_SUBJECT_FIELD_NOT_FOUND");
+    throw new QuestionDomainError("QUESTION_RELATION_IN_USE");
   }
 
   throw error;
@@ -82,6 +83,53 @@ function alternativeCreateData(parsed: ParsedQuestionInput) {
     position,
     isCorrect: alternative.isCorrect,
   }));
+}
+
+async function syncQuestionAlternatives(
+  tx: Prisma.TransactionClient,
+  questionId: string,
+  parsed: ParsedQuestionInput,
+) {
+  const existingAlternatives = await tx.questionAlternative.findMany({
+    where: { questionId },
+    orderBy: { position: "asc" },
+    select: { id: true },
+  });
+  const nextAlternatives = alternativeCreateData(parsed);
+
+  await Promise.all(
+    nextAlternatives
+      .slice(0, existingAlternatives.length)
+      .map((alternative, position) =>
+        tx.questionAlternative.update({
+          where: { id: existingAlternatives[position].id },
+          data: alternative,
+        }),
+      ),
+  );
+
+  if (nextAlternatives.length > existingAlternatives.length) {
+    await tx.questionAlternative.createMany({
+      data: nextAlternatives
+        .slice(existingAlternatives.length)
+        .map((alternative) => ({
+          questionId,
+          ...alternative,
+        })),
+    });
+  }
+
+  if (existingAlternatives.length > nextAlternatives.length) {
+    await tx.questionAlternative.deleteMany({
+      where: {
+        id: {
+          in: existingAlternatives
+            .slice(nextAlternatives.length)
+            .map((alternative) => alternative.id),
+        },
+      },
+    });
+  }
 }
 
 function questionData(parsed: ParsedQuestionInput) {
@@ -200,16 +248,7 @@ export async function updateQuestion(
         data: questionData(parsed),
       });
 
-      await tx.questionAlternative.deleteMany({
-        where: { questionId: id },
-      });
-
-      await tx.questionAlternative.createMany({
-        data: alternativeCreateData(parsed).map((alternative) => ({
-          questionId: id,
-          ...alternative,
-        })),
-      });
+      await syncQuestionAlternatives(tx, id, parsed);
 
       const updatedQuestion = await tx.question.findUnique({
         where: { id },

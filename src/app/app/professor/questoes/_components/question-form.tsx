@@ -90,6 +90,9 @@ function messageForError(error: string) {
   if (error === "QUESTION_DUPLICATE_CONTENT") {
     return "Ja existe uma questao com este enunciado.";
   }
+  if (error === "QUESTION_RELATION_IN_USE") {
+    return "Esta questao ja possui respostas vinculadas. Edite sem remover alternativas ja usadas.";
+  }
   if (error === "VALIDATION_ERROR") {
     return "Revise os dados da questao e tente novamente.";
   }
