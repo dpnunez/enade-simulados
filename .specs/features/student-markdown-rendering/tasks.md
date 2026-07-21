@@ -1,7 +1,7 @@
 # Student Markdown Rendering Tasks
 
 **Design**: `.specs/features/student-markdown-rendering/design.md`
-**Status**: Draft
+**Status**: Verified
 
 ---
 
@@ -46,9 +46,9 @@ E2E tests are not parallel-safe in this project, so all tasks run sequentially.
 
 **Done when**:
 
-- [ ] `react-markdown`, `remark-gfm`, `rehype-raw`, and `rehype-sanitize` are installed.
-- [ ] Lockfile is updated.
-- [ ] No unrelated dependency churn is introduced.
+- [x] `react-markdown`, `remark-gfm`, `rehype-raw`, and `rehype-sanitize` are installed.
+- [x] Lockfile is updated.
+- [x] No unrelated dependency churn is introduced.
 
 **Tests**: build/type gate after implementation
 **Gate**: `pnpm build`
@@ -70,12 +70,12 @@ E2E tests are not parallel-safe in this project, so all tasks run sequentially.
 
 **Done when**:
 
-- [ ] Empty/null values render without error.
-- [ ] Markdown emphasis, lists and links render as React elements.
-- [ ] Stored `<img src="https://...">` renders as responsive image.
-- [ ] `<script>`, event attributes such as `onerror`, and `javascript:` URLs are stripped or neutralized.
-- [ ] Component tests assert allowed and blocked cases.
-- [ ] Gate check passes: `pnpm test:unit`.
+- [x] Empty/null values render without error.
+- [x] Markdown emphasis, lists and links render as React elements.
+- [x] Stored `<img src="https://...">` renders as responsive image.
+- [x] `<script>`, event attributes such as `onerror`, and `javascript:` URLs are stripped or neutralized.
+- [x] Component tests assert allowed and blocked cases.
+- [x] Gate check passes: `pnpm test:unit`.
 
 **Tests**: unit/component
 **Gate**: quick
@@ -97,11 +97,11 @@ E2E tests are not parallel-safe in this project, so all tasks run sequentially.
 
 **Done when**:
 
-- [ ] `descriptionMarkdown` no longer renders as literal Markdown syntax.
-- [ ] `contentMarkdown` alternatives render formatted content inside existing labels.
-- [ ] Radio selection remains clickable when Markdown contains nested text or image.
-- [ ] Completed review visual states still work.
-- [ ] Gate check passes: `pnpm test:unit`.
+- [x] `descriptionMarkdown` no longer renders as literal Markdown syntax.
+- [x] `contentMarkdown` alternatives render formatted content inside existing labels.
+- [x] Radio selection remains clickable when Markdown contains nested text or image.
+- [x] Completed review visual states still work.
+- [x] Gate check passes: `pnpm test:unit`.
 
 **Tests**: unit gate plus E2E in T4
 **Gate**: quick
@@ -123,11 +123,11 @@ E2E tests are not parallel-safe in this project, so all tasks run sequentially.
 
 **Done when**:
 
-- [ ] E2E creates or seeds a question with Markdown and `<img src="...">`.
-- [ ] Student opens generated simulado and sees image element, not literal `<img ...>`.
-- [ ] Student can select an alternative and continue/finalize as before.
-- [ ] E2E does not depend on external network image loading; assertion can inspect element attributes.
-- [ ] Gate check passes: `pnpm test:e2e`.
+- [x] E2E creates or seeds a question with Markdown and `<img src="...">`.
+- [x] Student opens generated simulado and sees image element, not literal `<img ...>`.
+- [x] Student can select an alternative and continue/finalize as before.
+- [x] E2E does not depend on external network image loading; assertion can inspect element attributes.
+- [x] Gate check passes: `pnpm test:e2e`.
 
 **Tests**: e2e
 **Gate**: e2e
@@ -149,10 +149,10 @@ E2E tests are not parallel-safe in this project, so all tasks run sequentially.
 
 **Done when**:
 
-- [ ] `pnpm test:unit` passes.
-- [ ] Targeted or full `pnpm test:e2e` passes.
-- [ ] `pnpm build` passes or blocker is documented with exact reason.
-- [ ] Requirement statuses are updated from Pending to Verified.
+- [x] `pnpm test:unit` passes.
+- [x] Targeted `pnpm exec playwright test src/tests/e2e/student-simulated-exams.spec.ts` passes.
+- [x] `pnpm build` passes.
+- [x] Requirement statuses are updated from Pending to Verified.
 
 **Tests**: unit, e2e, build
 **Gate**: full/build

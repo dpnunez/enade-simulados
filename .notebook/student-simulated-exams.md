@@ -28,10 +28,12 @@ Persistence:
 
 Markdown rendering:
 - Professor question form uses `src/components/markdown/markdown-editor.tsx` with `@mdxeditor/editor` and image upload for `descriptionMarkdown`.
-- Student attempt view currently prints `descriptionMarkdown` and `contentMarkdown` as plain text in `simulation-attempt-view.tsx`; markdown image syntax is stored but not rendered.
+- Student attempt view renders `descriptionMarkdown` and `contentMarkdown` through `src/components/markdown/markdown-content.tsx`.
+- `MarkdownContent` uses `react-markdown` + `remark-gfm` + `rehype-raw` + `rehype-sanitize`; raw `<img src="https://...">` is allowed, scripts/events/unsafe protocols are stripped or neutralized.
+- Arbitrary DB image URLs use native `<img>` in the renderer; Next image optimization is not used for this content boundary.
 
 E2E:
 - `src/tests/e2e/student-simulated-exams.spec.ts` covers generation, out-of-order answers, draft saves/reopen/finalize, final review, paginated list actions, legacy redirects, and non-student denial.
 - `src/tests/e2e/helpers/simulated-exams.ts` cleans simulation attempts before deleting deterministic catalog rows.
 
-Updated: 2026-07-20
+Updated: 2026-07-21

@@ -6,11 +6,11 @@ O estudante hoje ve enunciados e alternativas de simulados como texto puro, mesm
 
 ## Goals
 
-- [ ] Renderizar Markdown em enunciados e alternativas na visao do aluno.
-- [ ] Renderizar imagens persistidas como tags HTML `<img src="" />`.
-- [ ] Sanitizar HTML cru antes de renderizar para reduzir risco de XSS.
-- [ ] Reutilizar um componente compartilhado de leitura Markdown em vez de acoplar a tela do aluno a bibliotecas de parsing.
-- [ ] Cobrir a renderizacao com testes unitarios/componentes e um fluxo E2E visivel.
+- [x] Renderizar Markdown em enunciados e alternativas na visao do aluno.
+- [x] Renderizar imagens persistidas como tags HTML `<img src="" />`.
+- [x] Sanitizar HTML cru antes de renderizar para reduzir risco de XSS.
+- [x] Reutilizar um componente compartilhado de leitura Markdown em vez de acoplar a tela do aluno a bibliotecas de parsing.
+- [x] Cobrir a renderizacao com testes unitarios/componentes e um fluxo E2E visivel.
 
 ## Out of Scope
 
@@ -90,10 +90,10 @@ O estudante hoje ve enunciados e alternativas de simulados como texto puro, mesm
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| SMR-01 | P1: Estudante Ve Enunciado Formatado | Design | Pending |
-| SMR-02 | P1: Estudante Ve Alternativas Formatadas | Design | Pending |
-| SMR-03 | P1: Renderizacao Segura E Reutilizavel | Design | Pending |
-| SMR-04 | Edge Cases: layout, URLs e HTML inseguro | Design | Pending |
+| SMR-01 | P1: Estudante Ve Enunciado Formatado | Execute | Verified |
+| SMR-02 | P1: Estudante Ve Alternativas Formatadas | Execute | Verified |
+| SMR-03 | P1: Renderizacao Segura E Reutilizavel | Execute | Verified |
+| SMR-04 | Edge Cases: layout, URLs e HTML inseguro | Execute | Verified |
 
 **Coverage:** 4 total, 4 mapped to design/tasks, 0 unmapped.
 
@@ -101,8 +101,8 @@ O estudante hoje ve enunciados e alternativas de simulados como texto puro, mesm
 
 ## Success Criteria
 
-- [ ] Tags `<img src="...">` salvas no markdown aparecem como imagem na tela do aluno.
-- [ ] Markdown comum nao aparece como sintaxe literal na tela do aluno.
-- [ ] HTML perigoso e atributos de evento nao chegam ao DOM renderizado.
-- [ ] Fluxo de responder, salvar, finalizar e revisar simulado permanece funcionando.
-- [ ] `pnpm test:unit` e o E2E principal de simulados passam.
+- [x] Tags `<img src="...">` salvas no markdown aparecem como imagem na tela do aluno.
+- [x] Markdown comum nao aparece como sintaxe literal na tela do aluno.
+- [x] HTML perigoso e atributos de evento nao chegam ao DOM renderizado.
+- [x] Fluxo de responder, salvar, finalizar e revisar simulado permanece funcionando.
+- [x] `pnpm test:unit` e o E2E principal de simulados passam.

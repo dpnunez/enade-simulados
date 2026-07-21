@@ -3,6 +3,7 @@ import { expect, test } from "@playwright/test";
 import { TEST_USERS } from "./fixtures/users";
 import { loginAs, ROLE_HOME_PATHS } from "./helpers/auth";
 import {
+  createMarkdownSimulatedExamQuestionSet,
   createSimulatedExamQuestionSet,
   eraseSimulatedExamE2eData,
 } from "./helpers/simulated-exams";
@@ -148,6 +149,52 @@ test.describe("student simulated exams", () => {
         error: "SIMULATION_ATTEMPT_ALREADY_COMPLETED",
       },
     });
+  });
+
+  test("student sees Markdown and stored html images in questions and alternatives", async ({
+    page,
+  }) => {
+    const data = await createMarkdownSimulatedExamQuestionSet("Markdown");
+
+    await loginAs(page, TEST_USERS.student);
+    await page.goto("/app/aluno/simulados/novo");
+
+    await page.getByLabel(new RegExp(data.title)).check();
+    await page.getByLabel("Quantidade").fill("1");
+    await page.getByRole("button", { name: "Gerar simulado" }).click();
+
+    await expect(page).toHaveURL(/\/app\/aluno\/simulados\/[^/]+$/);
+    await expect(page.getByText("Responder questoes")).toBeVisible();
+    await expect(page.getByText("Texto em destaque")).toHaveCSS(
+      "font-weight",
+      /^(6|7|8|9)00$/,
+    );
+    await expect(page.locator("li").filter({ hasText: "item renderizado" })).toHaveCount(
+      1,
+    );
+
+    const questionImage = page.getByRole("img", {
+      name: "Diagrama E2E Markdown",
+    });
+    await expect(questionImage).toHaveAttribute(
+      "src",
+      "https://example.com/e2e-question.png",
+    );
+    await expect(page.getByText(/<img src=/)).toHaveCount(0);
+
+    const correctAlternative = page.getByLabel(
+      /^Alternativa correta com Markdown/,
+    );
+    await expect(
+      page.getByRole("img", { name: "Imagem da alternativa correta" }),
+    ).toHaveAttribute("src", "https://example.com/e2e-alternative.png");
+
+    await correctAlternative.check();
+    await expect(correctAlternative).toBeChecked();
+
+    await page.getByRole("button", { name: "Finalizar e corrigir" }).click();
+    await expect(page.getByText("Finalizado")).toBeVisible();
+    await expect(page.getByText("1/1 acertos")).toBeVisible();
   });
 
   test("teacher and admin cannot access student simulation pages or APIs", async ({
