@@ -1,7 +1,7 @@
 # Teacher Simulation Ranking Date Filter Tasks
 
 **Design**: `.specs/features/teacher-simulation-ranking-date-filter/design.md`
-**Status**: Draft
+**Status**: Implementing (T1-T3 complete)
 
 ---
 
@@ -60,7 +60,7 @@ Nao ha tarefas paralelas: a cadeia de contrato/servico e direta e o E2E usa um u
 **Gate**: quick (`pnpm test:unit`)
 **Commit**: `feat(ranking): filter aggregates by completion date`
 
-### T3: Add completion-date ranking index migration
+### T3: Add completion-date ranking index migration ✅
 
 **What**: Criar e validar migration nao destrutiva do indice composto usado pelo ranking por periodo.
 **Where**: nova `prisma/migrations/*_simulation_ranking_completed_at_index/migration.sql`
@@ -72,9 +72,9 @@ Nao ha tarefas paralelas: a cadeia de contrato/servico e direta e o E2E usa um u
 
 **Done when**:
 
-- [ ] A migration somente cria o indice confirmado, sem backfill nem mudanca do modelo Prisma.
-- [ ] `EXPLAIN` demonstra elegibilidade do indice para predicado status/data, ou documenta ordenacao melhor comprovada pelo planner.
-- [ ] `pnpm e2e:prepare`, `pnpm prisma:generate` e `pnpm build` passam.
+- [x] A migration somente cria o indice confirmado, sem backfill nem mudanca do modelo Prisma.
+- [x] `EXPLAIN` demonstra elegibilidade do indice para predicado status/data, ou documenta ordenacao melhor comprovada pelo planner.
+- [x] `pnpm e2e:prepare`, `pnpm prisma:generate` e `pnpm build` passam.
 
 **Tests**: build plus E2E database preparation
 **Gate**: build (`pnpm build`)
