@@ -102,14 +102,19 @@ function buildOrderBy(input: ParsedSimulationRankingQuery) {
 }
 
 function buildCompletedAtFilter(input: ParsedSimulationRankingQuery) {
-  const startDateFilter = input.startDate
-    ? Prisma.sql`AND attempt."completedAt" >= ${input.startDate}::date`
-    : Prisma.sql``;
-  const endDateFilter = input.endDate
-    ? Prisma.sql`AND attempt."completedAt" < (${input.endDate}::date + INTERVAL '1 day')`
-    : Prisma.sql``;
+  if (input.startDate && input.endDate) {
+    return Prisma.sql` AND attempt."completedAt" >= ${input.startDate}::date AND attempt."completedAt" < (${input.endDate}::date + INTERVAL '1 day')`;
+  }
 
-  return Prisma.sql`${startDateFilter}${endDateFilter}`;
+  if (input.startDate) {
+    return Prisma.sql` AND attempt."completedAt" >= ${input.startDate}::date`;
+  }
+
+  if (input.endDate) {
+    return Prisma.sql` AND attempt."completedAt" < (${input.endDate}::date + INTERVAL '1 day')`;
+  }
+
+  return Prisma.sql``;
 }
 
 function rankingBaseSql(completedAtFilter: Prisma.Sql) {

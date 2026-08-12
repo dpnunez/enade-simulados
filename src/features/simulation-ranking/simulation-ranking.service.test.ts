@@ -115,6 +115,9 @@ describe("simulation-ranking.service", () => {
     for (const query of mocks.prisma.$queryRaw.mock.calls.map(
       ([query]) => query,
     )) {
+      expect(sqlText(query)).toMatch(
+        /attempt\.status = 'COMPLETED'\s+AND attempt\."completedAt"/,
+      );
       expect(sqlText(query)).toContain('attempt."completedAt" >=');
       expect(sqlText(query)).toContain('attempt."completedAt" <');
       expect(sqlText(query)).toContain("INTERVAL '1 day'");
