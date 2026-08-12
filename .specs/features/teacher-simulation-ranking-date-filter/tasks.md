@@ -36,7 +36,7 @@ Nao ha tarefas paralelas: a cadeia de contrato/servico e direta e o E2E usa um u
 **Gate**: quick (`pnpm test:unit`)
 **Commit**: `feat(ranking): validate date range query`
 
-### T2: Apply one validated period to aggregation and count
+### T2: Apply one validated period to aggregation and count ✅
 
 **What**: Construir fragmento SQL parametrizado de `completedAt` e reutiliza-lo nas consultas de ranking e `rowCount`.
 **Where**: `src/features/simulation-ranking/simulation-ranking.service.ts`, `src/features/simulation-ranking/simulation-ranking.service.test.ts`
@@ -48,13 +48,13 @@ Nao ha tarefas paralelas: a cadeia de contrato/servico e direta e o E2E usa um u
 
 **Done when**:
 
-- [ ] Intervalo fechado aparece nas duas consultas.
-- [ ] Intervalos abertos usam somente o limite informado.
-- [ ] O limite superior e exclusivo no dia posterior, incluindo o ultimo dia solicitado.
-- [ ] Chamada sem datas preserva o comportamento historico.
-- [ ] Quando os dois limites estiverem ausentes, o fragmento SQL de data nao e incluido.
-- [ ] Ha ao menos tres casos unitarios novos sem remover os quatro atuais.
-- [ ] `pnpm test:unit` passa.
+- [x] Intervalo fechado aparece nas duas consultas.
+- [x] Intervalos abertos usam somente o limite informado.
+- [x] O limite superior e exclusivo no dia posterior, incluindo o ultimo dia solicitado.
+- [x] Chamada sem datas preserva o comportamento historico.
+- [x] Quando os dois limites estiverem ausentes, o fragmento SQL de data nao e incluido.
+- [x] Ha ao menos tres casos unitarios novos sem remover os quatro atuais.
+- [x] `pnpm test:unit` passa.
 
 **Tests**: unit
 **Gate**: quick (`pnpm test:unit`)

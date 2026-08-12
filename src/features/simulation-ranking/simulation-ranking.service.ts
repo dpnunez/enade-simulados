@@ -101,7 +101,18 @@ function buildOrderBy(input: ParsedSimulationRankingQuery) {
   `;
 }
 
-function rankingBaseSql() {
+function buildCompletedAtFilter(input: ParsedSimulationRankingQuery) {
+  const startDateFilter = input.startDate
+    ? Prisma.sql`AND attempt."completedAt" >= ${input.startDate}::date`
+    : Prisma.sql``;
+  const endDateFilter = input.endDate
+    ? Prisma.sql`AND attempt."completedAt" < (${input.endDate}::date + INTERVAL '1 day')`
+    : Prisma.sql``;
+
+  return Prisma.sql`${startDateFilter}${endDateFilter}`;
+}
+
+function rankingBaseSql(completedAtFilter: Prisma.Sql) {
   return Prisma.sql`
     FROM (
       SELECT
@@ -113,6 +124,7 @@ function rankingBaseSql() {
         COALESCE(SUM(attempt."weightedScore"), 0) AS "weightedScore"
       FROM "SimulationAttempt" attempt
       WHERE attempt.status = 'COMPLETED'
+      ${completedAtFilter}
       GROUP BY attempt."studentId"
     ) attempt_totals
     INNER JOIN "User" student ON student.id = attempt_totals."studentId"
@@ -124,6 +136,7 @@ export async function listTeacherSimulationRanking(
 ): Promise<SimulationRankingPage> {
   const parsed = simulationRankingQuerySchema.parse(input);
   const offset = (parsed.page - 1) * parsed.pageSize;
+  const completedAtFilter = buildCompletedAtFilter(parsed);
 
   const [rows, countRows] = await Promise.all([
     prisma.$queryRaw<RankingAggregateRow[]>(Prisma.sql`
@@ -146,7 +159,7 @@ export async function listTeacherSimulationRanking(
             2
           )
         END AS "accuracyPercent"
-      ${rankingBaseSql()}
+      ${rankingBaseSql(completedAtFilter)}
       ${buildOrderBy(parsed)}
       LIMIT ${parsed.pageSize}
       OFFSET ${offset}
@@ -155,6 +168,7 @@ export async function listTeacherSimulationRanking(
       SELECT COUNT(DISTINCT attempt."studentId") AS "rowCount"
       FROM "SimulationAttempt" attempt
       WHERE attempt.status = 'COMPLETED'
+      ${completedAtFilter}
     `),
   ]);
 
