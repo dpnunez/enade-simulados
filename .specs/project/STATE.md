@@ -1,6 +1,7 @@
 # State
 
-**Last Updated:** 2026-06-21T16:05:00-03:00
+**Last Updated:** 2026-08-12T00:00:00-03:00
+**Current Work:** Planned - teacher simulation ranking date filter
 
 ---
 
@@ -153,6 +154,13 @@
 **Trade-off:** Todo `/app` recebe o provider client, mas paginas publicas seguem sem esse wrapper.
 **Impact:** Mutacoes de grandes areas e questoes invalidam suas query keys; feedback transiente usa `sonner`; ranking nao foi alterado.
 
+### AD-022: Ranking de simulados recebe recorte por data de conclusao (2026-08-12)
+
+**Decision:** Planejar filtro opcional por `SimulationAttempt.completedAt`, com limites `YYYY-MM-DD`, inicio inclusivo, fim inclusivo por limite exclusivo do dia seguinte e botao explicito para aplicar/limpar. Campos vazios sao normalizados para ausencia de filtro.
+**Reason:** Professores precisam analisar uma avaliacao, mes ou janela academica; a conclusao e o momento de resultado materializado confiavel.
+**Trade-off:** A feature adiciona estado de formulario, validacao cruzada e migration de indice, sem outros recortes ou presets.
+**Impact:** Schema, SQL, tabela, E2E e indice evoluem em conjunto conforme `.specs/features/teacher-simulation-ranking-date-filter`.
+
 ## Active Blockers
 
 - `pnpm build` com `.env.local` carregado falha porque `next/font` tenta buscar Inter em `fonts.googleapis.com` e a rede nao esta disponivel/autorizada nesta sessao.
@@ -205,6 +213,7 @@
 - [x] Implementar `.specs/features/teacher-simulation-ranking`: service/API/page, React Table, fixtures E2E e gates completos
 - [x] Planejar `.specs/features/professor-content-organization`: telas separadas para grandes areas, UX de questoes e listagens com React Table/React Query
 - [x] Implementar `.specs/features/professor-content-organization`: telas separadas, APIs de leitura, tabelas React Query/React Table e feedback com sonner
+- [ ] Implementar `.specs/features/teacher-simulation-ranking-date-filter`: filtro opcional por data de conclusao, indice e cobertura unitária/E2E
 - [ ] Revisar o roadmap quando a área administrativa ganhar CRUD real
 - [x] Definir provedor de email para envio real de convites e reset de senha em produção
 - [ ] Implementar `.specs/features/gmail-smtp-email`: Gmail SMTP para convites e reset de senha
