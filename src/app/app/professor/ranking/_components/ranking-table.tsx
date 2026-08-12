@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ChevronDown,
   ChevronLeft,
@@ -17,10 +18,19 @@ import {
   type PaginationState,
   type SortingState,
 } from "@tanstack/react-table";
+import { Controller, useForm } from "react-hook-form";
+import type { z } from "zod";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -30,6 +40,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { SimulationRankingRow } from "@/features/simulation-ranking/simulation-ranking.service";
+import {
+  simulationRankingDateFilterSchema,
+  type ParsedSimulationRankingQuery,
+} from "@/features/simulation-ranking/simulation-ranking.schema";
 
 type RankingResponse = {
   success: boolean;
@@ -49,6 +63,12 @@ const sortableColumnIds = new Set([
 ]);
 
 const pageSizeOptions = [10, 20, 50, 100];
+
+type RankingDateFilter = Pick<
+  ParsedSimulationRankingQuery,
+  "startDate" | "endDate"
+>;
+type RankingDateFilterForm = z.input<typeof simulationRankingDateFilterSchema>;
 
 function formatPercent(value: number) {
   return new Intl.NumberFormat("pt-BR", {
@@ -86,6 +106,26 @@ export function RankingTable() {
   const [sorting, setSorting] = useState<SortingState>([
     { id: "weightedScore", desc: true },
   ]);
+  const [appliedDateFilter, setAppliedDateFilter] =
+    useState<RankingDateFilter>({});
+  const form = useForm<RankingDateFilterForm, unknown, RankingDateFilter>({
+    resolver: zodResolver(simulationRankingDateFilterSchema),
+    defaultValues: {
+      startDate: "",
+      endDate: "",
+    },
+  });
+
+  function applyDateFilter(values: RankingDateFilter) {
+    setAppliedDateFilter(values);
+    setPagination((current) => ({ ...current, pageIndex: 0 }));
+  }
+
+  function clearDateFilter() {
+    form.reset({ startDate: "", endDate: "" });
+    setAppliedDateFilter({});
+    setPagination((current) => ({ ...current, pageIndex: 0 }));
+  }
 
   const columns = useMemo<ColumnDef<SimulationRankingRow>[]>(
     () => [
@@ -177,6 +217,12 @@ export function RankingTable() {
       sort,
       direction: activeSort.desc ? "desc" : "asc",
     });
+    if (appliedDateFilter.startDate) {
+      params.set("startDate", appliedDateFilter.startDate);
+    }
+    if (appliedDateFilter.endDate) {
+      params.set("endDate", appliedDateFilter.endDate);
+    }
 
     async function loadRanking() {
       setIsLoading(true);
@@ -219,7 +265,7 @@ export function RankingTable() {
     void loadRanking();
 
     return () => abortController.abort();
-  }, [pagination.pageIndex, pagination.pageSize, sorting]);
+  }, [appliedDateFilter, pagination.pageIndex, pagination.pageSize, sorting]);
 
   return (
     <div className="space-y-4">
@@ -231,6 +277,73 @@ export function RankingTable() {
           </AlertDescription>
         </Alert>
       ) : null}
+
+      <form onSubmit={form.handleSubmit(applyDateFilter)} noValidate>
+        <FieldGroup className="gap-4 sm:flex-row sm:items-end">
+          <Controller
+            name="startDate"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>Data inicial</FieldLabel>
+                <Input
+                  id={field.name}
+                  name={field.name}
+                  type="date"
+                  ref={field.ref}
+                  value={typeof field.value === "string" ? field.value : ""}
+                  onBlur={field.onBlur}
+                  onChange={field.onChange}
+                  aria-invalid={fieldState.invalid}
+                  aria-describedby={
+                    fieldState.invalid ? `${field.name}-error` : undefined
+                  }
+                />
+                {fieldState.invalid ? (
+                  <FieldError
+                    id={`${field.name}-error`}
+                    errors={[fieldState.error]}
+                  />
+                ) : null}
+              </Field>
+            )}
+          />
+          <Controller
+            name="endDate"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>Data final</FieldLabel>
+                <Input
+                  id={field.name}
+                  name={field.name}
+                  type="date"
+                  ref={field.ref}
+                  value={typeof field.value === "string" ? field.value : ""}
+                  onBlur={field.onBlur}
+                  onChange={field.onChange}
+                  aria-invalid={fieldState.invalid}
+                  aria-describedby={
+                    fieldState.invalid ? `${field.name}-error` : undefined
+                  }
+                />
+                {fieldState.invalid ? (
+                  <FieldError
+                    id={`${field.name}-error`}
+                    errors={[fieldState.error]}
+                  />
+                ) : null}
+              </Field>
+            )}
+          />
+          <Field orientation="horizontal" className="w-auto gap-2">
+            <Button type="submit">Aplicar filtros</Button>
+            <Button type="button" variant="outline" onClick={clearDateFilter}>
+              Limpar filtros
+            </Button>
+          </Field>
+        </FieldGroup>
+      </form>
 
       <Table>
         <TableHeader>

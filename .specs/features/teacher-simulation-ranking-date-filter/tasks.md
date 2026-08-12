@@ -1,7 +1,7 @@
 # Teacher Simulation Ranking Date Filter Tasks
 
 **Design**: `.specs/features/teacher-simulation-ranking-date-filter/design.md`
-**Status**: Implementing (T1-T3 complete)
+**Status**: Implementing (T1-T4 complete)
 
 ---
 
@@ -80,7 +80,7 @@ Nao ha tarefas paralelas: a cadeia de contrato/servico e direta e o E2E usa um u
 **Gate**: build (`pnpm build`)
 **Commit**: `perf(ranking): index completed attempts by date`
 
-### T4: Add date-filter form and browser coverage
+### T4: Add date-filter form and browser coverage ✅
 
 **What**: Adicionar formulario RHF/Zod, aplicar/limpar, integracao de query e fixture/spec E2E deterministicas.
 **Where**: `src/app/app/professor/ranking/_components/ranking-table.tsx`, `src/tests/e2e/helpers/simulation-ranking.ts`, `src/tests/e2e/teacher-simulation-ranking.spec.ts`
@@ -92,14 +92,14 @@ Nao ha tarefas paralelas: a cadeia de contrato/servico e direta e o E2E usa um u
 
 **Done when**:
 
-- [ ] Controles possuem labels acessiveis e usam RHF + Zod resolver.
-- [ ] Aplicar os dois campos vazios envia o ranking sem parametros de data e mantem o comportamento historico.
-- [ ] Intervalo invertido mostra erro e nao chama fetch.
-- [ ] Aplicar volta a pagina um, preserva sort e propaga datas em paginacao/ordenacao.
-- [ ] Limpar restaura o historico e preserva sort.
-- [ ] Fixture cria tentativas antes/dentro/depois; E2E prova o recorte, limites na URL e limpar.
-- [ ] A spec cresce de dois para pelo menos tres casos sem perder autorizacao.
-- [ ] `pnpm test:e2e` passa.
+- [x] Controles possuem labels acessiveis e usam RHF + Zod resolver.
+- [x] Aplicar os dois campos vazios envia o ranking sem parametros de data e mantem o comportamento historico.
+- [x] Intervalo invertido mostra erro e nao chama fetch.
+- [x] Aplicar volta a pagina um, preserva sort e propaga datas em paginacao/ordenacao.
+- [x] Limpar restaura o historico e preserva sort.
+- [x] Fixture cria tentativas antes/dentro/depois; E2E prova o recorte, limites na URL e limpar.
+- [x] A spec cresce de dois para pelo menos tres casos sem perder autorizacao.
+- [x] `pnpm test:e2e` passa (28 testes).
 
 **Tests**: E2E
 **Gate**: E2E (`pnpm test:e2e`)

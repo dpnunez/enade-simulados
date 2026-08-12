@@ -1,7 +1,7 @@
 # Teacher Simulation Ranking Date Filter Design
 
 **Spec**: `.specs/features/teacher-simulation-ranking-date-filter/spec.md`
-**Status**: Draft
+**Status**: Implemented (T1-T4 complete)
 
 ---
 
