@@ -13,12 +13,11 @@ jobs:
     timeout-minutes: 2
 
     steps:
-      - name: Query Supabase health check
+      - name: Query Supabase PostgreSQL health check
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+          DATABASE_URL: ${{ secrets.SUPABASE_KEEPALIVE_DATABASE_URL }}
         run: |
-          curl --fail --silent --show-error --max-time 20 \
-            "$SUPABASE_URL/rest/v1/health_check?select=id&limit=1" \
-            -H "apikey: $SUPABASE_PUBLISHABLE_KEY" \
-            -H "Accept: application/json"
+          psql "$DATABASE_URL" \
+            --command "select id from public.health_check limit 1;" \
+            --no-align \
+            --tuples-only
