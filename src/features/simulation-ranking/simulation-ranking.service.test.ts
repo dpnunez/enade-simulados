@@ -16,6 +16,10 @@ function sqlText(value: unknown) {
   return sql.sql ?? sql.text ?? sql.strings?.join("") ?? String(value);
 }
 
+function sqlValues(value: unknown) {
+  return (value as { values?: unknown[] }).values ?? [];
+}
+
 describe("simulation-ranking.service", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -96,6 +100,79 @@ describe("simulation-ranking.service", () => {
 
     expect(queryText).toContain('SUM(attempt."correctCount")');
     expect(queryText).toContain('attempt_totals."totalQuestions"');
+  });
+
+  it("aplica intervalo fechado de conclusao na agregacao e na contagem", async () => {
+    mocks.prisma.$queryRaw
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([{ rowCount: 0n }]);
+
+    await listTeacherSimulationRanking({
+      startDate: "2026-06-01",
+      endDate: "2026-06-30",
+    });
+
+    for (const query of mocks.prisma.$queryRaw.mock.calls.map(
+      ([query]) => query,
+    )) {
+      expect(sqlText(query)).toMatch(
+        /attempt\.status = 'COMPLETED'\s+AND attempt\."completedAt"/,
+      );
+      expect(sqlText(query)).toContain('attempt."completedAt" >=');
+      expect(sqlText(query)).toContain('attempt."completedAt" <');
+      expect(sqlText(query)).toContain("INTERVAL '1 day'");
+      expect(sqlValues(query)).toEqual(
+        expect.arrayContaining(["2026-06-01", "2026-06-30"]),
+      );
+    }
+  });
+
+  it("aplica somente o limite inicial quando o intervalo esta aberto no fim", async () => {
+    mocks.prisma.$queryRaw
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([{ rowCount: 0n }]);
+
+    await listTeacherSimulationRanking({ startDate: "2026-06-01" });
+
+    for (const query of mocks.prisma.$queryRaw.mock.calls.map(
+      ([query]) => query,
+    )) {
+      expect(sqlText(query)).toContain('attempt."completedAt" >=');
+      expect(sqlText(query)).not.toContain('attempt."completedAt" <');
+      expect(sqlValues(query)).toContain("2026-06-01");
+    }
+  });
+
+  it("aplica somente o limite final exclusivo do dia seguinte quando o intervalo esta aberto no inicio", async () => {
+    mocks.prisma.$queryRaw
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([{ rowCount: 0n }]);
+
+    await listTeacherSimulationRanking({ endDate: "2026-06-30" });
+
+    for (const query of mocks.prisma.$queryRaw.mock.calls.map(
+      ([query]) => query,
+    )) {
+      expect(sqlText(query)).not.toContain('attempt."completedAt" >=');
+      expect(sqlText(query)).toContain('attempt."completedAt" <');
+      expect(sqlText(query)).toContain("INTERVAL '1 day'");
+      expect(sqlValues(query)).toContain("2026-06-30");
+    }
+  });
+
+  it("nao inclui filtro de conclusao quando as datas estao ausentes", async () => {
+    mocks.prisma.$queryRaw
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([{ rowCount: 0n }]);
+
+    await listTeacherSimulationRanking({});
+
+    for (const query of mocks.prisma.$queryRaw.mock.calls.map(
+      ([query]) => query,
+    )) {
+      expect(sqlText(query)).not.toContain('attempt."completedAt"');
+      expect(sqlValues(query)).not.toContain(expect.any(String));
+    }
   });
 
   it("rejeita parametros invalidos antes da consulta", async () => {

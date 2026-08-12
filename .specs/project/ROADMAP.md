@@ -116,6 +116,12 @@
 - Erro não desconta pontos
 - Métricas extras: simulados/formularios feitos, acertos, erros, total de questões e acerto global
 
+**Filtro temporal do ranking de estudantes** - PLANNED
+
+- Professores restringem ranking e metricas pela data de conclusao dos simulados
+- Intervalos aceitam inicio e/ou fim, com data final inclusiva
+- Ranking historico permanece o padrao sem filtros
+
 ---
 
 ## Future Considerations

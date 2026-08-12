@@ -125,6 +125,7 @@ async function createCompletedAttempt(
   input: {
     studentId: string;
     subjectFieldId: string;
+    completedAt?: Date;
     answers: Array<{
       questionId: string;
       difficulty: "EASY" | "MEDIUM" | "HARD";
@@ -142,7 +143,7 @@ async function createCompletedAttempt(
       answer.isCorrect ? total + questionWeight(answer.difficulty) : total,
     0,
   );
-  const now = new Date();
+  const now = input.completedAt ?? new Date();
   const [attempt] = await db("SimulationAttempt")
     .insert({
       id: buildE2eId("attempt"),
@@ -240,10 +241,14 @@ export async function createSimulationRankingE2eData() {
   const questionSet = await createRankingQuestionSet(db);
   const seededStudentId = await getUserIdByEmail(db, "student@enade.local");
   const secondStudentId = await ensureRankingStudent(db, "Aluno Dois");
+  const beforeRangeStudentId = await ensureRankingStudent(db, "Aluno Antes");
+  const afterRangeStudentId = await ensureRankingStudent(db, "Aluno Depois");
+  const withinRangeDate = new Date("2026-07-15T12:00:00Z");
 
   await createCompletedAttempt(db, {
     studentId: seededStudentId,
     subjectFieldId: questionSet.subjectFieldId,
+    completedAt: new Date("2026-07-10T12:00:00Z"),
     answers: questionSet.questions.map((question) => ({
       ...question,
       isCorrect: true,
@@ -253,6 +258,7 @@ export async function createSimulationRankingE2eData() {
   await createCompletedAttempt(db, {
     studentId: secondStudentId,
     subjectFieldId: questionSet.subjectFieldId,
+    completedAt: new Date("2026-07-20T12:00:00Z"),
     answers: questionSet.questions.map((question) => ({
       ...question,
       isCorrect: question.difficulty === "MEDIUM",
@@ -264,6 +270,7 @@ export async function createSimulationRankingE2eData() {
     await createCompletedAttempt(db, {
       studentId,
       subjectFieldId: questionSet.subjectFieldId,
+      completedAt: withinRangeDate,
       answers: questionSet.questions.map((question) => ({
         ...question,
         isCorrect: false,
@@ -271,11 +278,33 @@ export async function createSimulationRankingE2eData() {
     });
   }
 
+  await createCompletedAttempt(db, {
+    studentId: beforeRangeStudentId,
+    subjectFieldId: questionSet.subjectFieldId,
+    completedAt: new Date("2026-07-09T12:00:00Z"),
+    answers: questionSet.questions.map((question) => ({
+      ...question,
+      isCorrect: false,
+    })),
+  });
+
+  await createCompletedAttempt(db, {
+    studentId: afterRangeStudentId,
+    subjectFieldId: questionSet.subjectFieldId,
+    completedAt: new Date("2026-07-21T12:00:00Z"),
+    answers: questionSet.questions.map((question) => ({
+      ...question,
+      isCorrect: false,
+    })),
+  });
+
   await db.destroy();
 
   return {
     topStudentEmail: "student@enade.local",
     topStudentName: "Student Test",
     secondStudentEmail: `aluno.dois@${createdStudentEmailDomain}`,
+    beforeRangeStudentEmail: `aluno.antes@${createdStudentEmailDomain}`,
+    afterRangeStudentEmail: `aluno.depois@${createdStudentEmailDomain}`,
   };
 }

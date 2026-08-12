@@ -52,4 +52,53 @@ describe("simulation-ranking.schema", () => {
       simulationRankingQuerySchema.parse({ direction: "sideways" }),
     ).toThrow(z.ZodError);
   });
+
+  it("normaliza datas vazias como ausencia de filtro", () => {
+    expect(
+      simulationRankingQuerySchema.parse({ startDate: "", endDate: "" }),
+    ).toEqual({
+      page: 1,
+      pageSize: 20,
+      sort: "weightedScore",
+      direction: "desc",
+      startDate: undefined,
+      endDate: undefined,
+    });
+  });
+
+  it("aceita limite inicial aberto", () => {
+    expect(
+      simulationRankingQuerySchema.parse({ startDate: "2026-08-01" }),
+    ).toMatchObject({ startDate: "2026-08-01" });
+  });
+
+  it("aceita limite final aberto", () => {
+    expect(
+      simulationRankingQuerySchema.parse({ endDate: "2026-08-31" }),
+    ).toMatchObject({ endDate: "2026-08-31" });
+  });
+
+  it("aceita intervalo de datas fechado", () => {
+    expect(
+      simulationRankingQuerySchema.parse({
+        startDate: "2026-08-01",
+        endDate: "2026-08-31",
+      }),
+    ).toMatchObject({ startDate: "2026-08-01", endDate: "2026-08-31" });
+  });
+
+  it("rejeita formato de data invalido", () => {
+    expect(() =>
+      simulationRankingQuerySchema.parse({ startDate: "01/08/2026" }),
+    ).toThrow(z.ZodError);
+  });
+
+  it("rejeita intervalo de datas invertido", () => {
+    expect(() =>
+      simulationRankingQuerySchema.parse({
+        startDate: "2026-08-31",
+        endDate: "2026-08-01",
+      }),
+    ).toThrow(z.ZodError);
+  });
 });

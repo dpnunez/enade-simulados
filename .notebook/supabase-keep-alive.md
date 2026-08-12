@@ -12,7 +12,7 @@ Schema: `prisma/schema.prisma:HealthCheck` → `prisma/migrations/20260811090000
 
 Secrets: GitHub repository `SUPABASE_KEEPALIVE_DATABASE_URL`
 - Connection URL belongs to the dedicated `keepalive` PostgreSQL role
-- Prefer the Supabase Session pooler URL when the direct connection is unavailable
+- GitHub Actions requires the Supabase Session pooler URL (port `5432`), because Free direct connections are IPv6-only
 - Never use `SUPABASE_SECRET_KEY`; `src/infra/storage/supabase-storage.adapter.ts:createSupabaseStorageClient()` uses it for privileged server-side Storage access
 
 Operation: apply the Prisma migration, create the restricted database role and grant, then add the connection URL as a GitHub repository secret; trigger `workflow_dispatch` once to validate the query.
