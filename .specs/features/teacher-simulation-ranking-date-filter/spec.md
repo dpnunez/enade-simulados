@@ -85,9 +85,9 @@ O ranking acumula todas as tentativas finalizadas desde o inicio da plataforma. 
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| RANK-DATE-01 | P1: Filtrar ranking por periodo | Tasks | Pending |
+| RANK-DATE-01 | P1: Filtrar ranking por periodo | Execute | Implementing |
 | RANK-DATE-02 | P1: Filtrar ranking por periodo | Tasks | Pending |
-| RANK-DATE-03 | P1: Validar intervalo de datas | Tasks | Pending |
+| RANK-DATE-03 | P1: Validar intervalo de datas | Execute | Implementing |
 | RANK-DATE-04 | P2: Limpar filtro aplicado | Tasks | Pending |
 | RANK-DATE-05 | P1: Filtrar ranking por periodo | Tasks | Pending |
 

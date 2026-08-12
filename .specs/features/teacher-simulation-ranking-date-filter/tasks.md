@@ -13,7 +13,7 @@ T1 -> T2 -> T3 -> T4 -> T5
 
 Nao ha tarefas paralelas: a cadeia de contrato/servico e direta e o E2E usa um unico PostgreSQL compartilhado.
 
-### T1: Extend ranking date-query schema and unit coverage
+### T1: Extend ranking date-query schema and unit coverage ✅
 
 **What**: Adicionar limites ISO opcionais e validacao de intervalo ao schema, incluindo contrato reutilizavel pelo formulario.
 **Where**: `src/features/simulation-ranking/simulation-ranking.schema.ts`, `src/features/simulation-ranking/simulation-ranking.schema.test.ts`
@@ -25,12 +25,12 @@ Nao ha tarefas paralelas: a cadeia de contrato/servico e direta e o E2E usa um u
 
 **Done when**:
 
-- [ ] Sem datas preserva os defaults atuais.
-- [ ] Strings vazias de ambos os campos sao normalizadas para ausencia de filtro, sem erro de validacao.
-- [ ] Limites individuais e um intervalo fechado valido fazem parse.
-- [ ] Formato invalido e `startDate > endDate` falham antes do banco.
-- [ ] Ha pelo menos quatro casos de data novos sem remover os seis casos atuais.
-- [ ] `pnpm test:unit` passa.
+- [x] Sem datas preserva os defaults atuais.
+- [x] Strings vazias de ambos os campos sao normalizadas para ausencia de filtro, sem erro de validacao.
+- [x] Limites individuais e um intervalo fechado valido fazem parse.
+- [x] Formato invalido e `startDate > endDate` falham antes do banco.
+- [x] Ha pelo menos quatro casos de data novos sem remover os seis casos atuais.
+- [x] `pnpm test:unit` passa.
 
 **Tests**: unit
 **Gate**: quick (`pnpm test:unit`)
