@@ -108,6 +108,14 @@ model Verification {
   @@unique([identifier, value])
 }
 
+// Technical record queried by the scheduled GitHub Action to keep a Supabase
+// Free project active. It intentionally contains no application data.
+model HealthCheck {
+  id Int @id
+
+  @@map("health_check")
+}
+
 model Invitation {
   id          String           @id @default(cuid())
   email       String

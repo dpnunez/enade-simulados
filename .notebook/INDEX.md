@@ -2,8 +2,9 @@
 
 > Project intelligence — read before every mission
 
-Last updated: 2026-07-21
+Last updated: 2026-08-11
 
+- [supabase-keep-alive](supabase-keep-alive.md) — Scheduled API query prevents Supabase Free inactivity pause | flow | supabase, prisma, github-actions, database
 - [student-simulated-exams](student-simulated-exams.md) — Student attempts + safe Markdown rendering | flow | simulated-exams, markdown, e2e
 - [smtp-email](smtp-email.md) — Gmail SMTP helper shared by invite/reset adapters | flow | email, smtp, gmail
 - [env-config](env-config.md) — App base URL resolves from NEXT_PUBLIC_URL, VERCEL_URL, then local fallback; DB uses DATABASE_URL | pattern | env, auth, db
