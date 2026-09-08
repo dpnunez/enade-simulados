@@ -341,6 +341,20 @@ export function SimulationAttemptView({
               );
             })}
           </div>
+
+          {mode === "completed" &&
+          "correctAnswerExplanation" in activeQuestion.question &&
+          activeQuestion.question.correctAnswerExplanation?.trim() ? (
+            <div className="mt-5 rounded-md border bg-muted/30 p-4">
+              <h3 className="mb-2 text-sm font-medium">
+                Explicacao da resposta
+              </h3>
+              <MarkdownContent
+                value={activeQuestion.question.correctAnswerExplanation}
+                className="text-sm"
+              />
+            </div>
+          ) : null}
         </div>
 
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">

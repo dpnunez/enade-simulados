@@ -53,8 +53,17 @@ test.describe("student simulated exams", () => {
     await expect(page.getByText("Finalizado")).toBeVisible();
     await expect(page.getByText("1/2 acertos")).toBeVisible();
     await expect(page.getByText("Incorreta", { exact: true })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Explicacao da resposta" }),
+    ).toBeVisible();
+    await expect(
+      page.getByText("Explicacao deterministica para simulado."),
+    ).toBeVisible();
     await page.getByRole("button", { name: "1" }).click();
     await expect(page.getByText("Correta", { exact: true })).toBeVisible();
+    await expect(
+      page.getByText("Explicacao deterministica para simulado."),
+    ).toBeVisible();
 
     await page.getByRole("link", { name: "Voltar a lista" }).click();
 

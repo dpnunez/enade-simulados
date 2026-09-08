@@ -29,6 +29,7 @@ Persistence:
 Markdown rendering:
 - Professor question form uses `src/components/markdown/markdown-editor.tsx` with `@mdxeditor/editor` and image upload for `descriptionMarkdown`.
 - Student attempt view renders `descriptionMarkdown` and `contentMarkdown` through `src/components/markdown/markdown-content.tsx`.
+- Completed reviews render `Question.correctAnswerExplanation` below the alternatives for both correct and incorrect answers; null or blank explanations are omitted, and in-progress DTOs still exclude the field.
 - `MarkdownContent` uses `react-markdown` + `remark-gfm` + `rehype-raw` + `rehype-sanitize`; raw `<img src="https://...">` is allowed, scripts/events/unsafe protocols are stripped or neutralized.
 - Arbitrary DB image URLs use native `<img>` in the renderer; Next image optimization is not used for this content boundary.
 
