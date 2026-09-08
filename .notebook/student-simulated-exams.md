@@ -37,4 +37,7 @@ E2E:
 - `src/tests/e2e/student-simulated-exams.spec.ts` covers generation, out-of-order answers, draft saves/reopen/finalize, final review, paginated list actions, legacy redirects, and non-student denial.
 - `src/tests/e2e/helpers/simulated-exams.ts` cleans simulation attempts before deleting deterministic catalog rows.
 
-Updated: 2026-07-21
+In-progress completion UX:
+- `src/app/app/aluno/simulados/_components/simulation-attempt-view.tsx` only shows the finalize action on the last question and validates completeness in the client before `PATCH`; incomplete attempts list every pending question and navigate to the first one.
+
+Updated: 2026-09-08

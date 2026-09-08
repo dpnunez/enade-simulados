@@ -130,9 +130,22 @@ test.describe("student simulated exams", () => {
     await expect(page.getByLabel(/^Alternativa correta/)).toBeChecked();
     await expect(page.getByText("Em andamento")).toBeVisible();
 
+    await expect(
+      page.getByRole("button", { name: "Finalizar e corrigir" }),
+    ).toHaveCount(0);
+    await page.getByRole("button", { name: "Proxima" }).click();
+    await page.getByRole("button", { name: "Finalizar e corrigir" }).click();
+    await expect(page.getByText("Responda todas as questoes")).toBeVisible();
+    await expect(
+      page.getByText(
+        "A questao 2 ainda nao foi respondida. Marque uma alternativa para finalizar.",
+      ),
+    ).toBeVisible();
+
+    await page.getByLabel(/^Alternativa correta/).check();
     await page.getByRole("button", { name: "Finalizar e corrigir" }).click();
     await expect(page.getByText("Finalizado")).toBeVisible();
-    await expect(page.getByText("1/2 acertos")).toBeVisible();
+    await expect(page.getByText("2/2 acertos")).toBeVisible();
     await expect(page.getByText("Correta", { exact: true })).toBeVisible();
 
     const saveAfterFinalization = await page.evaluate(async (id) => {

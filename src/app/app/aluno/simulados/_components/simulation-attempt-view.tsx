@@ -88,6 +88,14 @@ export function SimulationAttemptView({
     () => Object.keys(selectedByQuestion).length,
     [selectedByQuestion],
   );
+  const unansweredQuestionIndexes = useMemo(
+    () =>
+      attempt.questions.flatMap((question, index) =>
+        selectedByQuestion[question.id] ? [] : [index],
+      ),
+    [attempt.questions, selectedByQuestion],
+  );
+  const isLastQuestion = activeIndex === attempt.questions.length - 1;
   const hasUnsavedChanges = useMemo(() => {
     const selectedEntries = Object.entries(selectedByQuestion);
     const savedEntries = Object.entries(savedByQuestion);
@@ -103,6 +111,23 @@ export function SimulationAttemptView({
   async function finalizeAttempt() {
     setError(null);
     setSaveMessage(null);
+
+    if (unansweredQuestionIndexes.length > 0) {
+      const unansweredQuestionNumbers = unansweredQuestionIndexes
+        .map((index) => index + 1)
+        .join(", ");
+
+      setError({
+        title: "Responda todas as questoes",
+        message:
+          unansweredQuestionIndexes.length === 1
+            ? `A questao ${unansweredQuestionNumbers} ainda nao foi respondida. Marque uma alternativa para finalizar.`
+            : `As questoes ${unansweredQuestionNumbers} ainda nao foram respondidas. Marque uma alternativa em cada uma para finalizar.`,
+      });
+      setActiveIndex(unansweredQuestionIndexes[0]);
+      return;
+    }
+
     setIsFinalizing(true);
 
     try {
@@ -313,6 +338,7 @@ export function SimulationAttemptView({
                     disabled={mode === "completed"}
                     onChange={() => {
                       if (mode === "completed") return;
+                      setError(null);
                       setSaveMessage(null);
                       setSelectedByQuestion((current) => ({
                         ...current,
@@ -367,18 +393,15 @@ export function SimulationAttemptView({
             >
               Anterior
             </Button>
-            <Button
-              type="button"
-              variant="outline"
-              disabled={activeIndex === attempt.questions.length - 1}
-              onClick={() =>
-                setActiveIndex((index) =>
-                  Math.min(attempt.questions.length - 1, index + 1),
-                )
-              }
-            >
-              Proxima
-            </Button>
+            {!isLastQuestion ? (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setActiveIndex((index) => index + 1)}
+              >
+                Proxima
+              </Button>
+            ) : null}
           </div>
 
           {mode === "in-progress" ? (
@@ -393,13 +416,15 @@ export function SimulationAttemptView({
                   <Save aria-hidden="true" />
                   {isSaving ? "Salvando..." : "Salvar respostas"}
                 </Button>
-                <Button
-                  type="button"
-                  disabled={isFinalizing}
-                  onClick={finalizeAttempt}
-                >
-                  {isFinalizing ? "Finalizando..." : "Finalizar e corrigir"}
-                </Button>
+                {isLastQuestion ? (
+                  <Button
+                    type="button"
+                    disabled={isFinalizing}
+                    onClick={finalizeAttempt}
+                  >
+                    {isFinalizing ? "Finalizando..." : "Finalizar e corrigir"}
+                  </Button>
+                ) : null}
               </div>
               {hasUnsavedChanges ? (
                 <p className="text-xs text-muted-foreground">
