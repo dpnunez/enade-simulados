@@ -1,7 +1,7 @@
 # State
 
-**Last Updated:** 2026-08-12T00:00:00-03:00
-**Current Work:** Planned - teacher simulation ranking date filter
+**Last Updated:** 2026-09-08T20:02:23-03:00
+**Current Work:** Completed - student answer explanation hotfix
 
 ---
 
@@ -182,6 +182,7 @@
 | #   | Description                       | Date       | Commit | Status  |
 | --- | --------------------------------- | ---------- | ------ | ------- |
 | 001 | Inicialização de `.specs/project` | 2026-05-23 | -      | ✅ Done |
+| 002 | Exibir explicacao na revisao do aluno | 2026-09-08 | `fix(simulados): exibir explicacao na revisao do aluno` | ✅ Done |
 
 ## Deferred Ideas
 

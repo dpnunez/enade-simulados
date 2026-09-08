@@ -29,6 +29,7 @@ Persistence:
 Markdown rendering:
 - Professor question form uses `src/components/markdown/markdown-editor.tsx` with `@mdxeditor/editor` and image upload for `descriptionMarkdown`.
 - Student attempt view renders `descriptionMarkdown` and `contentMarkdown` through `src/components/markdown/markdown-content.tsx`.
+- Completed reviews render `Question.correctAnswerExplanation` below the alternatives for both correct and incorrect answers; null or blank explanations are omitted, and in-progress DTOs still exclude the field.
 - `MarkdownContent` uses `react-markdown` + `remark-gfm` + `rehype-raw` + `rehype-sanitize`; raw `<img src="https://...">` is allowed, scripts/events/unsafe protocols are stripped or neutralized.
 - Arbitrary DB image URLs use native `<img>` in the renderer; Next image optimization is not used for this content boundary.
 
@@ -36,4 +37,7 @@ E2E:
 - `src/tests/e2e/student-simulated-exams.spec.ts` covers generation, out-of-order answers, draft saves/reopen/finalize, final review, paginated list actions, legacy redirects, and non-student denial.
 - `src/tests/e2e/helpers/simulated-exams.ts` cleans simulation attempts before deleting deterministic catalog rows.
 
-Updated: 2026-07-21
+In-progress completion UX:
+- `src/app/app/aluno/simulados/_components/simulation-attempt-view.tsx` only shows the finalize action on the last question and validates completeness in the client before `PATCH`; incomplete attempts list every pending question and navigate to the first one.
+
+Updated: 2026-09-08
